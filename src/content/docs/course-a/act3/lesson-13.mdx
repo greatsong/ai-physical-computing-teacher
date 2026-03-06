@@ -1,0 +1,332 @@
+---
+title: "13차시: 센서 데이터로 ML 입문"
+description: "Google Teachable Machine으로 소리와 센서 데이터를 분류하는 머신러닝 모델을 만드는 수업 — 교사용 지도서"
+---
+
+<a class="student-link" href="https://greatsong.github.io/ai-physical-computing/course-a/act3/lesson-13/" target="_blank" rel="noopener">
+  <span class="link-icon">📖</span>
+  <span class="link-body">
+    <span class="link-label">학생 교재 보기</span>
+    <span class="link-title">13차시: 센서 데이터로 ML 입문 — 학생용 페이지</span>
+  </span>
+  <span class="link-arrow">→</span>
+</a>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">성취기준</div>
+      Teachable Machine으로 소리 분류 모델을 학습시키고, 규칙 기반과 ML의 차이를 이해할 수 있다
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">센서</div>
+      마이크 (내장/외장) + 팀별 선택 센서
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">난이도</div>
+      ● ● ● ● ○
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">오늘의 질문</div>
+      컴퓨터가 센서 데이터만 보고 '박수 소리'와 '말소리'를 구분할 수 있을까?
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">인공지능 리터러시</span> <span class="badge badge-amber">과학적 사고</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (팀별 1세트)</h5>
+  <ul>
+    <li>컴퓨터 (크롬 브라우저, 마이크 내장 또는 외장)</li>
+    <li>Raspberry Pi Pico 2 WH + Grove Shield (센서 데이터 수집용)</li>
+    <li>팀별 선택 센서 (가속도 센서 등)</li>
+    <li>USB 데이터 케이블</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>크롬 브라우저 — Teachable Machine 접속 확인</li>
+    <li>Thonny IDE (센서 데이터 CSV 수집용)</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>Teachable Machine 사이트(teachablemachine.withgoogle.com)가 학교 네트워크에서 접속 가능한지 확인</li>
+    <li>마이크 권한이 크롬에서 허용되어 있는가</li>
+    <li>교실이 너무 시끄럽지 않은가 — 소리 분류 활동 시 배경 소음에 영향</li>
+    <li>Teachable Machine 오디오 프로젝트를 미리 한 번 만들어 보고 흐름을 숙지</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 1">도입 5분</div>
+  <div class="main" style="flex: 7.5">전개 37분</div>
+  <div class="wrap-up" style="flex: 1.5">정리 8분</div>
+</div>
+
+---
+
+## 도입 (5분)
+
+<div class="teacher-script">
+  <p>"자, 여러분 지금까지 센서로 데이터를 모으고, 대시보드로 보여주는 것까지 했어요. 그런데 한 가지 질문이 있어요."</p>
+  <p>"대시보드에 숫자가 나오면, <strong>누가</strong> 그걸 보고 판단하죠? 사람이요, 맞죠? 온도가 28도면 사람이 '덥다'고 판단하고, CO2가 1000ppm이면 사람이 '환기해야겠다'고 판단해요."</p>
+  <p>"그런데 만약 <strong>컴퓨터가 스스로</strong> 판단할 수 있다면? 센서 데이터를 보고 '이건 박수 소리야', '이건 환기가 필요한 상태야' 하고 자동으로 분류할 수 있다면?"</p>
+  <p>"그게 바로 <strong>머신러닝</strong>이에요. 오늘 직접 체험해봅시다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"AI가 소리를 구분할 수 있어요?"</span>
+  <span class="bubble">"시리처럼요?"</span>
+  <span class="bubble">"어떻게 배우는 거예요?"</span>
+  <span class="bubble">"코딩을 많이 해야 해요?"</span>
+</div>
+
+<div class="teacher-script">
+  <p>"코딩 한 줄 안 해도 됩니다. 오늘 쓸 도구는 <strong>Teachable Machine</strong>이에요. 여러분이 할 일은 딱 세 가지 — 데이터를 모으고, 이름표를 붙이고, 학습 버튼을 누르는 것. 나머지는 컴퓨터가 합니다."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>"ML = 어렵고 복잡한 수학"이라는 선입견을 깨는 것이 도입의 핵심입니다. "데이터를 모으고, 이름표를 붙이고, 학습 버튼을 누르면 끝"이라는 단순한 메시지로 시작하세요. 원리는 활동 후에 되짚어 줍니다.</p>
+</div>
+
+---
+
+## 전개 (37분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">머신러닝 개념 안내</span>
+  <span class="step-time">5분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"ML을 한 문장으로 설명하면: <strong>데이터에서 패턴을 찾아 새로운 데이터를 예측하는 기술</strong>이에요."</p>
+  <p>"ML의 과정은 다섯 단계입니다. 데이터 수집, 라벨링(이름표 붙이기), 학습, 테스트, 배포. 오늘 이 다섯 단계를 전부 체험합니다."</p>
+  <p>"그리고 하나 더 — 지금까지 우리가 쓴 방식은 <strong>규칙 기반</strong>이었어요. '온도가 28도 이상이면 덥다'처럼 사람이 직접 규칙을 만들었죠. ML은 이 규칙을 <strong>데이터에서 자동으로</strong> 찾아내는 거예요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"아, if문 대신 데이터로 배우는 거구나"</span>
+  <span class="bubble">"라벨링이 뭐예요?"</span>
+</div>
+
+<div class="teaching-tip">
+  <p>"라벨링"은 "이름표 붙이기"로 쉽게 설명하세요. "사과 사진에 '사과'라고 적는 것, 박수 소리에 '박수'라고 적는 것이 라벨링"이라고 하면 바로 이해합니다. AI, ML, DL의 관계는 "AI > ML > DL" 포함 관계로 간단히 짚고 넘어가세요.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">소리 분류 모델 만들기 (Teachable Machine)</span>
+  <span class="step-time">15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"자, Teachable Machine에 접속하세요. teachablemachine.withgoogle.com 입니다. '시작하기'를 누르고, <strong>'오디오 프로젝트'</strong>를 선택하세요."</p>
+  <p>"클래스를 세 개 만들 거예요. Class 1은 '박수', Class 2는 '노크', Class 3은 '말소리'. 이름을 바꿔주세요."</p>
+  <p>"이제 각 클래스마다 '마이크' 버튼을 누르고 8초 이상 녹음합니다. 박수를 여러 번 쳐주세요 — 세게도, 약하게도, 빠르게도, 느리게도. 다양할수록 좋아요."</p>
+  <p>"세 클래스 다 녹음했으면, <strong>'모델 학습시키기'</strong> 버튼을 누르세요. 30초&#126;1분 걸립니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"녹음 중!"</span>
+  <span class="bubble">"박수 다 쳤어요"</span>
+  <span class="bubble">"학습 중이래요, 기다려야 해요"</span>
+  <span class="bubble">"오! 박수치니까 '박수'라고 나와요!"</span>
+  <span class="bubble">"근데 노크를 박수로 인식해요&#126;"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"마이크가 안 돼요"</div>
+    <span class="label">원인</span>
+    <span class="value">크롬에서 마이크 권한이 차단되어 있음</span>
+    <span class="label">대응</span>
+    <span class="value">주소 표시줄 왼쪽의 자물쇠 아이콘을 눌러 마이크 권한을 '허용'으로 변경하세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"학습이 안 끝나요"</div>
+    <span class="label">원인</span>
+    <span class="value">데이터가 너무 많거나 컴퓨터 사양이 낮음</span>
+    <span class="label">대응</span>
+    <span class="value">각 클래스의 샘플 수를 줄이거나, 다른 탭을 모두 닫고 기다리세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"박수랑 노크를 계속 헷갈려요"</div>
+    <span class="label">원인</span>
+    <span class="value">박수와 노크의 음향 특성이 유사함 (둘 다 짧은 충격음)</span>
+    <span class="label">대응</span>
+    <span class="value">이것이 바로 학습 포인트입니다! "왜 헷갈릴까?"를 분석하는 것이 ML의 핵심. 더 다양한 샘플을 추가하거나, 카테고리를 재정의해 보세요</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>이 시점에 순회하며 확인:</strong></p>
+  <ol>
+    <li>Teachable Machine에 접속하여 오디오 프로젝트를 시작했는가</li>
+    <li>최소 3개 클래스를 만들고 각각 녹음했는가</li>
+    <li>배경 소음(Background Noise)도 녹음했는가 — 빠뜨리기 쉬움</li>
+    <li>학습 완료 후 실시간 테스트를 해보고 있는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>박수와 노크의 혼동은 <strong>의도적으로 활용</strong>하세요. "왜 컴퓨터가 헷갈릴까?"라는 질문이 ML의 핵심 개념(데이터 품질, 클래스 간 유사성)으로 이어집니다. "사람도 눈 감고 들으면 구분하기 어려울 수 있잖아요?"라고 연결하면 자연스럽습니다. 과학 시간의 "표본의 대표성"과 연결하여 "학습 데이터가 편향되면 모델도 편향된다"는 원리를 강조할 수 있습니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">센서 데이터 수집 및 라벨링</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"소리 분류를 해봤으니, 이번에는 <strong>센서 데이터</strong>로 ML을 해볼까요?"</p>
+  <p>"예를 들어, 가속도 센서로 '가만히 있기', '걷기', '흔들기' 세 가지 동작의 데이터를 모아요. 각 동작에 이름표(라벨)를 붙이면, 나중에 ML이 새로운 동작을 자동으로 분류할 수 있어요."</p>
+  <p>"교재의 센서 데이터 수집 코드를 보세요. LABEL 값을 바꿔가며 동작별로 10초씩 데이터를 수집합니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"가만히 있기 데이터 수집!"</span>
+  <span class="bubble">"이제 걷기 하자"</span>
+  <span class="bubble">"CSV 파일이 만들어졌어요"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"센서가 없는 팀인데요?"</div>
+    <span class="label">대응</span>
+    <span class="value">소리 분류 활동에 더 집중하세요. 추가 클래스(손가락 튕기기, 휘파람 등)를 만들어 모델 정확도를 개선하는 활동으로 대체합니다</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>라벨(LABEL)을 바꿔가며 동작별 데이터를 수집하고 있는가</li>
+    <li>CSV 파일이 정상적으로 저장되고 있는가</li>
+    <li>수집 중 동작을 실제로 수행하고 있는가 (가만히 있어야 할 때 움직이면 잘못된 라벨)</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>라벨링의 중요성을 강조하세요. "걷기 데이터를 모으면서 멈춰 있으면, 컴퓨터가 '걷기 = 멈추기'라고 잘못 배워요. <strong>라벨과 실제 동작이 일치해야</strong> 좋은 모델이 나옵니다." 이것이 "Garbage in, Garbage out" 원칙입니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">모델 테스트 및 개선</span>
+  <span class="step-time">7분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"학습된 모델의 정확도를 테스트해 봅시다. 학습에 사용하지 않은 <strong>새로운 소리</strong>를 들려주세요."</p>
+  <p>"모델이 맞추면 좋은 거고, 틀리면 — 틀리는 것도 좋은 거예요! '왜 틀렸을까?'를 분석하는 게 ML에서 가장 중요한 질문이거든요."</p>
+  <p>"정확도가 낮다면 세 가지를 시도해 보세요. 데이터를 더 추가하거나, 카테고리를 합치거나 쪼개거나, 배경 소음 샘플을 더 다양하게 수집하세요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"약하게 치면 노크로 인식해요"</span>
+  <span class="bubble">"데이터 더 추가하니까 정확도가 올라갔어요!"</span>
+  <span class="bubble">"신뢰도가 87%래요"</span>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>새로운 입력으로 테스트하고 있는가 (학습 데이터와 같은 소리만 반복하면 의미 없음)</li>
+    <li>오분류 원인을 분석하려고 시도하는가</li>
+    <li>신뢰도(confidence) 점수를 읽고 해석하고 있는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>오분류 분석이 이 단계의 핵심입니다. "박수와 노크가 헷갈리는 이유"를 학생들에게 물어보세요. "둘 다 짧고 세게 나는 소리라서"라는 대답이 나오면, "맞아요, 주파수 스펙트럼이 유사하기 때문이에요"라고 한 단계 깊이를 더해주세요. 다양한 녹음(세기, 속도, 사람)으로 정확도가 올라가는 실험은 "데이터 다양성"의 가치를 체감하게 합니다.</p>
+</div>
+
+---
+
+## 정리 (8분)
+
+<div class="teacher-script">
+  <p>"오늘 여러분이 한 일을 정리해볼까요? 박수를 쳤더니 컴퓨터가 '이것은 박수입니다'라고 말했어요."</p>
+  <p>"여러분이 한 일은 네 가지예요. 데이터를 모았고, 이름표를 붙였고, 학습 버튼을 눌렀고, 컴퓨터가 스스로 패턴을 찾았어요."</p>
+  <p>"이것이 <strong>머신러닝의 전부</strong>입니다. 복잡한 수학이 아니라, <strong>좋은 데이터를 모으고 적절한 라벨을 붙이는 것</strong>이 핵심이에요."</p>
+  <p>"자율주행차가 사람과 신호등을 구분하는 것도, 시리가 '시리야'를 알아듣는 것도 같은 원리예요. 데이터→패턴 학습→예측."</p>
+  <p>"다음 시간에는 팀별 <strong>발표</strong>입니다. 대시보드 시연과 ML 결과를 포함해서 5분 발표를 준비해 오세요!"</p>
+</div>
+
+<div class="teaching-tip">
+  <p>"규칙 기반 vs ML"의 차이를 마지막에 한 번 더 정리해 주세요. "규칙 기반은 사람이 if문을 직접 만드는 것, ML은 데이터에서 컴퓨터가 자동으로 if문을 찾는 것"이라고 비유하면 학생들이 잘 이해합니다. 과학 시간의 "표본의 대표성"과 연결하여 "학습 데이터가 편향되면 모델도 편향된다"는 원리를 다시 강조하세요.</p>
+</div>
+
+---
+
+## 차별화 전략
+
+<div class="differentiation">
+  <div class="fast-learner">
+    <p><strong>빠른 학생에게:</strong></p>
+    <ul>
+      <li>박수와 노크의 혼동 원인을 주파수 스펙트럼 유사성으로 분석해 보세요</li>
+      <li>녹음 다양성(세기, 속도, 사람)을 높여 정확도 향상 실험을 수행하고 결과를 검증하세요</li>
+      <li>"학습 데이터 편향→모델 편향" 원리를 과학 시간의 "표본의 대표성"과 연결하여 설명해 보세요</li>
+      <li>친구에게 "AI 선생님" 비유로 ML 핵심 개념을 전달해 보세요</li>
+    </ul>
+  </div>
+  <div class="slow-learner">
+    <p><strong>느린 학생에게:</strong></p>
+    <ul>
+      <li>교사와 함께 소리 녹음과 모델 학습 과정을 천천히 진행하세요</li>
+      <li>클래스를 2개(박수/배경소음)로 줄여서 시작하세요</li>
+      <li>자신의 박수 소리를 모델이 맞추는 것을 확인하는 것만으로 충분합니다</li>
+      <li>센서 데이터 수집은 건너뛰고 소리 분류에 집중하세요</li>
+    </ul>
+  </div>
+</div>
+
+---
+
+## 평가 루브릭
+
+<table class="rubric-table">
+  <thead>
+    <tr><th>등급</th><th>관찰 기록 예시</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="badge badge-purple">S</span></td>
+      <td>Teachable Machine에서 박수/노크 혼동 원인을 주파수 스펙트럼 유사성으로 분석함. 녹음 다양성을 높여 정확도 향상을 실험으로 검증함. "학습 데이터 편향→모델 편향" 원리를 과학 시간의 "표본의 대표성"과 연결하여 설명함. 친구에게 "AI 선생님" 비유로 핵심 개념을 전달함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">A</span></td>
+      <td>박수/노크 혼동 원인을 주파수 관점에서 분석함. 다양한 샘플로 정확도 향상 실험을 수행함. "규칙 기반 vs ML" 차이를 구체적 예시와 함께 설명함. 데이터 편향이 모델에 미치는 영향을 논의함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">B</span></td>
+      <td>Teachable Machine에서 3가지 소리 클래스를 녹음하고 모델을 학습시킴. 오분류 원인을 분석함. "규칙 기반 vs ML" 차이를 이해함. 가속도 데이터 라벨링을 수행함. 신뢰도 점수를 해석함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-amber">C</span></td>
+      <td>소리 분류 모델을 만들고 테스트함. 오분류 이유를 "소리가 비슷해서"로 설명함. 라벨링의 중요성을 인식함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">D</span></td>
+      <td>교사 안내로 소리를 녹음하고 모델을 학습시킴. 자신의 박수 소리를 모델이 맞추는 것을 확인함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">E</span></td>
+      <td>교사 지원으로 녹음과 모델 학습을 체험함. 컴퓨터가 소리를 구분할 수 있다는 것을 인식함.</td>
+    </tr>
+  </tbody>
+</table>

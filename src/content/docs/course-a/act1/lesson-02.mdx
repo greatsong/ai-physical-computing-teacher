@@ -1,0 +1,394 @@
+---
+title: "2차시: 빛을 숫자로"
+description: "빛 센서로 밝기를 측정하고, Thonny Plotter로 첫 실시간 그래프를 그리기 — 교사용 지도서"
+---
+
+<a class="student-link" href="https://greatsong.github.io/ai-physical-computing/course-a/act1/lesson-02/" target="_blank" rel="noopener">
+  <span class="link-icon">📖</span>
+  <span class="link-body">
+    <span class="link-label">학생 교재 보기</span>
+    <span class="link-title">2차시: 빛을 숫자로 — 학생용 페이지</span>
+  </span>
+  <span class="link-arrow">→</span>
+</a>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">성취기준</div>
+      아날로그 센서를 연결하고 ADC 값을 백분율로 변환하며, Plotter로 실시간 그래프를 그릴 수 있다
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">센서</div>
+      빛 센서 (Grove Light Sensor v1.2, 아날로그)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">난이도</div>
+      ● ○ ○ ○ ○
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">오늘의 질문</div>
+      지금 이 교실은 정말 '밝은' 편일까?
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">데이터 리터러시</span> <span class="badge badge-amber">컴퓨팅 사고력</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (팀별 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH + Grove Shield</li>
+    <li>빛 센서 (Grove Light Sensor v1.2)</li>
+    <li>Grove 케이블 1개</li>
+    <li>USB 데이터 케이블 (충전 전용 불가!)</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE 설치 및 Pico 인식 확인</li>
+    <li>Thonny Plotter 기능 확인 (View > Plotter)</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>한 세트라도 미리 테스트 — A0 포트에서 ADC 값이 나오는가</li>
+    <li>Plotter 동작 확인 — 숫자만 print했을 때 그래프가 그려지는가</li>
+    <li>교실 조명 상태 확인 (창가/복도 쪽 밝기 차이가 있을수록 좋음)</li>
+    <li>스마트폰 손전등을 사용할 수 있는 환경인지 확인</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 1">도입 5분</div>
+  <div class="main" style="flex: 7">전개 35분</div>
+  <div class="wrap-up" style="flex: 2">정리 10분</div>
+</div>
+
+---
+
+## 도입 (5분)
+
+<div class="teacher-script">
+  <p>"여러분, 지금 이 교실이 밝은 편이라고 생각하나요? 한번 느껴보세요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"밝아요!"</span>
+  <span class="bubble">"그냥 보통이요"</span>
+  <span class="bubble">"창가는 밝은데 복도 쪽은 좀 어두워요"</span>
+  <span class="bubble">"형광등이 켜져 있으니까 밝죠"</span>
+</div>
+
+<div class="teacher-script">
+  <p>"재밌네요, 또 다 다르죠? 지난 시간에 온도도 자리마다 달랐잖아요. 오늘은 '밝기'를 숫자로 바꿔볼 겁니다."</p>
+  <p>"그런데 온도 센서는 I2C라는 디지털 통신을 썼죠? 오늘 빛 센서는 달라요. <strong>아날로그 센서</strong>입니다. 연속적인 전압 신호를 Pico가 <strong>0&#126;65535 사이의 숫자</strong>로 바꿔줘요. 이걸 ADC, Analog-to-Digital Converter라고 합니다."</p>
+  <p>"그리고 오늘의 하이라이트! 숫자를 <strong>실시간 그래프</strong>로 볼 겁니다. Thonny에 있는 Plotter라는 기능을 씁니다. 여러분의 <strong>첫 대시보드 경험</strong>이 될 거예요."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>1차시와의 연결고리를 의식적으로 만드세요. "지난 시간에는 온도를 측정했고, 오늘은 빛을 측정합니다. 둘 다 '느낌'을 '숫자'로 바꾸는 작업입니다." 이 반복 패턴이 학생들에게 센서 활용의 일반 원리를 인식하게 합니다.</p>
+</div>
+
+---
+
+## 전개 (35분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">센서 연결</span>
+  <span class="step-time">5분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"빛 센서를 꺼내세요. 앞면에 동그란 부품이 보이죠? 그게 포토레지스터예요. 빛이 많으면 저항이 줄고, 빛이 적으면 저항이 늘어납니다."</p>
+  <p>"이 센서를 Grove 케이블로 Shield의 <strong>A0 포트</strong>에 연결하세요. 주의! 지난 시간에 쓴 I2C 포트가 아니라, <strong>A0이라고 적힌 아날로그 포트</strong>입니다."</p>
+  <p>"USB 케이블 연결하고, Thonny 실행하세요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"A0 찾았어요!"</span>
+  <span class="bubble">"지난 시간이랑 포트가 다르네요"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"I2C 포트에 꽂았는데 이상한 값이 나와요"</div>
+    <span class="label">원인</span>
+    <span class="value">빛 센서는 아날로그 센서 — I2C 포트에서는 올바른 ADC 값을 읽을 수 없음</span>
+    <span class="label">대응</span>
+    <span class="value">A0 포트로 옮기게 안내하세요. "아날로그 센서는 A 포트!"라고 기억시키세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"센서를 A0에 꽂았는데 값이 계속 0이에요"</div>
+    <span class="label">원인</span>
+    <span class="value">케이블 접촉 불량 또는 센서 방향 문제</span>
+    <span class="label">대응</span>
+    <span class="value">케이블을 뺐다가 끝까지 밀어 넣으세요. 센서 앞면(포토레지스터)이 위를 향하는지 확인</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>이 시점에 순회하며 확인:</strong></p>
+  <ol>
+    <li>빛 센서가 <strong>A0 포트</strong>에 연결되어 있는가 (I2C에 꽂는 실수가 흔함)</li>
+    <li>1차시의 DHT20이 여전히 I2C에 꽂혀 있다면 분리했는가 (혼동 방지)</li>
+    <li>Thonny 하단에 'MicroPython (Raspberry Pi Pico)' 표시되는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>1차시에서 I2C 포트를 사용했기 때문에, 이번에도 같은 포트에 꽂는 학생이 많습니다. "아날로그 센서는 A 포트, I2C 센서는 I2C 포트"라는 규칙을 반복해주세요.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">ADC로 밝기 읽기</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이제 코드를 입력합니다. 스크린을 보세요."</p>
+  <p>"이번 코드에서 핵심은 <code>read_u16()</code>이에요. u16이 뭘까요? unsigned 16-bit, 즉 부호 없는 16비트 정수라는 뜻입니다. 0부터 65535까지의 값이 나와요."</p>
+  <p>"65535가 왜 이 숫자냐면, 2의 16승이 65536이거든요. 0부터 세니까 최대가 65535입니다. 수학 시간에 거듭제곱 배웠죠? 바로 그겁니다."</p>
+  <p>"코드를 입력하고 실행 버튼 누르세요."</p>
+</div>
+
+<details class="student-content">
+  <summary>학생 교재 — 기본 코드</summary>
+  <div class="content">
+
+```python
+from machine import ADC, Pin
+import time
+
+# 아날로그 입력 설정 (Grove Shield A0 포트 = GP26)
+light = ADC(Pin(26))
+
+# 2초마다 밝기 측정하여 출력
+while True:
+    raw_value = light.read_u16()           # 0 &#126; 65535
+    brightness = round(raw_value / 65535 * 100, 1)  # 퍼센트로 변환
+    print(f"밝기: {brightness}%")
+    print(brightness)  # Plotter용 숫자만 출력
+    time.sleep(2)
+```
+
+  </div>
+</details>
+
+<div class="student-voice">
+  <span class="bubble">"밝기: 47.2%라고 나와요!"</span>
+  <span class="bubble">"손으로 가리면 10%까지 내려가요!"</span>
+  <span class="bubble">"손전등 비추면 90% 넘어요!"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"값이 항상 0이에요"</div>
+    <span class="label">원인</span>
+    <span class="value">센서 연결 불량이거나, 코드에서 Pin 번호가 틀린 경우</span>
+    <span class="label">대응</span>
+    <span class="value">Pin(26)인지 확인하고, 케이블을 다시 꽂으세요. A0 포트가 GP26에 연결되어 있습니다</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"값이 계속 65535로 최대예요"</div>
+    <span class="label">원인</span>
+    <span class="value">센서에 강한 직사광선이 들어오거나, 내부 회로 문제</span>
+    <span class="label">대응</span>
+    <span class="value">센서를 손으로 살짝 가려 값이 변하는지 확인하세요. 변하지 않으면 케이블 교체</span>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>코드 해설 포인트</strong> — 실행 후 3가지만 짚어주세요:</p>
+  <ol>
+    <li><code>ADC(Pin(26))</code> — "ADC는 아날로그를 디지털로 바꿔주는 변환기예요. 26번 핀이 A0 포트에 연결되어 있어요."</li>
+    <li><code>read_u16()</code> — "0&#126;65535 사이의 숫자로 읽어요. 어두우면 0에 가깝고, 밝으면 65535에 가까워요."</li>
+    <li><code>raw_value / 65535 * 100</code> — "이 식이 0&#126;65535를 0&#126;100%로 바꿔주는 거예요. 비례식이죠."</li>
+  </ol>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">Plotter로 실시간 그래프 그리기</span>
+  <span class="step-time">8분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"자, 이제 오늘의 하이라이트입니다. Thonny 메뉴에서 <strong>View > Plotter</strong>를 클릭하세요. 화면 아래쪽에 그래프 영역이 나타날 거예요."</p>
+  <p>"코드를 다시 실행하세요. print로 출력한 숫자가 자동으로 그래프가 됩니다."</p>
+  <p>"이제 실험해봅시다! 센서를 손으로 천천히 가려보세요. 그래프가 어떻게 변하나요? 그다음, 빠르게 손을 떼보세요. 차이가 보이죠?"</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"와, 그래프가 움직여요!"</span>
+  <span class="bubble">"손으로 가리니까 쑥 내려가요!"</span>
+  <span class="bubble">"빨리 가리면 그래프가 급하게 떨어져요"</span>
+  <span class="bubble">"손전등 비추면 확 올라가요!"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"Plotter에 그래프가 안 나와요"</div>
+    <span class="label">원인</span>
+    <span class="value">print 출력에 텍스트가 섞여 있으면 Plotter가 인식하지 못함</span>
+    <span class="label">대응</span>
+    <span class="value">Plotter용으로 <code>print(brightness)</code>처럼 숫자만 출력하는 줄이 있는지 확인하세요</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>Plotter가 열려 있고 실시간 그래프가 움직이는가</li>
+    <li>센서에 손을 대거나 떼면서 그래프 변화를 체험하고 있는가</li>
+    <li>"빨리 가리면 기울기가 급하고, 천천히 가리면 기울기가 완만하다"를 발견했는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>Plotter 그래프의 <strong>기울기</strong>에 주목하게 유도하세요. "빠르게 가리면 그래프가 급하게 떨어지고, 천천히 가리면 완만하게 떨어지죠? 이 기울기가 바로 '변화의 속도'입니다." 수학 시간의 '변화율' 개념과 자연스럽게 연결됩니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">교실 곳곳 밝기 측정</span>
+  <span class="step-time">12분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이제 진짜 실험입니다. 교실 안 <strong>5곳 이상</strong>의 밝기를 측정하세요."</p>
+  <p>"창가, 커튼 친 곳, 교실 중앙, 복도 쪽, 사물함 앞 — 어디든 좋습니다. 각 위치에서 센서를 <strong>천장 방향</strong>으로 향하게 하고, 값이 안정될 때까지 5초 정도 기다린 뒤 기록하세요."</p>
+  <p>"기록표에 체감 밝기도 같이 적으세요. 나중에 센서 값과 비교할 겁니다."</p>
+</div>
+
+<details class="student-content">
+  <summary>학생 교재 — 밝기 기록표</summary>
+  <div class="content">
+
+| 장소 | 체감 밝기 (밝음/보통/어두움) | 센서 값 (0&#126;65535) | 밝기 (%) | 비고 |
+|------|---------------------------|-------------------|----------|------|
+| 창가 (햇빛) | | | | |
+| 창가 (커튼) | | | | |
+| 교실 중앙 | | | | |
+| 복도 쪽 | | | | |
+| 사물함 앞 | | | | |
+
+  </div>
+</details>
+
+<div class="student-voice">
+  <span class="bubble">"창가는 78%인데 복도 쪽은 32%밖에 안 돼요!"</span>
+  <span class="bubble">"커튼 치면 확 줄어요"</span>
+  <span class="bubble">"사물함 앞이 제일 어두워요, 15%"</span>
+  <span class="bubble">"근데 사물함 앞이 느낌은 그렇게 어둡지 않았는데?"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"같은 자리인데 값이 자꾸 바뀌어요"</div>
+    <span class="label">대응</span>
+    <span class="value">센서 방향을 일정하게 유지하세요. 센서 앞에 손이나 몸 그림자가 가리지 않는지 확인하세요</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>최소 5곳 이상 측정하고 있는가</li>
+    <li>센서 방향을 일정하게 유지하고 있는가</li>
+    <li>체감 밝기와 센서 값을 모두 기록하고 있는가</li>
+    <li>"체감은 밝은데 센서 값은 낮다"는 불일치를 발견한 팀이 있는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>"체감과 센서 값의 불일치"가 이번 활동의 핵심 발견입니다. 우리 눈은 밝기 변화에 자동 적응하지만 센서는 절대적인 값을 측정합니다. 이 차이를 발견한 팀이 있으면 전체에 공유하게 하세요.</p>
+</div>
+
+---
+
+## 정리 (10분)
+
+<div class="teacher-script">
+  <p>"오늘 수업을 정리해봅시다. 지난 시간에는 온도를 숫자로, 오늘은 빛을 숫자로 바꿨습니다."</p>
+  <p>"지난 시간과 다른 점이 뭐였죠? 맞아요, 포트가 달랐어요. 온도 센서는 I2C 포트, 빛 센서는 A0 포트. 센서마다 통신 방식이 다르기 때문입니다."</p>
+  <p>"그리고 오늘은 <strong>그래프</strong>를 처음 그려봤습니다. 숫자만 보면 '47%'가 높은 건지 낮은 건지 감이 잘 안 오는데, 그래프로 보면 변화가 한눈에 보이죠? 이게 바로 <strong>시각화</strong>의 힘입니다."</p>
+  <p>"여러분 기록표에서 체감 밝기와 센서 값이 다른 곳이 있었나요? 우리 눈은 자동으로 밝기에 적응하지만, 센서는 그렇지 않아요. 센서가 주는 객관적인 숫자 — 이것이 데이터의 가치입니다."</p>
+  <p>"다음 시간에는 센서 데이터를 <strong>파일로 자동 저장</strong>합니다. 화면에 흘러가는 데이터를 영구적으로 기록하는 '자동 기록 시스템'을 만들어볼 거예요."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>1차시(온도)와 2차시(빛)의 공통점과 차이점을 정리해주세요. 공통점: "느낌을 숫자로 바꾸고, 데이터로 비교한다." 차이점: "센서 종류, 포트, 통신 방식이 다르다." 이 패턴을 인식하면 3차시 이후 새로운 센서를 만나도 학생들이 스스로 접근할 수 있습니다.</p>
+</div>
+
+---
+
+## 차별화 전략
+
+<div class="differentiation">
+  <div class="fast-learner">
+    <p><strong>빠른 학생에게:</strong></p>
+    <ul>
+      <li>도전 코드 실행: 밝기 판정(밝음/보통/어두움) + Pico 내장 LED 연동</li>
+      <li>"65535가 왜 이 숫자인지 계산해보세요" — 2의 16승 = 65536, 0부터 세면 최대 65535</li>
+      <li>교실 조도 기준 조사: 학교 교실에 적정한 조도(lux)가 얼마인지 찾아보기</li>
+      <li>Plotter 그래프의 기울기와 수학 시간 '변화율' 개념의 연결</li>
+    </ul>
+  </div>
+  <div class="slow-learner">
+    <p><strong>느린 학생에게:</strong></p>
+    <ul>
+      <li>코드를 복사/붙여넣기해서 실행하는 것부터 시작</li>
+      <li>센서를 손으로 가리고 떼면서 Plotter 그래프 변화만 관찰</li>
+      <li>"올라가면 밝아지는 거, 내려가면 어두워지는 거"만 이해해도 충분</li>
+      <li>측정은 3곳만 해도 괜찮음</li>
+    </ul>
+  </div>
+</div>
+
+---
+
+## 평가 루브릭
+
+<table class="rubric-table">
+  <thead>
+    <tr><th>등급</th><th>관찰 기록 예시</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="badge badge-purple">S</span></td>
+      <td>ADC 값 65535가 16비트에서 유래함을 알아내고 수학 시간 거듭제곱과 연결. Plotter 기울기를 변화율과 연결. 교실 조도 기준 조사 과제를 자발 설정. 친구에게 코드를 줄 단위로 설명해 줌.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">A</span></td>
+      <td>ADC 16비트 유래를 발견하고 0&#126;100% 변환 공식의 수학적 의미를 설명. Plotter 기울기를 관찰하며 변화의 경사도를 표현. 교실 조도 데이터로 학습 환경 개선안 제시.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">B</span></td>
+      <td>빛 센서를 A0에 연결하고 ADC 값을 백분율로 변환. Plotter 실시간 그래프에서 변화 속도를 체감하고 시각화의 가치를 인식. 교실 5곳 밝기를 표로 정리.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-amber">C</span></td>
+      <td>센서 연결 후 Plotter로 그래프 확인. 손으로 가리면 내려가고 손전등 비추면 올라가는 인과관계 이해. 3곳 이상 측정.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">D</span></td>
+      <td>교사 안내에 따라 센서 연결하고 Plotter 사용. 그래프 움직임에 재미를 느낌.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">E</span></td>
+      <td>교사 도움으로 센서 연결과 Plotter 실행. 그래프가 변한다는 것을 관찰.</td>
+    </tr>
+  </tbody>
+</table>

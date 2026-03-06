@@ -1,0 +1,415 @@
+---
+title: "3차시: 자동 기록 시스템"
+description: "센서 데이터를 CSV 파일로 자동 저장하는 데이터 로거 만들기 — 교사용 지도서"
+---
+
+<a class="student-link" href="https://greatsong.github.io/ai-physical-computing/course-a/act1/lesson-03/" target="_blank" rel="noopener">
+  <span class="link-icon">📖</span>
+  <span class="link-body">
+    <span class="link-label">학생 교재 보기</span>
+    <span class="link-title">3차시: 자동 기록 시스템 — 학생용 페이지</span>
+  </span>
+  <span class="link-arrow">→</span>
+</a>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">성취기준</div>
+      파일 입출력을 사용하여 센서 데이터를 CSV 파일로 자동 저장하고, 수동 기록과의 차이를 설명할 수 있다
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">센서</div>
+      DHT20 (온습도, I2C)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">난이도</div>
+      ● ● ○ ○ ○
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">오늘의 질문</div>
+      센서 데이터를 사람 대신 컴퓨터가 기록하면 어떤 점이 달라질까?
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">데이터 리터러시</span> <span class="badge badge-amber">컴퓨팅 사고력</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (팀별 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH + Grove Shield</li>
+    <li>DHT20 온습도 센서 (I2C)</li>
+    <li>Grove 케이블 1개</li>
+    <li>USB 데이터 케이블 (충전 전용 불가!)</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE 설치 및 Pico 인식 확인</li>
+    <li>Thonny 파일 탐색기에서 Pico 내부 파일 확인하는 방법 숙지</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>한 세트로 미리 CSV 저장 테스트 — data.csv가 Pico 안에 생성되는가</li>
+    <li>Thonny 파일 탐색기에서 Pico 내부 파일이 보이는지 확인</li>
+    <li>Pico 내부 저장 공간이 충분한지 확인 (이전 파일이 너무 많으면 삭제)</li>
+    <li>5분간 자동 기록 대기 시간에 학생들이 할 수 있는 센서 자극 활동 준비</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 1">도입 5분</div>
+  <div class="main" style="flex: 7">전개 35분</div>
+  <div class="wrap-up" style="flex: 2">정리 10분</div>
+</div>
+
+---
+
+## 도입 (5분)
+
+<div class="teacher-script">
+  <p>"여러분, 지난 두 시간 동안 온도도 측정하고, 밝기도 측정하고, 그래프도 그렸죠. 그런데 한 가지 문제가 있었어요. 뭘까요?"</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"Thonny를 끄면 데이터가 사라져요"</span>
+  <span class="bubble">"그래프도 다시 못 봐요"</span>
+  <span class="bubble">"매번 눈으로 보고 적어야 해요"</span>
+</div>
+
+<div class="teacher-script">
+  <p>"맞아요! 지금까지 우리가 측정한 데이터는 화면에 잠깐 나왔다가 사라졌습니다. 기록하려면 눈으로 보고 손으로 적어야 했죠."</p>
+  <p>"과학 시간에 실험할 때 어떻게 하나요? 온도계를 보면서 노트에 적죠. 그런데 사람이 기록하면 문제가 있어요. 깜빡 잊을 수도 있고, 시간 간격이 들쑥날쑥할 수도 있고, 글씨를 잘못 읽을 수도 있죠."</p>
+  <p>"오늘은 이 문제를 해결합니다. 코드가 센서 데이터를 <strong>자동으로 파일에 기록</strong>하게 만들 거예요. 파일 형식은 <strong>CSV</strong> — 쉼표로 구분된 데이터 파일입니다. 엑셀이나 구글 시트에서 바로 열 수 있어요."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>"파일에 저장한다"는 개념이 학생들에게 추상적일 수 있습니다. "여러분이 일기를 쓰듯이, 코드가 센서의 일기를 자동으로 써주는 거예요"라는 비유가 효과적입니다. 또한 "기상청 자동 기상 관측소도 이런 원리로 24시간 데이터를 기록한다"고 덧붙이면 실용성을 느끼게 됩니다.</p>
+</div>
+
+---
+
+## 전개 (35분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">DHT20 재연결 + 1차시 코드 복습</span>
+  <span class="step-time">5분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"1차시에서 사용했던 DHT20 센서를 다시 꺼내세요. <strong>I2C 포트</strong>에 연결합니다. 기억나죠? 지난 시간 빛 센서는 A0이었고, DHT20은 I2C입니다."</p>
+  <p>"먼저 1차시 기본 코드를 실행해서 센서가 정상 작동하는지 확인하세요. 온도와 습도가 출력되면 준비 완료입니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"온도 나와요, 24.1도!"</span>
+  <span class="bubble">"I2C 포트 맞죠?"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"1차시 코드를 저장 안 했어요"</div>
+    <span class="label">대응</span>
+    <span class="value">학생 교재 1차시 페이지에서 기본 코드를 복사해오게 하세요. 이것도 "기록의 중요성"을 상기시키는 기회입니다</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"OSError가 나요"</div>
+    <span class="label">원인</span>
+    <span class="value">DHT20이 I2C 포트가 아닌 다른 포트에 연결됨</span>
+    <span class="label">대응</span>
+    <span class="value">I2C0 또는 I2C1 포트에 연결했는지 확인하세요</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>이 시점에 순회하며 확인:</strong></p>
+  <ol>
+    <li>DHT20이 <strong>I2C 포트</strong>에 올바르게 연결되어 있는가</li>
+    <li>1차시 코드 실행 시 온도/습도가 정상 출력되는가</li>
+    <li>이전 차시의 빛 센서가 함께 꽂혀 있어서 혼란을 주지 않는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>이 단계는 빠르게 지나가세요. 1차시를 이미 했으므로 대부분 빠르게 연결합니다. 단, 1차시 코드를 저장하지 않은 팀이 많을 수 있습니다. 이 경험 자체가 "데이터를 저장해야 한다"는 오늘 수업의 동기를 강화합니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">파일 저장 코드 작성</span>
+  <span class="step-time">12분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"센서가 정상인 것을 확인했으니, 이제 오늘의 핵심 코드를 작성합니다. 화면에 출력하는 것에 더해, <strong>파일에도 동시에 저장</strong>하는 코드예요."</p>
+  <p>"코드를 입력하기 전에 핵심 개념 3개를 알려줄게요. 파일을 다루는 건 크게 세 단계입니다."</p>
+  <p>"첫째, <code>open()</code> — 파일을 엽니다. 노트를 펼치는 거예요."</p>
+  <p>"둘째, <code>write()</code> — 파일에 씁니다. 노트에 글을 쓰는 거예요."</p>
+  <p>"셋째, <code>flush()</code> — 즉시 저장합니다. 연필로 꾹 눌러 쓰는 거예요. 이게 없으면 데이터가 메모리에만 남아서, 전원이 꺼지면 사라질 수 있어요."</p>
+  <p>"자, 코드를 입력하세요."</p>
+</div>
+
+<details class="student-content">
+  <summary>학생 교재 — CSV 자동 저장 코드</summary>
+  <div class="content">
+
+```python
+from machine import I2C, Pin
+import time
+
+# I2C 통신 설정 (Grove Shield I2C0 포트)
+i2c = I2C(0, sda=Pin(8), scl=Pin(9))
+
+# DHT20 센서 초기화
+sensor_addr = 0x38
+time.sleep(0.1)
+
+def read_dht20():
+    """DHT20 센서에서 온도와 습도를 읽습니다"""
+    i2c.writeto(sensor_addr, bytes([0xAC, 0x33, 0x00]))
+    time.sleep(0.08)
+    data = i2c.readfrom(sensor_addr, 7)
+
+    humidity = ((data[1] << 12) | (data[2] << 4) | (data[3] >> 4)) / 1048576 * 100
+    temperature = (((data[3] & 0x0F) << 16) | (data[4] << 8) | data[5]) / 1048576 * 200 - 50
+
+    return round(temperature, 1), round(humidity, 1)
+
+# CSV 파일 생성 (헤더 쓰기)
+file = open("data.csv", "w")
+file.write("측정번호,온도(C),습도(%)\n")
+
+# 10초마다 측정하여 파일에 저장
+count = 1
+while True:
+    temp, humi = read_dht20()
+
+    # 화면에 출력
+    print(f"[{count}] 온도: {temp}°C, 습도: {humi}%")
+
+    # 파일에 저장
+    file.write(f"{count},{temp},{humi}\n")
+    file.flush()  # 버퍼를 비워 즉시 저장
+
+    count += 1
+    time.sleep(10)
+```
+
+  </div>
+</details>
+
+<div class="student-voice">
+  <span class="bubble">"1차시 코드랑 비슷한데, 아래에 file 부분이 추가됐어요"</span>
+  <span class="bubble">"flush가 뭐예요?"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">SyntaxError — file.write 줄에서 에러</div>
+    <span class="label">원인</span>
+    <span class="value">f-string의 따옴표나 중괄호가 빠진 경우</span>
+    <span class="label">대응</span>
+    <span class="value"><code>f"&#123;count&#125;,&#123;temp&#125;,&#123;humi&#125;\n"</code> 형식이 정확한지 확인하세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"코드는 실행되는데 파일이 안 보여요"</div>
+    <span class="label">원인</span>
+    <span class="value">Thonny 파일 탐색기를 열지 않았거나, 컴퓨터에서 실행한 경우</span>
+    <span class="label">대응</span>
+    <span class="value">Thonny 왼쪽 파일 탐색기에서 "Raspberry Pi Pico"를 클릭하세요. 코드를 Pico에 저장하고 실행해야 합니다</span>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>코드 해설 포인트</strong> — 파일 입출력 3개 함수의 역할만 명확히 하세요:</p>
+  <ol>
+    <li><code>open("data.csv", "w")</code> — "w는 write, 쓰기 모드예요. 파일이 없으면 새로 만들어요."</li>
+    <li><code>file.write()</code> — "한 줄의 데이터를 파일에 씁니다. CSV니까 쉼표로 구분하고, \n으로 줄바꿈해요."</li>
+    <li><code>file.flush()</code> — "바로바로 저장해! 라는 뜻이에요. 이게 없으면 데이터가 메모리에 쌓여 있다가 한꺼번에 쓰는데, 그 전에 전원이 꺼지면 날아가요."</li>
+  </ol>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">5분간 자동 기록 실행</span>
+  <span class="step-time">8분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"코드를 실행하세요. 10초마다 한 번씩 측정합니다. 5분 동안 약 30개의 데이터가 쌓일 거예요."</p>
+  <p>"기다리는 동안 그냥 앉아 있지 마세요! 센서에 자극을 줘보세요."</p>
+  <p>"첫 번째 — 센서 위에 손을 올려서 온도를 올려보세요. 몇 번째 데이터에서 올라가는지 기억해두세요."</p>
+  <p>"두 번째 — 입김을 불어서 습도를 올려보세요."</p>
+  <p>"세 번째 — 아무것도 하지 말고 자연 상태를 관찰하세요."</p>
+  <p>"나중에 CSV 파일을 열면, '아, 이때 내가 손을 올렸구나'라는 게 데이터에 남아 있을 겁니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"[5] 온도: 25.8도래요, 손 올렸더니 올라갔어요!"</span>
+  <span class="bubble">"입김 불었더니 습도가 68%까지 올라갔어요!"</span>
+  <span class="bubble">"자동으로 기록되니까 편하다!"</span>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>Shell에 측정 번호가 증가하며 출력되고 있는가</li>
+    <li>센서에 자극을 주면서 능동적으로 실험하고 있는가</li>
+    <li>5분이 지나면 Stop 버튼을 눌러 코드를 정지시킬 준비가 되어 있는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>5분 대기 시간을 지루하지 않게 만드는 것이 중요합니다. "몇 번째 데이터에서 손을 올렸는지 기억해두세요"라고 미리 과제를 주면, 나중에 CSV 파일에서 해당 시점의 데이터 변화를 찾는 활동으로 자연스럽게 연결됩니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">CSV 파일 확인 및 분석</span>
+  <span class="step-time">5분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"Stop 버튼을 누르세요. 이제 Thonny 왼쪽 파일 탐색기에서 'Raspberry Pi Pico'를 클릭하고, <strong>data.csv</strong> 파일을 더블클릭해서 열어보세요."</p>
+  <p>"보이나요? 측정번호, 온도, 습도가 쉼표로 구분되어 깔끔하게 저장되어 있죠. 이게 CSV 형식이에요."</p>
+  <p>"손을 올렸던 시점의 데이터를 찾아보세요. 온도가 올라간 구간이 보이나요?"</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"와, 30개 데이터가 다 저장돼 있어요!"</span>
+  <span class="bubble">"7번째쯤에 온도가 26도로 올라갔어요, 그때 손 올렸거든요"</span>
+  <span class="bubble">"사람이 적는 것보다 훨씬 정확하고 빠르네요"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"data.csv 파일이 없어요"</div>
+    <span class="label">원인</span>
+    <span class="value">코드를 컴퓨터에서 실행했거나, Pico에 저장하지 않고 실행한 경우</span>
+    <span class="label">대응</span>
+    <span class="value">코드를 Pico에 저장(Save to Raspberry Pi Pico)한 뒤 다시 실행하세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"파일에 헤더만 있고 데이터가 없어요"</div>
+    <span class="label">원인</span>
+    <span class="value">코드 실행 직후 바로 정지했거나, 센서 에러로 write까지 도달하지 못한 경우</span>
+    <span class="label">대응</span>
+    <span class="value">코드를 다시 실행하고 최소 10초 이상 기다린 뒤 정지하세요</span>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p>CSV 파일을 열었을 때 "와!" 하는 반응이 나오도록 유도하세요. "여러분이 아무것도 안 했는데 30개 데이터가 쌓여 있죠? 코드가 대신 기록해준 겁니다." 이 성취감이 파일 입출력에 대한 동기를 만듭니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">5</span>
+  <span class="step-title">토론 — 자동 vs 수동 기록</span>
+  <span class="step-time">5분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"자, 이제 모둠에서 이야기해봅시다. 사람이 직접 기록하는 것과 코드가 자동으로 기록하는 것, 뭐가 다를까요?"</p>
+  <p>"힌트를 드릴게요. 정확성, 간격의 일정성, 빠짐없는 기록, 24시간 가동 — 이런 관점에서 생각해보세요."</p>
+  <p>"그리고 자동 기록에도 한계가 있을까요? 센서가 고장 나면? 저장 공간이 부족하면?"</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"사람은 깜빡할 수 있는데 코드는 안 빠트려요"</span>
+  <span class="bubble">"10초마다 정확하게 기록되잖아요"</span>
+  <span class="bubble">"근데 센서가 고장 나면 잘못된 데이터를 계속 기록하겠죠?"</span>
+  <span class="bubble">"농장에서 온도 관리할 때 쓸 수 있을 것 같아요"</span>
+</div>
+
+<div class="teaching-tip">
+  <p>토론에서 "표본 간격의 일정성"과 "인간 오차 제거"라는 키워드가 나오도록 유도하세요. 모든 팀이 발표할 필요는 없고, 핵심적인 의견 2&#126;3개를 골라 전체에 공유하면 됩니다.</p>
+</div>
+
+---
+
+## 정리 (10분)
+
+<div class="teacher-script">
+  <p>"오늘 수업을 정리해봅시다. 1차시에서 온도를 읽고, 2차시에서 빛을 그래프로 보고, 오늘 3차시에서 데이터를 파일로 저장했습니다."</p>
+  <p>"오늘 배운 핵심은 <strong>세 단계</strong>예요. 파일을 열고(<code>open</code>), 데이터를 쓰고(<code>write</code>), 즉시 저장한다(<code>flush</code>). 이 세 단계만 기억하면 됩니다."</p>
+  <p>"여러분이 만든 30줄짜리 데이터 — 이건 그냥 숫자가 아니에요. 여러분이 손을 올렸을 때 온도가 올라가고, 입김을 불었을 때 습도가 올라간 <strong>이야기</strong>가 담겨 있습니다. 데이터를 읽는다는 건 그 이야기를 찾아가는 과정입니다."</p>
+  <p>"기상청의 자동 기상 관측소, 병원의 환자 모니터링, 공장의 품질 관리 — 모두 오늘 여러분이 만든 것과 같은 원리입니다. 사람이 24시간 지켜볼 수 없는 것을 코드가 대신 기록합니다."</p>
+  <p>"다음 시간에는 드디어 <strong>OLED 디스플레이</strong>를 사용합니다. Shell 창이 아니라 작은 화면에 센서 데이터를 보여주는 나만의 <strong>대시보드</strong>를 만들어볼 거예요. 1막의 마지막 차시입니다!"</p>
+</div>
+
+<div class="teaching-tip">
+  <p>1&#126;3차시의 흐름을 한 줄로 정리해주세요. "센서로 읽고(1차시) → 그래프로 보고(2차시) → 파일로 기록한다(3차시)." 이 흐름이 4차시의 대시보드까지 이어지면서, 1막 전체가 하나의 스토리로 연결된다는 것을 인식시키세요.</p>
+</div>
+
+---
+
+## 차별화 전략
+
+<div class="differentiation">
+  <div class="fast-learner">
+    <p><strong>빠른 학생에게:</strong></p>
+    <ul>
+      <li>도전 코드 실행: <code>for</code> 반복문으로 30회 자동 종료 + 파일 크기 확인</li>
+      <li>CSV에 타임스탬프를 추가하는 코드를 자발적으로 작성해보기</li>
+      <li>30개 데이터의 최대/최소/평균을 계산해보기</li>
+      <li>"이 자동 기록 시스템을 과학 시간 실험에 활용하면 어떨까?" 생각해보기</li>
+    </ul>
+  </div>
+  <div class="slow-learner">
+    <p><strong>느린 학생에게:</strong></p>
+    <ul>
+      <li>코드를 복사/붙여넣기해서 실행하는 것부터 시작</li>
+      <li>CSV 파일이 만들어졌다는 것만 확인하면 성공</li>
+      <li>"파일을 열고, 쓰고, 저장한다" 세 단계만 기억하게 하기</li>
+      <li>파일 내용을 함께 읽으며 "이 숫자가 온도고, 이 숫자가 습도야" 확인</li>
+    </ul>
+  </div>
+</div>
+
+---
+
+## 평가 루브릭
+
+<table class="rubric-table">
+  <thead>
+    <tr><th>등급</th><th>관찰 기록 예시</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="badge badge-purple">S</span></td>
+      <td>CSV에 타임스탬프를 추가하는 코드를 자발적으로 작성. 30개 데이터의 기초 통계 요약. 과학 시간 실험 보고서와 연결하여 자동 기록의 신뢰도를 설명. 친구에게 "파일은 열고, 쓰고, 닫는 세 단계"라고 설명.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">A</span></td>
+      <td>CSV에 타임스탬프 추가하여 시계열 추적. 기초 통계 활용. 수동 vs 자동 기록의 차이를 "표본 간격의 일정성"과 "인간 오차 제거" 관점에서 정리.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">B</span></td>
+      <td>CSV 자동 저장 코드 작성. open/write/flush 역할 구분. 5분간 30개 데이터 수집하며 온도 상승 실험. "코드는 정확한 간격으로 빠짐없이 저장한다"고 정리.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-amber">C</span></td>
+      <td>예제 참고하여 CSV 저장 완성. 센서 데이터가 파일에 쌓이는 것 확인. for 반복문과 flush 이해.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">D</span></td>
+      <td>교사 안내에 따라 코드 입력하고 CSV 생성 확인. 파일을 열어 숫자 저장 확인.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">E</span></td>
+      <td>교사 도움으로 코드 실행. 파일이 만들어졌다는 것을 이해.</td>
+    </tr>
+  </tbody>
+</table>

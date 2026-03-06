@@ -1,0 +1,86 @@
+---
+title: "AI 피지컬 컴퓨팅 교사용 지도서"
+description: "센서+바이브코딩+대시보드+머신러닝 — 15차시 수업 지도서"
+template: splash
+hero:
+  tagline: "15차시 수업의 교사 스크립트, 예상 학생 반응, 지도 팁을 한곳에"
+  actions:
+    - text: 1차시부터 보기
+      link: /ai-physical-computing-teacher/course-a/act1/lesson-01/
+      icon: right-arrow
+    - text: 수업 전 준비
+      link: /ai-physical-computing-teacher/guide/preparation/
+      icon: seti:config
+      variant: secondary
+    - text: 학생용 교재
+      link: https://greatsong.github.io/ai-physical-computing/
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+이 지도서는 학생용 교재 **"AI 피지컬 컴퓨팅"**과 동일한 구조로 구성되어 있습니다.
+각 차시 페이지에서 학생이 보는 내용과 함께, **교사 스크립트**, **예상 학생 반응**, **지도 팁**, **평가 기준**을 확인할 수 있습니다.
+
+---
+
+## 지도서 구성 요소
+
+<CardGrid stagger>
+  <Card title="교사 스크립트" icon="document">
+    도입(5분) → 전개(35분) → 정리(10분) 구간별로
+    **교사가 말할 문장**을 구체적으로 제시합니다.
+    자신의 스타일에 맞게 변형하여 사용하세요.
+  </Card>
+
+  <Card title="예상 학생 반응" icon="comment">
+    올바른 반응과 오개념 반응을 구분하여 제시합니다.
+    **"학생이 이렇게 말하면 이렇게 대응하세요"** 형태로
+    현장에서 바로 활용할 수 있습니다.
+  </Card>
+
+  <Card title="지도 팁" icon="star">
+    시간 배분, 순회 지도 포인트, 자주 발생하는 오류와 대응법,
+    빠른 학생/느린 학생 차별화 전략을 포함합니다.
+  </Card>
+
+  <Card title="평가 루브릭" icon="list-format">
+    차시별 S~E 등급의 관찰 기록 예시와
+    성취기준 체크리스트를 제공합니다.
+    생활기록부 작성에 직접 활용할 수 있습니다.
+  </Card>
+</CardGrid>
+
+---
+
+## 수업 전체 흐름
+
+| 단계 | 1막 (1~4차시) | 2막 (5~10차시) | 3막 (11~15차시) |
+|------|--------------|----------------|-----------------|
+| **코딩 방식** | 직접 코딩 | 바이브 코딩 (AI 활용) | 바이브 코딩 + ML |
+| **교사 역할** | 시범 → 따라하기 지도 | 프롬프트 작성 코칭 | 프로젝트 퍼실리테이터 |
+| **핵심 관찰** | 코드-동작 대응 이해 | AI 코드 비판적 검토 | 설계-구현-발표 전 과정 |
+| **주요 위험** | 포트/배선 혼동 | AI 코드 맹신 | 팀 내 역할 불균형 |
+
+---
+
+## 빠른 링크
+
+<CardGrid>
+  <LinkCard
+    title="지도서 사용법"
+    description="이 지도서의 구성 요소와 활용 방법을 안내합니다."
+    href="/ai-physical-computing-teacher/guide/how-to-use/"
+  />
+  <LinkCard
+    title="수업 전 준비"
+    description="장비 세팅, 소프트웨어 설치, 학생 그룹 편성 가이드."
+    href="/ai-physical-computing-teacher/guide/preparation/"
+  />
+  <LinkCard
+    title="평가 루브릭"
+    description="S~E 등급 관찰 기록 예시. 생기부 작성에 직접 활용 가능."
+    href="/ai-physical-computing-teacher/appendix/rubric/"
+  />
+</CardGrid>

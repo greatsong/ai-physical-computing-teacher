@@ -1,0 +1,25 @@
+
+export default new Map([
+["src/content/docs/index.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Findex.mdx&astroContentModuleFlag=true")],
+["src/content/docs/course-b/guide.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fcourse-b%2Fguide.mdx&astroContentModuleFlag=true")],
+["src/content/docs/appendix/observation.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fappendix%2Fobservation.mdx&astroContentModuleFlag=true")],
+["src/content/docs/guide/how-to-use.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fguide%2Fhow-to-use.mdx&astroContentModuleFlag=true")],
+["src/content/docs/guide/preparation.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fguide%2Fpreparation.mdx&astroContentModuleFlag=true")],
+["src/content/docs/course-a/act1/lesson-01.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fcourse-a%2Fact1%2Flesson-01.mdx&astroContentModuleFlag=true")],
+["src/content/docs/appendix/troubleshooting.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fappendix%2Ftroubleshooting.mdx&astroContentModuleFlag=true")],
+["src/content/docs/course-a/act1/lesson-02.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fcourse-a%2Fact1%2Flesson-02.mdx&astroContentModuleFlag=true")],
+["src/content/docs/course-a/act1/lesson-03.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fcourse-a%2Fact1%2Flesson-03.mdx&astroContentModuleFlag=true")],
+["src/content/docs/appendix/rubric.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fappendix%2Frubric.mdx&astroContentModuleFlag=true")],
+["src/content/docs/course-a/act3/lesson-11.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fcourse-a%2Fact3%2Flesson-11.mdx&astroContentModuleFlag=true")],
+["src/content/docs/course-a/act3/lesson-13.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fcourse-a%2Fact3%2Flesson-13.mdx&astroContentModuleFlag=true")],
+["src/content/docs/course-a/act1/lesson-04.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fcourse-a%2Fact1%2Flesson-04.mdx&astroContentModuleFlag=true")],
+["src/content/docs/course-a/act3/lesson-12.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fcourse-a%2Fact3%2Flesson-12.mdx&astroContentModuleFlag=true")],
+["src/content/docs/course-a/act3/lesson-14.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fcourse-a%2Fact3%2Flesson-14.mdx&astroContentModuleFlag=true")],
+["src/content/docs/course-a/act3/lesson-15.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fcourse-a%2Fact3%2Flesson-15.mdx&astroContentModuleFlag=true")],
+["src/content/docs/course-a/act2/lesson-05.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fcourse-a%2Fact2%2Flesson-05.mdx&astroContentModuleFlag=true")],
+["src/content/docs/course-a/act2/lesson-06.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fcourse-a%2Fact2%2Flesson-06.mdx&astroContentModuleFlag=true")],
+["src/content/docs/course-a/act2/lesson-07.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fcourse-a%2Fact2%2Flesson-07.mdx&astroContentModuleFlag=true")],
+["src/content/docs/course-a/act2/lesson-08.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fcourse-a%2Fact2%2Flesson-08.mdx&astroContentModuleFlag=true")],
+["src/content/docs/course-a/act2/lesson-09.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fcourse-a%2Fact2%2Flesson-09.mdx&astroContentModuleFlag=true")],
+["src/content/docs/course-a/act2/lesson-10.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fdocs%2Fcourse-a%2Fact2%2Flesson-10.mdx&astroContentModuleFlag=true")]]);
+		

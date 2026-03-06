@@ -1,0 +1,449 @@
+---
+title: "4차시: 첫 번째 대시보드"
+description: "OLED 디스플레이에 센서 데이터를 실시간으로 표시하는 나만의 대시보드 만들기 — 교사용 지도서"
+---
+
+<a class="student-link" href="https://greatsong.github.io/ai-physical-computing/course-a/act1/lesson-04/" target="_blank" rel="noopener">
+  <span class="link-icon">📖</span>
+  <span class="link-body">
+    <span class="link-label">학생 교재 보기</span>
+    <span class="link-title">4차시: 첫 번째 대시보드 — 학생용 페이지</span>
+  </span>
+  <span class="link-arrow">→</span>
+</a>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">성취기준</div>
+      다중 센서와 OLED 디스플레이를 동시에 연결하고, 센서 데이터를 실시간으로 표시하는 대시보드를 설계할 수 있다
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">센서</div>
+      DHT20 (온습도, I2C) + 빛 센서 (아날로그) + OLED SSD1306 (I2C)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">난이도</div>
+      ● ● ○ ○ ○
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">오늘의 질문</div>
+      센서 데이터를 Shell 창이 아니라, 화면에 예쁘게 보여줄 수는 없을까?
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">컴퓨팅 사고력</span> <span class="badge badge-amber">디자인 사고</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (팀별 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH + Grove Shield</li>
+    <li>DHT20 온습도 센서 (I2C)</li>
+    <li>빛 센서 (Grove Light Sensor v1.2, 아날로그)</li>
+    <li>OLED 디스플레이 (SSD1306, 128x64, I2C)</li>
+    <li>Grove 케이블 3개 (센서 2개 + 디스플레이 1개)</li>
+    <li>USB 데이터 케이블</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE 설치 및 Pico 인식 확인</li>
+    <li>ssd1306 라이브러리 설치 (Thonny > 도구 > 패키지 관리 > ssd1306 검색)</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>ssd1306 라이브러리를 <strong>반드시 사전에</strong> 모든 Pico에 설치 — 수업 중 설치하면 시간 부족</li>
+    <li>한 세트로 3개 장치 동시 연결 테스트 — I2C scan으로 0x38(DHT20)과 0x3C(OLED) 확인</li>
+    <li>OLED에 "Hello!" 텍스트 출력 확인</li>
+    <li>I2C Y-스플리터 케이블이 있으면 준비 (없으면 I2C1 포트 사용 안내)</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 1">도입 5분</div>
+  <div class="main" style="flex: 7">전개 35분</div>
+  <div class="wrap-up" style="flex: 2">정리 10분</div>
+</div>
+
+---
+
+## 도입 (5분)
+
+<div class="teacher-script">
+  <p>"여러분, 지금까지 센서 데이터를 어디에서 확인했나요?"</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"Thonny Shell 창이요"</span>
+  <span class="bubble">"Plotter 그래프요"</span>
+  <span class="bubble">"CSV 파일이요"</span>
+</div>
+
+<div class="teacher-script">
+  <p>"맞아요, 전부 컴퓨터 화면에서 봤죠. 그런데 현실 세계의 모니터링 시스템을 생각해보세요. 병원의 심박수 모니터, 자동차 계기판, 공장의 온도 모니터 — 이런 것들은 전용 화면이 있잖아요. 컴퓨터를 열지 않아도 바로 볼 수 있죠."</p>
+  <p>"오늘은 이걸 만들어봅니다. 이 작은 OLED 화면에 온도, 습도, 밝기를 동시에 실시간으로 보여주는 <strong>나만의 대시보드</strong>를 만들 거예요."</p>
+  <p>"그리고 오늘은 특별합니다. 1차시 센서(DHT20), 2차시 센서(빛), 그리고 새로운 OLED 디스플레이까지 — <strong>3개 장치를 동시에</strong> 연결합니다. 1막의 모든 것을 통합하는 마지막 차시입니다."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>"대시보드"라는 단어를 일상 경험과 연결하세요. "자동차 운전할 때 속도, 연료, RPM을 한눈에 보죠? 그게 대시보드예요. 여러분도 교실 환경을 한눈에 볼 수 있는 대시보드를 만듭니다." 학생들이 대시보드의 목적을 직관적으로 이해하게 됩니다.</p>
+</div>
+
+---
+
+## 전개 (35분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">세 장치 연결하기</span>
+  <span class="step-time">7분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"오늘은 3개를 동시에 연결합니다. 차근차근 가봅시다."</p>
+  <p>"첫째, <strong>DHT20</strong>을 I2C0 포트에 연결하세요. 1차시에서 했던 것과 같습니다."</p>
+  <p>"둘째, <strong>OLED 디스플레이</strong>를 I2C1 포트에 연결하세요. DHT20과 OLED 둘 다 I2C 통신을 쓰지만, 주소가 다릅니다. DHT20은 0x38, OLED는 0x3C. 주소가 다르니까 충돌 없이 같이 쓸 수 있어요."</p>
+  <p>"셋째, <strong>빛 센서</strong>를 A0 포트에 연결하세요. 2차시에서 했던 것과 같습니다."</p>
+  <p>"연결이 끝나면, Thonny Shell에서 I2C 스캔 코드를 실행해서 장치가 제대로 인식되는지 확인합니다."</p>
+</div>
+
+<details class="student-content">
+  <summary>학생 교재 — I2C 장치 확인 코드</summary>
+  <div class="content">
+
+```python
+from machine import I2C, Pin
+i2c = I2C(0, sda=Pin(8), scl=Pin(9))
+print([hex(a) for a in i2c.scan()])
+# ['0x38', '0x3c'] → DHT20과 OLED가 보입니다
+```
+
+  </div>
+</details>
+
+<div class="student-voice">
+  <span class="bubble">"3개를 한꺼번에 꽂으니까 복잡해요"</span>
+  <span class="bubble">"0x38이랑 0x3c가 나와요!"</span>
+  <span class="bubble">"주소가 다르니까 충돌이 안 나는 거군요"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"I2C scan에서 하나만 나와요"</div>
+    <span class="label">원인</span>
+    <span class="value">DHT20이나 OLED 중 하나가 제대로 연결되지 않은 경우. 또는 둘이 다른 I2C 버스에 연결된 경우</span>
+    <span class="label">대응</span>
+    <span class="value">같은 I2C0 버스에 연결했는지 확인하세요. I2C1에 연결했다면 코드에서 I2C(1, sda=Pin(6), scl=Pin(7))로 별도 스캔하세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"I2C scan에서 아무것도 안 나와요"</div>
+    <span class="label">원인</span>
+    <span class="value">케이블 불량이거나, 모든 장치가 잘못된 포트에 연결된 경우</span>
+    <span class="label">대응</span>
+    <span class="value">케이블을 하나씩 뺐다가 다시 꽂으며 확인하세요. 아날로그 포트에 I2C 장치를 꽂지 않았는지 확인</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"ssd1306 모듈을 찾을 수 없다는 에러"</div>
+    <span class="label">원인</span>
+    <span class="value">ssd1306 라이브러리가 Pico에 설치되지 않음</span>
+    <span class="label">대응</span>
+    <span class="value">Thonny > 도구 > 패키지 관리 > "ssd1306" 검색 > 설치. 인터넷 연결 필요</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>이 시점에 순회하며 확인:</strong></p>
+  <ol>
+    <li>DHT20이 <strong>I2C 포트</strong>에, 빛 센서가 <strong>A0 포트</strong>에, OLED가 <strong>I2C 포트</strong>에 연결되어 있는가</li>
+    <li>I2C scan에서 <strong>0x38과 0x3c</strong> 두 개가 모두 보이는가</li>
+    <li>ssd1306 라이브러리가 설치되어 있는가 — 미설치 팀이 있으면 즉시 설치 안내</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>이 단계에서 시간을 가장 많이 쓰게 됩니다. 3개 장치 동시 연결은 학생들에게 처음이라 혼란스러울 수 있습니다. <strong>ssd1306 라이브러리 미설치</strong>가 가장 흔한 문제이므로, 수업 전에 반드시 모든 Pico에 미리 설치해두세요.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">OLED에 글자 띄우기</span>
+  <span class="step-time">5분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"연결 확인이 끝났으면, OLED에 글자를 띄워봅시다. 간단한 코드로 'Hello!'를 출력해볼 거예요."</p>
+  <p>"OLED 제어는 3단계입니다. <code>fill(0)</code>으로 화면을 지우고, <code>text()</code>로 글자를 버퍼에 그리고, <code>show()</code>로 화면에 전송합니다. 그림을 먼저 도화지에 그리고 나서 벽에 거는 것과 같아요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"와, OLED에 글자가 나와요!"</span>
+  <span class="bubble">"글자가 진짜 작아요"</span>
+  <span class="bubble">"한글은 안 되나요?"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"OLED 화면이 아무것도 안 나와요"</div>
+    <span class="label">원인</span>
+    <span class="value">I2C 주소 불일치 또는 케이블 불량</span>
+    <span class="label">대응</span>
+    <span class="value">I2C scan으로 0x3c가 보이는지 확인하세요. 안 보이면 케이블 교체</span>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p>"한글은 안 되나요?"라는 질문이 반드시 나옵니다. "SSD1306은 내장 폰트가 영어와 숫자만 지원해요. 한글을 쓰려면 폰트 파일이 별도로 필요합니다. 오늘은 영어로 진행하고, 나중에 AI에게 한글 폰트 적용을 시켜볼 수도 있어요."라고 답하세요.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">실시간 대시보드 만들기</span>
+  <span class="step-time">13분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이제 진짜 대시보드를 만듭니다. 온도, 습도, 밝기 — 세 가지 센서 데이터를 OLED 화면 하나에 동시에 보여주는 코드를 작성합니다."</p>
+  <p>"OLED 해상도는 128x64 픽셀입니다. 가로 128, 세로 64. 한 글자가 8x8 픽셀이니까, 가로로 16글자, 세로로 8줄까지 쓸 수 있어요."</p>
+  <p>"코드를 입력하고 실행해보세요."</p>
+</div>
+
+<details class="student-content">
+  <summary>학생 교재 — 대시보드 기본 코드</summary>
+  <div class="content">
+
+```python
+from machine import I2C, Pin, ADC
+from ssd1306 import SSD1306_I2C
+import time
+
+# I2C 설정
+i2c = I2C(0, sda=Pin(8), scl=Pin(9))
+
+# OLED 디스플레이 초기화 (128x64)
+oled = SSD1306_I2C(128, 64, i2c)
+
+# DHT20 센서
+sensor_addr = 0x38
+time.sleep(0.1)
+
+# 빛 센서 (A0)
+light = ADC(Pin(26))
+
+def read_dht20():
+    i2c.writeto(sensor_addr, bytes([0xAC, 0x33, 0x00]))
+    time.sleep(0.08)
+    data = i2c.readfrom(sensor_addr, 7)
+    humidity = ((data[1] << 12) | (data[2] << 4) | (data[3] >> 4)) / 1048576 * 100
+    temperature = (((data[3] & 0x0F) << 16) | (data[4] << 8) | data[5]) / 1048576 * 200 - 50
+    return round(temperature, 1), round(humidity, 1)
+
+# 대시보드 루프
+while True:
+    temp, humi = read_dht20()
+    bright = round(light.read_u16() / 65535 * 100, 1)
+
+    oled.fill(0)  # 화면 지우기
+    oled.text("=== Dashboard ===", 0, 0)
+    oled.text(f"Temp:  {temp} C", 0, 16)
+    oled.text(f"Humi:  {humi} %", 0, 28)
+    oled.text(f"Light: {bright} %", 0, 40)
+    oled.show()  # 화면 전송
+
+    time.sleep(1)
+```
+
+  </div>
+</details>
+
+<div class="student-voice">
+  <span class="bubble">"OLED에 온도, 습도, 밝기가 다 나와요!"</span>
+  <span class="bubble">"1초마다 바뀌어요!"</span>
+  <span class="bubble">"손으로 센서 가리면 Light가 내려가요!"</span>
+  <span class="bubble">"진짜 대시보드 같아요!"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"온도는 나오는데 밝기가 0이에요"</div>
+    <span class="label">원인</span>
+    <span class="value">빛 센서가 A0 포트에 연결되지 않았거나, 코드에서 Pin 번호가 틀린 경우</span>
+    <span class="label">대응</span>
+    <span class="value">빛 센서가 A0 포트에 연결되어 있고, 코드에서 Pin(26)인지 확인하세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"OLED 화면이 깜빡거려요"</div>
+    <span class="label">원인</span>
+    <span class="value">fill(0)과 show() 사이에 시간이 걸리는 작업이 있어 화면이 갱신될 때 깜빡임</span>
+    <span class="label">대응</span>
+    <span class="value">정상적인 동작입니다. sleep(1) 값을 2로 늘리면 깜빡임이 줄어듭니다</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>OLED에 온도, 습도, 밝기 세 가지 값이 모두 표시되는가</li>
+    <li>센서를 손으로 감싸거나 빛을 가리면 값이 변하는가</li>
+    <li>코드의 구조를 이해하고 있는가 — "fill로 지우고, text로 그리고, show로 보여준다"</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>이 순간이 1막 전체의 클라이맥스입니다. 1차시 센서(DHT20), 2차시 센서(빛), 그리고 새로운 출력장치(OLED)가 통합되는 경험입니다. "여러분이 4차시 동안 배운 것이 전부 하나로 합쳐졌어요!"라며 성취감을 강화하세요.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">나만의 대시보드 꾸미기</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"기본 대시보드가 완성됐습니다. 이제 여러분만의 스타일로 꾸며보세요."</p>
+  <p>"128x64 픽셀 안에 어떤 정보를 어디에 배치할지 생각해보세요. 종이에 먼저 그려봐도 좋아요."</p>
+  <p>"도전 코드를 참고하면 구분선을 넣거나, 쾌적도 판정(Good/Alert)을 추가하거나, 온도 변화 미니 그래프를 그릴 수도 있어요."</p>
+  <p>"가장 중요한 정보는 크게, 상단에 배치하세요. 경고가 필요한 상황은 눈에 띄게 표시하세요. 이것이 대시보드 디자인의 기본 원칙입니다."</p>
+</div>
+
+<details class="student-content">
+  <summary>학생 교재 — 도전 코드 (그래픽 대시보드)</summary>
+  <div class="content">
+
+```python
+# 상단: 제목 + 구분선
+oled.text("AI PhysComp", 0, 0)
+oled.hline(0, 10, 128, 1)
+
+# 중단: 센서값 + 쾌적도 판정
+oled.text(f"T:{temp}C", 0, 14)
+oled.text(f"H:{humi}%", 68, 14)
+
+# 하단: 온도 미니 바 그래프
+oled.hline(0, 38, 128, 1)
+for i, t in enumerate(temp_history):
+    bar_h = max(1, min(12, int((t - 15) / 20 * 12)))
+    oled.vline(i * 4, 64 - bar_h, bar_h, 1)
+```
+
+  </div>
+</details>
+
+<div class="student-voice">
+  <span class="bubble">"구분선 넣으니까 훨씬 보기 좋아요"</span>
+  <span class="bubble">"Good이라고 나와요! 쾌적한 교실이에요"</span>
+  <span class="bubble">"바 그래프가 올라가는 게 보여요!"</span>
+  <span class="bubble">"병원 모니터 같아요"</span>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>기본 대시보드를 벗어나 레이아웃을 수정하거나 요소를 추가하고 있는가</li>
+    <li>좌표(x, y) 값을 바꿔보며 배치를 실험하고 있는가</li>
+    <li>모둠 간에 대시보드 디자인을 비교하고 있는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>대시보드 디자인은 정답이 없습니다. "같은 데이터라도 배치에 따라 읽는 속도가 달라진다"는 점을 강조하세요. "만약 이 대시보드를 교실 벽에 걸어둔다면, 멀리서도 온도를 바로 확인할 수 있으려면 어떻게 배치해야 할까요?"와 같은 질문으로 디자인 사고를 유도하세요.</p>
+</div>
+
+---
+
+## 정리 (10분)
+
+<div class="teacher-script">
+  <p>"여러분, 1막이 끝났습니다. 4차시에 걸쳐 무엇을 했는지 한번 돌아봅시다."</p>
+  <p>"1차시 — 센서로 온도를 읽었습니다. 느낌을 숫자로 바꿨죠."</p>
+  <p>"2차시 — 빛을 숫자로 바꾸고, 그래프로 시각화했습니다."</p>
+  <p>"3차시 — 데이터를 파일에 자동 저장했습니다. 코드가 대신 기록하는 시스템이었죠."</p>
+  <p>"4차시 — 오늘, 세 가지를 하나로 합쳐서 대시보드를 만들었습니다."</p>
+  <p>"여러분 앞에 있는 이 작은 OLED 화면 — 이게 바로 자동차 계기판, 병원 환자 모니터, 공장 모니터링 시스템의 원리입니다. 128x64 픽셀 안에 여러분이 그 원리를 직접 구현한 겁니다."</p>
+  <p>"그런데 한 가지 느껴본 것 있지 않나요? 코드를 한 줄 한 줄 직접 쓰는 건... 좀 힘들죠?"</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"맞아요, 오타 때문에 에러 많이 났어요"</span>
+  <span class="bubble">"코드가 점점 길어져서 헷갈려요"</span>
+</div>
+
+<div class="teacher-script">
+  <p>"맞아요. 그래서 다음 시간부터는 방법이 바뀝니다. <strong>2막: 바이브 코딩</strong>이 시작됩니다!"</p>
+  <p>"지금까지 직접 쓴 코드를 AI에게 자연어로 설명하면 어떤 코드가 나올까요? AI가 생성한 코드와 여러분의 코드를 비교해봅니다. 기대하세요!"</p>
+</div>
+
+<div class="teaching-tip">
+  <p>1막 마무리는 <strong>성취감 + 다음 막에 대한 기대</strong>의 균형이 중요합니다. "4차시 동안 센서 연결, 코드 작성, 데이터 기록, 대시보드 설계까지 직접 했다"는 성취감을 충분히 느끼게 한 뒤, "이걸 AI에게 시키면?"이라는 호기심으로 2막을 예고하세요. 1막에서 직접 코딩한 경험이 있어야 2막에서 AI 코드의 의미를 이해할 수 있습니다.</p>
+</div>
+
+---
+
+## 차별화 전략
+
+<div class="differentiation">
+  <div class="fast-learner">
+    <p><strong>빠른 학생에게:</strong></p>
+    <ul>
+      <li>도전 코드 실행: 구분선 + 쾌적도 판정 + 온도 미니 바 그래프</li>
+      <li>128x64 OLED 레이아웃에 미술 시간의 시각적 위계(크기, 위치, 대비) 적용</li>
+      <li>막대 그래프 높이 비례식을 정확히 계산해보기: <code>(t - 15) / 20 * 12</code>의 의미</li>
+      <li>병원 모니터와 자동차 계기판의 공통 설계 원리 분석</li>
+    </ul>
+  </div>
+  <div class="slow-learner">
+    <p><strong>느린 학생에게:</strong></p>
+    <ul>
+      <li>기본 코드를 복사/붙여넣기해서 실행하는 것부터 시작</li>
+      <li>OLED에 세 가지 값이 나오면 성공 — 레이아웃 꾸미기는 선택</li>
+      <li>센서를 만지며 화면 값이 변하는 것을 관찰하는 데 집중</li>
+      <li>"1차시 센서 + 2차시 센서 + 화면 = 대시보드"라는 통합 개념만 이해해도 충분</li>
+    </ul>
+  </div>
+</div>
+
+---
+
+## 평가 루브릭
+
+<table class="rubric-table">
+  <thead>
+    <tr><th>등급</th><th>관찰 기록 예시</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="badge badge-purple">S</span></td>
+      <td>128x64 OLED 레이아웃에 미술 시간의 시각적 위계를 적용. 막대 그래프 비례식 정확히 계산. 병원 모니터/자동차 계기판의 공통 설계 원리 분석. 좌표 설명으로 친구를 도움.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">A</span></td>
+      <td>128x64 OLED를 영역 분할하여 독창적 레이아웃 설계. 막대 그래프 비례식 적용. "같은 데이터라도 배치에 따라 의사결정 속도가 달라진다"고 분석.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">B</span></td>
+      <td>DHT20, 빛 센서, OLED 3개 I2C 장치 동시 연결. 각 장치 주소가 달라 충돌 없이 작동하는 원리 이해. OLED 레이아웃 직접 설계하고 반복 개선.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-amber">C</span></td>
+      <td>3개 장치 연결하고 OLED에 센서 값 표시. 1&#126;3차시 통합 성취감.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">D</span></td>
+      <td>교사 안내로 장치 연결하고 예제 코드 실행. 센서 조작 시 화면 변화 관찰.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">E</span></td>
+      <td>교사 도움으로 연결. OLED에 숫자가 나오고 센서 만지면 바뀌는 것 체험.</td>
+    </tr>
+  </tbody>
+</table>

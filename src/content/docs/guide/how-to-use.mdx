@@ -1,0 +1,179 @@
+---
+title: 지도서 사용법
+description: 이 지도서의 구성 요소와 활용 방법
+---
+
+## 각 차시 페이지 구성
+
+모든 차시 페이지는 아래 순서로 구성됩니다.
+
+### 1. 수업 개요 카드
+
+<div class="lesson-overview">
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">성취기준</div>
+      해당 차시의 핵심 성취기준
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분 (도입/전개/정리 배분)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">센서</div>
+      필요 센서 및 장비 목록
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">난이도</div>
+      학생 체감 난이도
+    </div>
+  </div>
+</div>
+
+성취기준, 소요시간, 센서, 난이도, 오늘의 질문, 핵심 역량이 한눈에 보입니다.
+
+### 2. 학생 교재 연결
+
+<a class="student-link" href="#" style="pointer-events: none;">
+  <span class="link-icon">📖</span>
+  <span class="link-body">
+    <span class="link-label">학생 교재 보기</span>
+    <span class="link-title">해당 차시 학생용 페이지로 이동</span>
+  </span>
+  <span class="link-arrow">→</span>
+</a>
+
+각 차시 상단에 학생 교재 링크가 있습니다. 클릭하면 학생이 보는 페이지로 바로 이동합니다. 수업 중 학생 화면을 확인할 때 유용합니다.
+
+또한 수업 중 참조할 학생 교재 내용(코드, 활동지 등)은 접이식 박스로 포함되어 있습니다:
+
+<details class="student-content">
+  <summary>학생 교재 — 코드 예시</summary>
+  <div class="content">
+    이 안에 학생 교재의 코드, 활동지, 토론 질문 등이 들어갑니다. 클릭하면 열리고 닫힙니다.
+  </div>
+</details>
+
+민트+코랄 색상은 학생 교재의 디자인을 따른 것으로, 교사 지도서(딥 퍼플+로즈)와 시각적으로 구분됩니다.
+
+### 3. 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (팀별 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH + Grove Shield</li>
+    <li>해당 차시의 센서 + Grove 케이블</li>
+    <li>USB 데이터 케이블 (충전 전용 불가!)</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>한 세트라도 미리 테스트 완료</li>
+    <li>활동지 인쇄</li>
+  </ul>
+</div>
+
+카테고리별로 정리된 체크리스트입니다. 수업 전에 인쇄하여 하나씩 체크하세요.
+
+### 4. 시간 배분 바
+
+<div class="time-block">
+  <div class="intro" style="flex: 1">도입 5분</div>
+  <div class="main" style="flex: 7">전개 35분</div>
+  <div class="wrap-up" style="flex: 2">정리 10분</div>
+</div>
+
+보라색 = 도입, 로즈 = 전개, 앰버 = 정리. 비율은 차시마다 다릅니다.
+
+### 5. 교사 스크립트
+
+<div class="teacher-script">
+  <p>"자, 여러분 앞에 있는 작은 센서를 한번 볼까요? 이 센서가 지금 이 교실의 온도를 읽고 있습니다."</p>
+</div>
+
+**보라색 박스**로 표시됩니다. 교사가 직접 말할 문장을 제시하며, 자신의 스타일에 맞게 변형하세요.
+
+### 6. 수업 흐름 단계
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">센서 연결</span>
+  <span class="step-time">7분</span>
+</div>
+
+번호가 매겨진 원형 뱃지 + 단계명 + 소요시간으로 수업 흐름을 한눈에 파악할 수 있습니다.
+
+### 7. 학생 반응
+
+<div class="student-voice">
+  <span class="bubble">"온도가 나와요! 24.3도래요!"</span>
+  <span class="bubble">"2초마다 바뀌어요!"</span>
+  <span class="bubble">"손으로 감싸면 온도가 올라가요!"</span>
+</div>
+
+**초록 박스** 안의 말풍선으로 표시됩니다. 수업이 잘 진행될 때 나오는 긍정적 반응입니다.
+
+### 8. 예상 문제 & 대응
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"숫자가 안 변해요"</div>
+    <span class="label">원인</span>
+    <span class="value">센서 접촉 불량 또는 I2C 통신 실패</span>
+    <span class="label">대응</span>
+    <span class="value">Grove 케이블을 뺐다가 다시 꽂고, 포트 라벨이 I2C인지 확인하세요</span>
+  </div>
+</div>
+
+**로즈 카드**로 표시됩니다. 학생이 말하는 **증상**, **원인**, **교사 대응**이 분리되어 수업 중 빠르게 찾을 수 있습니다.
+
+### 9. 지도 팁
+
+<div class="teaching-tip">
+  <p>DHT20 센서는 I2C 포트에만 연결 가능합니다. 학생들이 아날로그 포트에 꽂으면 값이 나오지 않으니, 순회 시 포트 위치를 먼저 확인하세요.</p>
+</div>
+
+**앰버 박스**로 표시됩니다. 시간 배분, 자주 발생하는 실수, 대응 방법을 포함합니다.
+
+### 10. 순회 지도 포인트
+
+<div class="patrol-point">
+  <p>전개 10분 시점에 순회하며 확인할 것:</p>
+  <ol>
+    <li>센서가 올바른 포트에 연결되어 있는가</li>
+    <li>Shell 창에 숫자가 출력되고 있는가</li>
+    <li>측정값을 표에 기록하고 있는가</li>
+  </ol>
+</div>
+
+**에메랄드 박스**로 표시됩니다. 특정 시점에 교실을 돌며 확인할 사항입니다.
+
+### 11. 차별화 전략
+
+<div class="differentiation">
+  <div class="fast-learner">
+    <p>측정 간격을 0.5초로 줄여 응답 속도를 실험해 보게 하세요.</p>
+  </div>
+  <div class="slow-learner">
+    <p>예제 코드를 그대로 복사하여 실행하는 것부터 시작하세요.</p>
+  </div>
+</div>
+
+빠른 학생과 느린 학생에 대한 대응 전략입니다.
+
+### 12. 평가 루브릭
+
+<table class="rubric-table">
+  <thead>
+    <tr><th>등급</th><th>관찰 기록 예시</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><span class="badge badge-purple">S</span></td><td>교재 범위를 넘는 탐구, 교과 간 전이, 동료 지원</td></tr>
+    <tr><td><span class="badge badge-purple">A</span></td><td>자발적 탐구, 독창적 분석, 코드 변경 실험</td></tr>
+    <tr><td><span class="badge badge-purple">B</span></td><td>핵심 역량 체득, 자기 언어로 표현</td></tr>
+    <tr><td><span class="badge badge-amber">C</span></td><td>좋은 배움, 기본 활동 완수</td></tr>
+    <tr><td><span class="badge badge-rose">D</span></td><td>의미 있는 배움, 교사 안내 필요</td></tr>
+    <tr><td><span class="badge badge-rose">E</span></td><td>최소한의 배움, 직접 지원 필요</td></tr>
+  </tbody>
+</table>
+
+각 차시에 구체적인 관찰 기록 예시가 제공됩니다. 생기부 세특 작성에 직접 활용하세요.

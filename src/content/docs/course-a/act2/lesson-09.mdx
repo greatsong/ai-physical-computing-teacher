@@ -1,0 +1,336 @@
+---
+title: "9차시: 데이터 정리와 시각화"
+description: "PC Python으로 센서 데이터를 정리하고 matplotlib으로 시각화 — 교사용 지도서"
+---
+
+<a class="student-link" href="https://greatsong.github.io/ai-physical-computing/course-a/act2/lesson-09/" target="_blank" rel="noopener">
+  <span class="link-icon">📖</span>
+  <span class="link-body">
+    <span class="link-label">학생 교재 보기</span>
+    <span class="link-title">9차시: 데이터 정리와 시각화 — 학생용 페이지</span>
+  </span>
+  <span class="link-arrow">→</span>
+</a>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">성취기준</div>
+      센서 데이터에서 이상값을 제거하고, 이동평균 필터를 적용하여 의미 있는 시각화를 만들 수 있다
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">환경</div>
+      PC Python (pandas + matplotlib) — Pico 미사용
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">난이도</div>
+      ● ● ● ○ ○
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">오늘의 질문</div>
+      센서 데이터를 '예쁜 대시보드'로 만들려면 먼저 무엇을 해야 할까?
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">데이터 리터러시</span> <span class="badge badge-amber">컴퓨팅 사고력</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>PC Python 3 설치 확인 (Thonny "Local Python 3" 또는 VS Code)</li>
+    <li>pandas, matplotlib 라이브러리 설치 (<code>pip install pandas matplotlib</code>)</li>
+    <li>plotly 설치 (도전 활동용, <code>pip install plotly</code>)</li>
+  </ul>
+  <h5>데이터</h5>
+  <ul>
+    <li>이전 차시에서 수집한 CSV 파일 (없으면 기본 코드의 샘플 데이터 사용)</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>교사용 PC에서 pandas, matplotlib이 동작하는지 미리 테스트</li>
+    <li>학생 PC에 라이브러리 사전 설치 (수업 중 설치하면 5&#126;10분 소모)</li>
+    <li>Thonny 인터프리터를 "Local Python 3"으로 바꾸는 방법 안내 슬라이드 준비</li>
+    <li>이동평균 비교표 인쇄</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 1">도입 5분</div>
+  <div class="main" style="flex: 7">전개 35분</div>
+  <div class="wrap-up" style="flex: 2">정리 10분</div>
+</div>
+
+---
+
+## 도입 (5분)
+
+<div class="teacher-script">
+  <p>"여러분, 지금까지 센서로 데이터를 모았잖아요. 온도, 습도, CO2, 심박수... 숫자가 쭉 나열되어 있었죠?"</p>
+  <p>"그런데 숫자 20개를 보고 '이 교실의 환기 상태가 어떤지' 바로 알 수 있나요?"</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"숫자만 보면 잘 모르겠어요"</span>
+  <span class="bubble">"그래프로 그리면 되지 않아요?"</span>
+  <span class="bubble">"뉴스에서 그래프 많이 보는데"</span>
+</div>
+
+<div class="teacher-script">
+  <p>"맞아요, 그래프로 그리면 한눈에 보이죠. 그런데 한 가지 문제가 있어요. 센서 데이터에는 '이상한 값'이 섞여 있어요. 9999가 갑자기 튀어나오거나, 0이 찍히거나. 이걸 그대로 그래프로 그리면 어떻게 될까요?"</p>
+  <p>"그래서 오늘은 그래프를 그리기 <strong>전에</strong> 데이터를 '청소'하는 법을 배웁니다. 이것을 <strong>데이터 전처리</strong>라고 해요. 현실 세계의 모든 데이터 분석에서 가장 먼저 하는 작업입니다."</p>
+  <p>"그리고 오늘은 Pico가 아니라 <strong>컴퓨터 Python</strong>을 씁니다. Thonny에서 인터프리터를 'Local Python 3'으로 바꾸세요."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>학생들이 Thonny 인터프리터를 바꾸지 않고 MicroPython에서 실행하면 <code>import pandas</code>에서 에러가 납니다. <strong>"오늘은 Pico가 아니라 컴퓨터 Python"</strong>이라는 점을 도입부에서 반드시 강조하고, 인터프리터 변경 방법을 화면에 띄워두세요.</p>
+</div>
+
+---
+
+## 전개 (35분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">인터프리터 전환 및 코드 실행</span>
+  <span class="step-time">8분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"Thonny 오른쪽 아래에 'MicroPython'이라고 되어 있으면 클릭해서 <strong>'Local Python 3'</strong>으로 바꾸세요. 안 보이면 '도구 → 옵션 → 인터프리터'에서 바꿀 수 있어요."</p>
+  <p>"바꿨으면 학생 교재의 기본 코드를 복사해서 실행해보세요. 그래프가 팝업으로 뜰 거예요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"그래프가 떴어요!"</span>
+  <span class="bubble">"이상한 점이 하나 위로 튀어나와 있어요"</span>
+  <span class="bubble">"9999가 찍혀서 그래프가 이상해졌어요"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"ModuleNotFoundError: No module named 'pandas'"</div>
+    <span class="label">원인</span>
+    <span class="value">PC Python에 pandas가 설치되어 있지 않음</span>
+    <span class="label">대응</span>
+    <span class="value">Thonny 메뉴 '도구 → 패키지 관리'에서 pandas 검색 후 설치. 또는 터미널에서 <code>pip install pandas matplotlib</code></span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"인터프리터를 바꿨는데도 에러나요"</div>
+    <span class="label">원인</span>
+    <span class="value">Thonny가 여전히 Pico 인터프리터를 사용 중</span>
+    <span class="label">대응</span>
+    <span class="value">Thonny를 완전히 닫았다가 다시 열고, USB 케이블을 분리한 상태에서 시작하세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"그래프 창이 안 떠요"</div>
+    <span class="label">원인</span>
+    <span class="value">matplotlib 백엔드 문제 (특히 맥OS)</span>
+    <span class="label">대응</span>
+    <span class="value"><code>plt.savefig('chart.png')</code>로 파일 저장 후 이미지로 확인. 또는 VS Code에서 실행</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>이 시점에 순회하며 확인:</strong></p>
+  <ol>
+    <li>인터프리터가 "Local Python 3"으로 바뀌었는가</li>
+    <li>그래프가 화면에 표시되는가</li>
+    <li>이상값(9999, 0, -10)이 그래프에서 어떻게 보이는지 인식하는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>인터프리터 전환이 이 차시의 <strong>최대 허들</strong>입니다. 사전에 라이브러리를 설치해두지 않으면 수업 시간 절반을 설치에 쓰게 됩니다. 반드시 수업 전에 확인하세요.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">이상값 확인과 제거</span>
+  <span class="step-time">8분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"그래프를 보세요. 회색 점선이 원본 데이터예요. 위로 튀어나온 점이 보이죠? 그게 9999ppm이에요. 교실에서 CO2가 9999ppm이면 어떻게 될까요?"</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"숨을 못 쉬겠죠?"</span>
+  <span class="bubble">"그 정도면 교실이 아니라 화산 분화구예요"</span>
+  <span class="bubble">"센서가 오류를 낸 거예요"</span>
+</div>
+
+<div class="teacher-script">
+  <p>"맞아요, 센서 오류예요. 이런 값을 <strong>이상값(outlier)</strong>이라고 합니다. 코드에서 <code>df[(df['co2'] &gt;= 100) &amp; (df['co2'] &lt;= 5000)]</code> 이 부분이 '100 미만이거나 5000 초과인 값은 버려라'라는 뜻이에요."</p>
+  <p>"이상값을 제거하니까 평균이 어떻게 바뀌었나요? 콘솔 출력을 비교해보세요."</p>
+</div>
+
+<details class="student-content">
+  <summary>학생 교재 — 전처리 효과 비교표</summary>
+  <div class="content">
+
+| 단계 | 데이터 개수 | 평균 | 최솟값 | 최댓값 | 범위 |
+|------|-----------|------|--------|--------|------|
+| 원본 데이터 | | | | | |
+| 이상값 제거 후 | | | | | |
+| 이동평균(3) 적용 후 | | | | | |
+| 이동평균(5) 적용 후 | | | | | |
+
+  </div>
+</details>
+
+<div class="teaching-tip">
+  <p>이상값 제거 전후의 평균 변화를 <strong>숫자로</strong> 확인하게 하세요. "쓰레기를 넣으면 쓰레기가 나온다(Garbage In, Garbage Out)"를 체감하는 순간입니다. 수학 시간의 '대푯값'과 연결하면 교과 통합 효과가 있습니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">이동평균 필터 실험</span>
+  <span class="step-time">12분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이상값을 제거했지만, 아직도 그래프가 들쭉날쭉하죠? 이건 센서의 작은 오차 때문이에요. 이걸 매끄럽게 만드는 방법이 <strong>이동평균(Moving Average)</strong>입니다."</p>
+  <p>"<code>.rolling(window=3).mean()</code> — 이건 '3개씩 묶어서 평균을 구해라'라는 뜻이에요. 윈도우 크기를 3, 5, 10으로 바꿔가며 그래프가 어떻게 달라지는지 비교해보세요."</p>
+  <p>"코로나 때 뉴스에서 '7일 이동평균'이라는 말을 들어본 사람? 그거랑 같은 원리입니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"3이면 약간 부드러워지고, 10이면 완전 매끈해져요"</span>
+  <span class="bubble">"근데 10이면 환기 시작 시점이 늦게 보여요"</span>
+  <span class="bubble">"부드러워지는 대신 반응이 느려지네요"</span>
+  <span class="bubble">"코로나 7일 이동평균이 이거였어요?"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"이동평균 그래프가 처음 몇 개가 빠져 있어요"</div>
+    <span class="label">원인</span>
+    <span class="value">rolling()의 특성 — window=5이면 앞 4개는 NaN (데이터 부족)</span>
+    <span class="label">대응</span>
+    <span class="value">정상 동작입니다. "왜 처음 몇 개가 없을까?" 질문으로 이동평균 원리를 이해하게 유도하세요</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>윈도우 크기를 최소 2가지 이상 비교하고 있는가</li>
+    <li>"부드러움 vs 반응 속도" 트레이드오프를 인식하고 있는가</li>
+    <li>이동평균 비교표를 작성하고 있는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>이동평균의 <strong>트레이드오프</strong>를 직관적으로 이해하게 하는 것이 핵심입니다. "부드러워지면 좋은 것 아닌가요?"라는 질문에 "환기를 시작한 정확한 시점을 알고 싶다면?"이라고 반문하세요. 윈도우가 클수록 부드럽지만, 급격한 변화를 놓치게 됩니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">그래프 완성과 공유</span>
+  <span class="step-time">7분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이제 그래프에 마무리 손질을 해봅시다. 제목, 축 이름, 범례가 있으면 다른 사람도 이 그래프를 이해할 수 있어요."</p>
+  <p>"기본 코드에 환기 시작 시점을 나타내는 수직선과 1000ppm 기준선도 있죠? 이런 <strong>주석</strong>을 추가하면 그래프의 설득력이 크게 올라갑니다."</p>
+  <p>"완성된 그래프를 이미지로 저장하세요. 다음 시간에 AI에게 데이터를 분석시킬 때 활용할 수 있어요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"그래프가 진짜 뉴스에 나오는 것 같아요"</span>
+  <span class="bubble">"환기 시작 지점에 수직선 넣으니까 확 눈에 들어와요"</span>
+  <span class="bubble">"PNG로 저장했어요!"</span>
+</div>
+
+<div class="teaching-tip">
+  <p>시간 여유가 있으면 도전 코드(plotly)를 시도하게 하세요. HTML 파일로 저장되는 인터랙티브 대시보드는 학생들의 성취감을 크게 높여줍니다. 마우스로 확대/축소되는 것을 보면 "와!" 하는 반응이 나옵니다.</p>
+</div>
+
+---
+
+## 정리 (10분)
+
+<div class="teacher-script">
+  <p>"오늘 여러분은 숫자 20개를 가지고 세 가지 작업을 했어요."</p>
+  <p>"첫째, <strong>이상값 제거</strong> — 센서 오류를 걸러냈습니다. 둘째, <strong>이동평균</strong> — 노이즈를 줄여서 추세를 드러냈습니다. 셋째, <strong>시각화</strong> — 숫자를 그래프로 바꿔서 누구나 이해할 수 있게 만들었습니다."</p>
+  <p>"이 세 단계를 합쳐서 <strong>데이터 전처리</strong>라고 합니다. 현실 세계에서 데이터 과학자가 업무 시간의 80%를 전처리에 쓴다는 말이 있어요. 그만큼 중요합니다."</p>
+  <p>"pandas를 한마디로 설명하면 '<strong>엑셀인데 마우스 대신 코드로 조작하는 것</strong>'이에요. 코드로 하면 뭐가 좋을까요? 반복할 수 있고, 기록이 남고, 자동화할 수 있죠."</p>
+  <p>"다음 시간에는 이렇게 정리한 데이터를 <strong>AI에게 보여주고 분석을 시킵니다</strong>. AI가 사람이 못 찾은 패턴도 찾아줄까요? 직접 확인해봅시다."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>"데이터 과학자의 80%가 전처리"라는 통계는 학생들에게 전처리의 중요성을 인식시키는 데 효과적입니다. pandas = "코드로 쓰는 엑셀"이라는 비유도 잘 와닿습니다. 다음 시간 예고에서 "AI에게 분석을 시킨다"는 말에 학생들이 흥미를 보일 것입니다.</p>
+</div>
+
+---
+
+## 차별화 전략
+
+<div class="differentiation">
+  <div class="fast-learner">
+    <p><strong>빠른 학생에게:</strong></p>
+    <ul>
+      <li>이상치 제거 기준을 "평균에서 표준편차의 2배 이상"으로 통계적으로 정의해보기 (수학 시간 산포도와 연결)</li>
+      <li>이동평균 창 크기별 그래프를 겹쳐 그려 트레이드오프를 시각적으로 비교</li>
+      <li>환기 시점에 주석(annotation)을 추가하여 출판 수준 그래프 만들기</li>
+      <li>pandas를 "엑셀인데 마우스 대신 코드로"라고 비유하며 친구에게 설명해보기</li>
+    </ul>
+  </div>
+  <div class="slow-learner">
+    <p><strong>느린 학생에게:</strong></p>
+    <ul>
+      <li>인터프리터 전환을 교사가 직접 도와주기</li>
+      <li>기본 코드를 복사/붙여넣기로 실행하여 그래프가 뜨는 것부터 확인</li>
+      <li>이상값이 그래프를 어떻게 왜곡하는지 눈으로 확인하는 것에 집중</li>
+      <li>윈도우 크기 하나만 바꿔보는 작은 실험</li>
+    </ul>
+  </div>
+</div>
+
+---
+
+## 평가 루브릭
+
+<table class="rubric-table">
+  <thead>
+    <tr><th>등급</th><th>관찰 기록 예시</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="badge badge-purple">S</span></td>
+      <td>이상치 제거 기준을 "평균에서 표준편차의 2배 이상"으로 정의하고 수학 시간 산포도 개념과 연결함. 이동평균 창 크기별 트레이드오프를 시각적으로 비교하고, 코로나 7일 이동평균과 동일한 원리임을 설명함. 그래프에 환기 시점 주석을 추가하여 출판 수준 시각화를 완성함. pandas를 "엑셀인데 마우스 대신 코드로"라고 비유하며 친구를 도움.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">A</span></td>
+      <td>이상치 제거를 통계적 근거로 필터링하고, 이동평균 창 크기별 그래프를 겹쳐 비교함. 환기 시점 수직선과 주석을 추가하여 출판 수준의 시각화를 완성함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">B</span></td>
+      <td>pandas로 CSV를 불러와 이상치를 식별하고 제거함. 3/5/10포인트 이동평균의 트레이드오프를 발견함. matplotlib으로 제목, 축 이름, 범례를 갖춘 CO2 변화 그래프를 완성함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-amber">C</span></td>
+      <td>pandas로 CSV를 읽고 교사 안내에 따라 이상치를 제거하고 이동평균을 적용함. 원본과 정제 데이터 그래프를 비교하고 차이를 인식함. 기본 그래프를 완성함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">D</span></td>
+      <td>교사의 코드를 따라 입력하여 그래프를 그림. 이상값이 그래프를 왜곡한다는 것을 이해함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">E</span></td>
+      <td>교사가 준비한 코드를 실행하여 그래프가 화면에 나오는 것을 확인함.</td>
+    </tr>
+  </tbody>
+</table>

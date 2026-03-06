@@ -1,0 +1,367 @@
+---
+title: "1차시: 센서로 세상 읽기"
+description: "DHT20 온습도 센서로 교실 온도 측정 — 교사용 지도서"
+---
+
+<a class="student-link" href="https://greatsong.github.io/ai-physical-computing/course-a/act1/lesson-01/" target="_blank" rel="noopener">
+  <span class="link-icon">📖</span>
+  <span class="link-body">
+    <span class="link-label">학생 교재 보기</span>
+    <span class="link-title">1차시: 센서로 세상 읽기 — 학생용 페이지</span>
+  </span>
+  <span class="link-arrow">→</span>
+</a>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">성취기준</div>
+      센서를 연결하고 코드를 실행하여 환경 데이터를 수집할 수 있다
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">센서</div>
+      DHT20 (온습도, I2C)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">난이도</div>
+      ● ○ ○ ○ ○
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">오늘의 질문</div>
+      우리 교실은 정말 24도일까?
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">과학적 사고</span> <span class="badge badge-amber">컴퓨팅 사고력</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (팀별 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH + Grove Shield</li>
+    <li>DHT20 온습도 센서 (I2C)</li>
+    <li>Grove 케이블 1개</li>
+    <li>USB 데이터 케이블 (충전 전용 불가!)</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE 설치 및 Pico 인식 확인</li>
+    <li>MicroPython 펌웨어 설치 완료</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>한 세트라도 미리 테스트 — I2C 포트에서 값이 나오는가</li>
+    <li>교실 에어컨/난방 상태 확인 (온도 차이가 있어야 실험 의미 있음)</li>
+    <li>활동지 인쇄 (위치별 온도 기록표)</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 1">도입 5분</div>
+  <div class="main" style="flex: 7">전개 35분</div>
+  <div class="wrap-up" style="flex: 2">정리 10분</div>
+</div>
+
+---
+
+## 도입 (5분)
+
+<div class="teacher-script">
+  <p>"여러분, 지금 이 교실은 몇 도일까요? 한번 느껴보세요. 손을 들어서 말해 볼 사람?"</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"24도요!"</span>
+  <span class="bubble">"25도?"</span>
+  <span class="bubble">"좀 추운 것 같아요, 22도?"</span>
+  <span class="bubble">"에어컨 바로 앞이라 추워요"</span>
+  <span class="bubble">"창가라 더워요"</span>
+</div>
+
+<div class="teacher-script">
+  <p>"재밌네요, 같은 교실인데 대답이 다 다르죠? 그럼 진짜 몇 도인지, 어떻게 하면 정확히 알 수 있을까요?"</p>
+  <p>"맞아요, 측정을 해야죠. 오늘 여러분 앞에 있는 이 작은 부품이 온도와 습도를 숫자로 읽어주는 <strong>센서</strong>입니다. 이름은 DHT20이에요."</p>
+  <p>"오늘 수업이 끝나면, 여러분은 이 센서로 교실 곳곳의 온도를 측정하고, 체감 온도가 왜 자리마다 다른지를 <strong>데이터로</strong> 증명할 수 있게 됩니다."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>"느낌"과 "측정"의 차이를 강조하세요. 학생들의 체감 온도 대답이 서로 다를수록 센서의 필요성이 자연스럽게 드러납니다. 에어컨이 꺼진 상태라면 "창가와 복도 쪽이 다를까?"로 유도하세요.</p>
+</div>
+
+---
+
+## 전개 (35분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">센서 연결</span>
+  <span class="step-time">7분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"자, Grove Shield를 Pico 위에 끼우세요. 핀 방향 맞춰서 — 살짝 힘을 줘야 들어갑니다."</p>
+  <p>"DHT20 센서를 꺼내서, <strong>I2C</strong>라고 적힌 포트에 Grove 케이블로 연결하세요. 아날로그(A0)가 아니라 I2C입니다. 커넥터 모양이 딱 맞는 쪽으로 넣으면 돼요."</p>
+  <p>"USB 케이블을 PC에 연결하고, Thonny를 실행하세요. 오른쪽 아래에 'MicroPython (Raspberry Pi Pico)'가 보이면 준비 완료입니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"연결했어요!"</span>
+  <span class="bubble">"Thonny에 Pico라고 나와요"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"아무것도 안 나와요"</div>
+    <span class="label">원인</span>
+    <span class="value">USB 케이블이 충전 전용이거나, Pico가 인식되지 않은 경우</span>
+    <span class="label">대응</span>
+    <span class="value">데이터 케이블로 교체하거나 Thonny를 재시작하세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"A0에 꽂았는데 안 돼요"</div>
+    <span class="label">원인</span>
+    <span class="value">DHT20은 I2C 센서 — 아날로그 포트에서는 동작하지 않음</span>
+    <span class="label">대응</span>
+    <span class="value">I2C라고 적힌 포트로 옮기게 안내하세요</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>이 시점에 순회하며 확인:</strong></p>
+  <ol>
+    <li>Grove Shield가 Pico에 올바르게 끼워져 있는가 (핀이 어긋나면 동작 안 함)</li>
+    <li>DHT20이 <strong>I2C 포트</strong>에 연결되어 있는가 (가장 흔한 실수)</li>
+    <li>Thonny 하단에 'MicroPython (Raspberry Pi Pico)' 표시되는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>DHT20-I2C 연결 실수가 <strong>가장 흔합니다</strong>. 순회 시 포트 라벨을 먼저 확인하세요. Shield에 I2C 포트가 2개 있으므로 어디든 꽂아도 됩니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">코드 입력 및 실행</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이제 코드를 입력합니다. 스크린에 있는 코드를 한 줄씩 따라 쳐보세요. 복사해도 좋지만, 한 번쯤은 직접 쳐보길 권합니다. 타이핑하면서 코드를 더 잘 기억하게 됩니다."</p>
+  <p>"다 입력했으면, 초록색 실행 버튼을 누르세요."</p>
+</div>
+
+<details class="student-content">
+  <summary>학생 교재 — 기본 코드</summary>
+  <div class="content">
+
+```python
+from machine import I2C, Pin
+import time
+
+i2c = I2C(0, sda=Pin(8), scl=Pin(9))
+sensor_addr = 0x38
+time.sleep(0.1)
+
+def read_dht20():
+    i2c.writeto(sensor_addr, bytes([0xAC, 0x33, 0x00]))
+    time.sleep(0.08)
+    data = i2c.readfrom(sensor_addr, 7)
+    humidity = ((data[1] << 12) | (data[2] << 4) | (data[3] >> 4)) / 1048576 * 100
+    temperature = (((data[3] & 0x0F) << 16) | (data[4] << 8) | data[5]) / 1048576 * 200 - 50
+    return round(temperature, 1), round(humidity, 1)
+
+while True:
+    temp, humi = read_dht20()
+    print(f"온도: {temp}°C, 습도: {humi}%")
+    time.sleep(2)
+```
+
+  </div>
+</details>
+
+<div class="student-voice">
+  <span class="bubble">"온도가 나와요! 24.3도, 습도 52%!"</span>
+  <span class="bubble">"2초마다 바뀌어요!"</span>
+  <span class="bubble">"손으로 감싸면 온도가 올라가요!"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">SyntaxError가 나요</div>
+    <span class="label">원인</span>
+    <span class="value">들여쓰기, 따옴표, 콜론 중 하나가 빠졌거나 틀렸음</span>
+    <span class="label">대응</span>
+    <span class="value">에러 메시지의 줄 번호를 확인하고 해당 줄의 들여쓰기부터 점검하세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">OSError가 나요</div>
+    <span class="label">원인</span>
+    <span class="value">센서 연결 불량 (I2C 통신 실패)</span>
+    <span class="label">대응</span>
+    <span class="value">Grove 케이블을 뺐다가 다시 꽂고, 다른 I2C 포트도 시도해 보세요</span>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>코드 해설 포인트</strong> — 전체를 설명하지 말고, 학생이 실행한 뒤 3개만 짚어주세요:</p>
+  <ol>
+    <li><code>while True:</code> — "이건 '영원히 반복해'라는 뜻이에요. 센서를 한 번만 읽는 게 아니라 계속 읽어야 하니까요."</li>
+    <li><code>time.sleep(2)</code> — "2초 쉬라는 뜻이에요. 이걸 1로 바꾸면 어떻게 될까요?"</li>
+    <li><code>f"온도: &#123;temp:.1f&#125;도"</code> — "f를 붙이면 중괄호 안에 변수 값이 들어가요. .1f는 소수점 한 자리라는 뜻."</li>
+  </ol>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">교실 온도 탐험</span>
+  <span class="step-time">15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"코드가 잘 돌아가고 있죠? 이제 진짜 실험입니다."</p>
+  <p>"팀별로 교실 안 <strong>4&#126;5곳</strong>의 온도를 측정하세요. 에어컨 앞, 창가, 복도 쪽, 교탁 앞, 교실 가운데 — 어디든 좋습니다. 각 위치에서 <strong>10초 정도</strong> 기다렸다가 안정된 값을 기록하세요."</p>
+  <p>"측정 결과를 활동지의 표에 적으세요. 위치, 온도, 습도를 기록합니다."</p>
+</div>
+
+<details class="student-content">
+  <summary>학생 교재 — 측정 기록표</summary>
+  <div class="content">
+
+| 측정 위치 | 체감 온도 (따뜻/보통/서늘) | 센서 온도 (°C) | 센서 습도 (%) | 비고 |
+|-----------|--------------------------|---------------|--------------|------|
+| 창가 | | | | |
+| 복도 쪽 | | | | |
+| 에어컨 앞 | | | | |
+| 교실 중앙 | | | | |
+| 문 옆 | | | | |
+
+  </div>
+</details>
+
+<div class="student-voice">
+  <span class="bubble">"에어컨 앞이 22도인데 창가는 26도예요!"</span>
+  <span class="bubble">"차이가 4도나 나요!"</span>
+  <span class="bubble">"왜 같은 교실인데 이렇게 다르죠?"</span>
+  <span class="bubble">"에어컨 바람이 닿는 데까지만 시원한 거예요?"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"USB 케이블이 짧아서 못 가요"</div>
+    <span class="label">대응</span>
+    <span class="value">노트북을 들고 이동하거나, 한 팀이 여러 위치를 순서대로 측정하세요</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>최소 3곳 이상 측정하고 있는가</li>
+    <li>각 위치에서 충분히 기다린 뒤 기록하는가 (이동 직후의 값은 불안정)</li>
+    <li>표에 위치명과 함께 기록하고 있는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>이 단계가 수업의 핵심입니다. <strong>"같은 교실인데 온도가 다르다"</strong>는 발견이 "센서로 세상을 읽는다"는 오늘의 메시지와 직결됩니다. 학생들이 충분히 돌아다니며 측정할 시간을 주세요. 15분이 부족하면 정리 시간을 5분으로 줄여도 됩니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">결과 공유</span>
+  <span class="step-time">3분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"자, 측정 결과를 한 팀씩 발표해 볼까요? 가장 높은 온도와 가장 낮은 온도가 어디였나요?"</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"에어컨 앞이 22.3도로 가장 낮고, 창가가 26.1도로 가장 높았어요"</span>
+  <span class="bubble">"에어컨에서 멀어질수록 온도가 올라가요"</span>
+</div>
+
+---
+
+## 정리 (10분)
+
+<div class="teacher-script">
+  <p>"오늘 수업 처음에 여러분한테 물었죠? 이 교실이 몇 도냐고. 그때는 다들 감으로 대답했잖아요. 그런데 지금은?"</p>
+  <p>"맞아요, 이제 <strong>데이터</strong>로 말할 수 있게 됐어요. '에어컨 앞은 22도, 창가는 26도, 차이가 4도' — 이건 느낌이 아니라 <strong>측정</strong>이에요."</p>
+  <p>"이게 바로 센서의 힘입니다. 사람의 감각은 주관적이지만, 센서는 객관적인 숫자를 줍니다."</p>
+  <p>"다음 시간에는 빛을 숫자로 바꿔봅니다. 그리고 처음으로 <strong>그래프</strong>를 그려볼 거예요."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>"감각 vs 측정"의 대비를 학생의 경험으로 환기시키세요. 처음에 대답한 체감 온도와 실제 측정값의 차이를 짚어주면 효과적입니다.</p>
+</div>
+
+---
+
+## 차별화 전략
+
+<div class="differentiation">
+  <div class="fast-learner">
+    <p><strong>빠른 학생에게:</strong></p>
+    <ul>
+      <li><code>time.sleep(2)</code>를 0.5로 바꿔서 응답 속도를 실험해 보세요</li>
+      <li>측정값을 5개 이상 모아서 평균을 계산해 보세요</li>
+      <li>"왜 습도도 함께 측정하는 걸까?" — 체감온도와 습도의 관계를 조사</li>
+    </ul>
+  </div>
+  <div class="slow-learner">
+    <p><strong>느린 학생에게:</strong></p>
+    <ul>
+      <li>코드를 복사/붙여넣기해서 실행하는 것부터 시작</li>
+      <li>실행 성공 후, sleep 값만 바꿔보는 작은 실험</li>
+      <li>옆 팀의 도움을 받아 포트 연결 확인</li>
+    </ul>
+  </div>
+</div>
+
+---
+
+## 평가 루브릭
+
+<table class="rubric-table">
+  <thead>
+    <tr><th>등급</th><th>관찰 기록 예시</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="badge badge-purple">S</span></td>
+      <td>DHT20 센서로 교실 5개 지점의 온도를 측정한 뒤 에어컨 토출구와의 거리에 따른 온도 분포를 좌표 위에 그려 열전달 패턴을 시각화함. 과학 시간에 "우리가 피지컬 컴퓨팅 시간에 쓴 DHT20이면 소수점 한 자리까지 정확하게 나올 텐데"라며 교과 간 전이를 보이고, 옆 팀의 I2C 포트 연결을 도와줌.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">A</span></td>
+      <td>교실 5개 지점의 온도를 측정하여 에어컨 토출구와의 거리에 따른 온도 분포를 시각화함. 측정 간격을 0.5초로 줄여 응답 속도를 실험하는 등 교재 범위를 넘는 탐구를 자발적으로 수행함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">B</span></td>
+      <td>DHT20 센서를 I2C 포트에 정확히 연결하고 4&#126;5개 지점의 온도를 측정하여 에어컨 근처와 창가의 3&#126;4도 차이를 데이터로 확인함. 코드에서 sleep 값을 바꿔보며 코드와 동작의 대응 관계를 탐구함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-amber">C</span></td>
+      <td>센서를 올바른 포트에 연결하고 3개 지점 이상을 측정하여 위치별 온도 차이를 확인함. 코드의 반복 구조와 출력 형식을 이해함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">D</span></td>
+      <td>교사의 안내에 따라 센서를 연결하고 코드를 실행하여 온습도 값 출력을 확인함. 2개 지점을 측정하고 온도가 다르다는 사실을 인식함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">E</span></td>
+      <td>교사의 도움으로 센서를 연결하고 코드를 실행함. 센서가 교실의 온도를 읽고 있다는 기본 개념을 이해함.</td>
+    </tr>
+  </tbody>
+</table>

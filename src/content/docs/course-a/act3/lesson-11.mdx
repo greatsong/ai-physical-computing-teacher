@@ -1,0 +1,324 @@
+---
+title: "11차시: 팀 프로젝트 설계"
+description: "센서+대시보드+AI로 해결할 문제를 발견하고 프로젝트 계획서를 작성하는 수업 — 교사용 지도서"
+---
+
+<a class="student-link" href="https://greatsong.github.io/ai-physical-computing/course-a/act3/lesson-11/" target="_blank" rel="noopener">
+  <span class="link-icon">📖</span>
+  <span class="link-body">
+    <span class="link-label">학생 교재 보기</span>
+    <span class="link-title">11차시: 팀 프로젝트 설계 — 학생용 페이지</span>
+  </span>
+  <span class="link-arrow">→</span>
+</a>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">성취기준</div>
+      센서+대시보드+AI를 통합한 프로젝트를 설계하고, 바이브 코딩 전략을 포함한 계획서를 작성할 수 있다
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">센서</div>
+      팀별 자유 선택
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">난이도</div>
+      ● ● ○ ○ ○
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">오늘의 질문</div>
+      센서+대시보드+AI로 해결할 수 있는 우리만의 문제는 뭘까?
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">창의적 문제해결</span> <span class="badge badge-amber">컴퓨팅 사고력</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (팀별 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH + Grove Shield</li>
+    <li>센서 키트 전체 (팀별 센서 선택용)</li>
+    <li>OLED 디스플레이 (SSD1306)</li>
+    <li>USB 데이터 케이블</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE 설치 및 Pico 인식 확인</li>
+    <li>Google Docs 또는 종이 활동지 (브레인스토밍용)</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>센서 키트가 팀별로 살펴볼 수 있도록 테이블에 배치되어 있는가</li>
+    <li>팀 구성(3&#126;4명)이 사전에 정해져 있는가 — 아직이면 도입 전에 편성</li>
+    <li>프로젝트 계획서 템플릿을 칠판/스크린에 띄울 준비</li>
+    <li>예시 프로젝트 아이디어 3&#126;4개를 미리 정리해 두기 (아이디어가 막히는 팀에게 제공)</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 1">도입 5분</div>
+  <div class="main" style="flex: 7">전개 35분</div>
+  <div class="wrap-up" style="flex: 2">정리 10분</div>
+</div>
+
+---
+
+## 도입 (5분)
+
+<div class="teacher-script">
+  <p>"여러분, 10차시 동안 우리가 뭘 해왔는지 한번 되돌아볼까요? 1막에서는 센서를 직접 연결하고 코드를 한 줄씩 쳤어요. 2막에서는 AI한테 코드를 요청하는 바이브 코딩을 배웠고요."</p>
+  <p>"그런데 지금까지는 선생님이 '이 센서를 써라, 이 코드를 짜라' 정해줬잖아요. 오늘부터는 다릅니다."</p>
+  <p>"3막의 주인공은 <strong>여러분 팀</strong>이에요. 스스로 문제를 발견하고, 센서와 대시보드와 AI를 조합해서 해결하는 프로젝트를 설계할 거예요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"자유롭게 정할 수 있어요?"</span>
+  <span class="bubble">"센서 여러 개 써도 돼요?"</span>
+  <span class="bubble">"급식실 소음 측정하고 싶어요!"</span>
+  <span class="bubble">"교실 환기 타이밍 알려주는 거 만들고 싶어요"</span>
+</div>
+
+<div class="teacher-script">
+  <p>"좋아요! 그런 아이디어들이 나오면 됩니다. 오늘 수업이 끝나면, 여러분 팀은 '무슨 문제를 어떤 센서로 해결할지, 대시보드를 어떻게 만들지, 어디에 바이브 코딩을 쓸지'까지 정리된 프로젝트 계획서를 갖게 됩니다."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>3막 시작이므로 분위기 전환이 중요합니다. "이제 선생님이 아니라 여러분이 결정한다"는 메시지를 분명히 주세요. 팀 구성이 아직 안 되어 있다면, 3&#126;4명씩 빠르게 편성하세요. 되도록 다양한 성향의 학생이 섞이도록 합니다.</p>
+</div>
+
+---
+
+## 전개 (35분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">문제 발견 브레인스토밍</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"팀별로 모여서 브레인스토밍을 시작합니다. 학교 안에서 <strong>센서+대시보드+AI로 해결하면 좋겠다</strong> 싶은 문제를 자유롭게 적어보세요."</p>
+  <p>"규칙은 네 가지입니다. 첫째, <strong>비판 금지</strong> — 어떤 아이디어든 일단 적어요. 둘째, <strong>자유롭게</strong> — 엉뚱한 것도 환영. 셋째, <strong>연결하기</strong> — 다른 사람 아이디어에 덧붙여도 좋아요. 넷째, <strong>최소 10개</strong> — 숫자 목표를 정해두면 더 많이 나옵니다."</p>
+  <p>"10분 드릴 테니 10개 이상 적어보세요. 시작!"</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"급식실 소음 측정!"</span>
+  <span class="bubble">"복도 통행량 측정하면 재밌겠다"</span>
+  <span class="bubble">"교실 CO2 측정해서 환기 알림!"</span>
+  <span class="bubble">"화분 흙 습도 측정"</span>
+  <span class="bubble">"운동장 온도 변화"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"아이디어가 안 나와요"</div>
+    <span class="label">원인</span>
+    <span class="value">문제 발견 경험이 부족하거나 범위가 너무 넓게 느껴짐</span>
+    <span class="label">대응</span>
+    <span class="value">"학교에서 불편한 것 세 가지를 먼저 적어봐" 또는 예시 프로젝트 표를 보여주세요. "교실, 급식실, 복도, 운동장" 장소별로 떠올려 보게 유도</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"센서로 할 수 없는 것만 나와요"</div>
+    <span class="label">원인</span>
+    <span class="value">센서 종류에 대한 이해가 부족</span>
+    <span class="label">대응</span>
+    <span class="value">센서 도감을 보여주며 "이 센서로 측정할 수 있는 게 뭘까?" 역방향으로 질문하세요</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>이 시점에 순회하며 확인:</strong></p>
+  <ol>
+    <li>모든 팀원이 발언하고 있는가 (조용한 학생에게 "○○ 생각은?")</li>
+    <li>아이디어 수가 5개 이상 나왔는가 (부족하면 장소/시간 힌트 제공)</li>
+    <li>비판 없이 자유롭게 적고 있는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>브레인스토밍이 잘 안 되는 팀에게는 <strong>"만약에&#126;" 발상법</strong>을 안내하세요. "만약에 교실에 센서가 100개 있다면?", "만약에 급식실 소음을 숫자로 보여줄 수 있다면?" 등 가정을 던져주면 아이디어가 확장됩니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">센서/대시보드 설계</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"자, 이제 아이디어 중에서 하나를 골라야 해요. 팀에서 투표해도 좋고, 토론으로 정해도 좋아요."</p>
+  <p>"하나를 골랐으면, 구체적으로 설계해봅시다. 설계 체크리스트를 볼까요?"</p>
+  <p>"첫째, <strong>어떤 센서를 쓸 건가요?</strong> 1&#126;3개. 둘째, <strong>OLED 대시보드에 뭘 표시할 건가요?</strong> 종이에 128x64 사각형을 그리고 스케치해 보세요. 셋째, <strong>PC 대시보드도 만들 건가요?</strong> 넷째, <strong>AI/ML을 어디에 활용할 건가요?</strong>"</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"온습도랑 소리 센서 같이 쓰면 되겠다"</span>
+  <span class="bubble">"OLED에 온도 크게 쓰고 막대그래프로 소음 표시하자"</span>
+  <span class="bubble">"ML로 환기 필요한 상태를 자동 감지하면 어때?"</span>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>센서 선택이 문제 해결과 연결되어 있는가 (무작정 많이 쓰려는 팀은 1&#126;2개로 집중하도록)</li>
+    <li>OLED 스케치를 종이에 그리고 있는가</li>
+    <li>실현 가능한 수준인가 (너무 복잡하면 범위를 줄이도록 안내)</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>설계 단계에서 가장 중요한 것은 <strong>"설계 먼저 하면 시행착오가 줄어든다"</strong>는 공학적 사고를 심어주는 것입니다. "코드부터 짜고 싶은 마음을 참고, 종이에 먼저 그려보는 게 프로 엔지니어의 방법"이라고 강조하세요.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">바이브 코딩 전략 수립</span>
+  <span class="step-time">5분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"자, 이제 중요한 질문입니다. 프로젝트의 어떤 부분을 <strong>직접 코딩</strong>하고, 어떤 부분을 <strong>바이브 코딩</strong>으로 할 건가요?"</p>
+  <p>"예를 들어, 센서 읽기 기본 코드는 우리가 이미 배웠으니 직접 할 수 있죠. 하지만 OLED 레이아웃이나 웹 대시보드는 AI에게 맡기는 게 효율적일 수 있어요."</p>
+  <p>"이건 '실력이 없어서 AI한테 맡기는 게' 아니에요. 프로 개발자도 전략적으로 AI를 활용합니다. <strong>어디는 직접, 어디는 AI</strong> — 이 판단 자체가 실력이에요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"센서 읽기는 직접, OLED은 바이브 코딩으로!"</span>
+  <span class="bubble">"웹 대시보드는 아직 안 배웠으니까 AI한테 부탁하자"</span>
+</div>
+
+<div class="teaching-tip">
+  <p>바이브 코딩 전략 표를 팀별로 작성하게 하세요. "직접 코딩"과 "바이브 코딩"의 구분 기준을 토론하게 하면 메타인지가 발달합니다. "이미 배운 것 vs 아직 안 배운 것", "이해하고 싶은 것 vs 빨리 결과를 내고 싶은 것" 등 다양한 기준이 나올 수 있습니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">프로젝트 계획서 작성</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"마지막으로, 지금까지 정한 내용을 <strong>프로젝트 계획서</strong>로 정리합니다. 교재에 있는 Python 딕셔너리 형태 템플릿을 보세요."</p>
+  <p>"팀 이름, 프로젝트 제목, 문제, 센서 목록, 대시보드 계획, AI/ML 활용, 바이브 코딩 전략, 일정, 역할 분담 — 이 항목들을 모두 채워보세요."</p>
+  <p>"Thonny에서 직접 코드로 작성해도 좋고, 종이에 적어도 좋습니다. 핵심은 <strong>구조화된 정리</strong>예요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"나는 센서 담당할게"</span>
+  <span class="bubble">"나는 OLED 대시보드!"</span>
+  <span class="bubble">"ML은 같이 하자"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"역할을 못 나누겠어요"</div>
+    <span class="label">원인</span>
+    <span class="value">팀원 수와 역할 수가 안 맞거나, 모두 같은 역할을 원함</span>
+    <span class="label">대응</span>
+    <span class="value">"센서+데이터", "OLED 대시보드", "PC 대시보드", "ML+발표" 네 가지 역할을 제시하세요. 3명 팀은 하나를 합치면 됩니다</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>계획서에 핵심 항목(문제, 센서, 대시보드, ML)이 모두 포함되어 있는가</li>
+    <li>역할 분담이 팀원 수에 맞게 되어 있는가</li>
+    <li>일정(12차시: 대시보드, 13차시: ML, 14차시: 발표)을 인식하고 있는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>계획서를 Python 딕셔너리로 작성하는 것은 <strong>"코드가 문서가 된다"</strong>는 개발 문화를 체험시키는 것입니다. 하지만 코딩에 시간을 너무 쓰면 설계가 부실해질 수 있으므로, 종이에 먼저 적고 시간이 남으면 코드로 옮기도록 안내하세요.</p>
+</div>
+
+---
+
+## 정리 (10분)
+
+<div class="teacher-script">
+  <p>"자, 팀별로 30초씩만 계획을 공유해볼까요? 프로젝트 이름과 핵심 아이디어만 말해주세요."</p>
+  <p>(각 팀 발표 후)</p>
+  <p>"여러분이 오늘 한 일을 정리하면요 — '교실이 답답하다'는 막연한 느낌이 '센서로 측정하고 대시보드로 보여주고 AI로 분석하자'는 <strong>구체적인 설계</strong>가 되었어요."</p>
+  <p>"이게 바로 <strong>엔지니어의 사고방식</strong>입니다. 문제를 발견하고, 도구를 전략적으로 조합하고, 역할을 나누어서 해결하는 것. 스마트홈, 스마트시티, IoT 시스템 — 모두 이런 설계 과정에서 시작돼요."</p>
+  <p>"다음 시간에는 오늘 설계한 대로 <strong>실시간 대시보드</strong>를 만듭니다. 바이브 코딩을 적극 활용하세요!"</p>
+</div>
+
+<div class="teaching-tip">
+  <p>팀별 발표 시 다른 팀의 아이디어에서 자극을 받을 수 있도록 짧은 코멘트를 달아주세요. "이 팀은 소리 센서를 쓰네요, 저 팀은 초음파로 통행량을 재요 — 같은 센서도 문제에 따라 쓰임이 달라지죠?" 이런 연결이 효과적입니다. 사회 시간의 프로젝트 방법론과 연결지어 "다른 과목에서 배운 문제 해결 방법이 여기서도 쓰이죠?"라고 말해줄 수도 있습니다.</p>
+</div>
+
+---
+
+## 차별화 전략
+
+<div class="differentiation">
+  <div class="fast-learner">
+    <p><strong>빠른 학생에게:</strong></p>
+    <ul>
+      <li>계획서 검증기 도전 코드를 실행하여 복잡도 점수를 확인해 보세요</li>
+      <li>"센서 가용성 / 데이터 수집 난이도 / 사회적 영향력" 평가 매트릭스로 아이디어를 비교해 보세요</li>
+      <li>바이브 코딩과 직접 코딩의 경계를 더 세분화해 보세요 (예: 센서 드라이버는 AI, 분석 로직은 직접)</li>
+      <li>아이디어가 막히는 다른 팀에게 "만약에&#126;" 발상법을 안내해 주세요</li>
+    </ul>
+  </div>
+  <div class="slow-learner">
+    <p><strong>느린 학생에게:</strong></p>
+    <ul>
+      <li>교사가 예시 프로젝트 3개를 제시하고 그 중에서 고르도록 하세요</li>
+      <li>센서 1개 + OLED 표시만으로 범위를 줄여주세요</li>
+      <li>역할 분담에서 "부품 정리 및 테스트 보조" 역할을 만들어 참여감을 주세요</li>
+      <li>계획서는 종이에 간단히 적는 것으로 충분합니다</li>
+    </ul>
+  </div>
+</div>
+
+---
+
+## 평가 루브릭
+
+<table class="rubric-table">
+  <thead>
+    <tr><th>등급</th><th>관찰 기록 예시</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="badge badge-purple">S</span></td>
+      <td>10개 이상 문제를 제안하고, "센서 가용성/데이터 수집 난이도/사회적 영향력" 평가 매트릭스로 의사결정함. 바이브 코딩 전략을 세분화하여 센서 드라이버는 AI, 분석 로직은 직접 코딩으로 구분함. 아이디어가 막힌 다른 팀에게 "만약에&#126;" 발상법을 안내함. 사회 시간의 프로젝트 방법론과 연결하여 "문제 정의→조사→해결→발표 구조가 같다"고 설명함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">A</span></td>
+      <td>10개 이상 문제를 제안하고, 평가 매트릭스로 의사결정함. 데이터 수집 계획(샘플 수, 주기, 기간)과 예상 결과를 명세에 포함함. 바이브 코딩과 직접 코딩의 경계를 명확히 구분함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">B</span></td>
+      <td>10개 이상 브레인스토밍 후 팀 투표로 문제를 선정함. 필요 센서, OLED 레이아웃 스케치, PC 대시보드 계획, ML 분류 목표를 구체적으로 정의함. 팀원 역할을 분담하고 "설계 먼저 하면 시행착오가 줄어든다"는 공학적 사고를 보임.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-amber">C</span></td>
+      <td>팀원과 5개 이상 문제를 제안하고, 토론으로 하나를 선정함. 필요 센서와 대시보드 계획을 세우고 역할을 분담함. OLED 레이아웃을 간단히 스케치함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">D</span></td>
+      <td>팀 활동에 참여하여 1&#126;2개 아이디어를 제안함. 팀 방향에 따라 역할 수행을 준비함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">E</span></td>
+      <td>팀 활동에 참여함. 자신의 역할을 팀원과 교사의 설명으로 이해함.</td>
+    </tr>
+  </tbody>
+</table>

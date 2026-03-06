@@ -1,0 +1,307 @@
+---
+title: "15차시: 되돌아보기와 다음 단계"
+description: "15주 학습 여정을 되돌아보고, 센서 패스포트를 완성하며, 코스 B를 안내하는 수업 — 교사용 지도서"
+---
+
+<a class="student-link" href="https://greatsong.github.io/ai-physical-computing/course-a/act3/lesson-15/" target="_blank" rel="noopener">
+  <span class="link-icon">📖</span>
+  <span class="link-body">
+    <span class="link-label">학생 교재 보기</span>
+    <span class="link-title">15차시: 되돌아보기와 다음 단계 — 학생용 페이지</span>
+  </span>
+  <span class="link-arrow">→</span>
+</a>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">성취기준</div>
+      15주 학습 여정을 성찰하고, 센서 패스포트를 완성하며, Python 개념 14가지를 자가 점검할 수 있다
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">센서</div>
+      (해당 없음 — 성찰 활동)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">난이도</div>
+      ● ○ ○ ○ ○
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">오늘의 질문</div>
+      15차시 동안 나는 어떤 능력을 얻었을까?
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">메타인지</span> <span class="badge badge-amber">자기주도 학습</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>학생 준비물</h5>
+  <ul>
+    <li>그동안의 활동 기록 (코드, 대시보드 사진, ML 결과 스크린샷 등)</li>
+    <li>컴퓨터 (Python 설치 — 성장 시각화 코드 실행용)</li>
+    <li>필기구 (성찰 활동용)</li>
+  </ul>
+  <h5>교사 준비물</h5>
+  <ul>
+    <li>센서 패스포트 양식 인쇄 (또는 디지털 공유)</li>
+    <li>15주 여정 요약 슬라이드 (1&#126;15차시 핵심 사진/스크린샷 모음)</li>
+    <li>코스 B 안내 자료</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>15주 여정 사진을 모아 슬라이드로 정리 — 1차시 첫 센서 연결 사진부터 14차시 발표 사진까지</li>
+    <li>수료증 또는 센서 패스포트 스티커 등 마무리 보상 준비 (선택)</li>
+    <li>코스 B 안내 페이지 URL 준비</li>
+    <li>따뜻하고 축하하는 분위기 조성 — 마지막 차시는 성취감이 핵심</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 1.5">도입 7분</div>
+  <div class="main" style="flex: 6.5">전개 33분</div>
+  <div class="wrap-up" style="flex: 2">정리 10분</div>
+</div>
+
+---
+
+## 도입 (7분)
+
+<div class="teacher-script">
+  <p>"여러분, 오늘이 코스 A의 <strong>마지막 수업</strong>입니다."</p>
+  <p>"잠깐 1차시를 떠올려 볼까요? (1차시 사진을 보여주며) 이때 여러분은 DHT20이라는 센서를 처음 만졌어요. I2C 포트가 어딘지도 몰랐고, 코드 한 줄도 생소했어요."</p>
+  <p>"지금은요? 센서를 연결하고, AI에게 코드를 요청하고, OLED에 대시보드를 만들고, Teachable Machine으로 ML 모델까지 학습시켰어요. 그리고 그 결과를 사람들 앞에서 발표했죠."</p>
+  <p>"<strong>직접 코딩→바이브 코딩→대시보드→ML</strong> — 15주 동안의 여정이었어요. 오늘은 그 여정을 되돌아보고, 여러분이 얼마나 성장했는지 스스로 확인하는 시간입니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"벌써 15주나 됐어요?"</span>
+  <span class="bubble">"1차시 때 USB 케이블도 몰랐는데&#126;"</span>
+  <span class="bubble">"바이브 코딩이 제일 좋았어요"</span>
+  <span class="bubble">"대시보드 만들 때가 진짜 재밌었어요"</span>
+</div>
+
+<div class="teaching-tip">
+  <p>도입에서 <strong>1차시 때의 사진이나 코드</strong>를 보여주면 효과적입니다. "그때는 이게 어려웠는데 지금은 쉽죠?"라는 대비가 성장 인식을 강화합니다. 학생들의 추억을 불러일으키는 질문("처음 센서에서 숫자가 나왔을 때 기분이 어땠어요?")으로 시작하세요. 이 차시는 기술 학습이 아니라 <strong>정서적 마무리</strong>가 핵심이므로, 따뜻하고 축하하는 분위기를 만들어 주세요.</p>
+</div>
+
+---
+
+## 전개 (33분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">학습 여정 회고</span>
+  <span class="step-time">12분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"5가지 성찰 질문에 조용히 답을 적어보세요. '잘했다/못했다' 평가가 아니라, <strong>무엇을 경험했는지</strong>를 적어주세요."</p>
+  <p>"첫 번째 — 1차시를 떠올려보세요. 처음 센서를 연결했을 때 가장 어려웠던 것은? 지금은 어떤가요?"</p>
+  <p>"두 번째 — 바이브 코딩을 떠올려보세요. AI에게 코드를 요청할 때 가장 중요한 것은 무엇이었나요?"</p>
+  <p>"세 번째 — 대시보드를 떠올려보세요. OLED에 데이터가 나타났을 때의 느낌은?"</p>
+  <p>"네 번째 — ML을 떠올려보세요. 컴퓨터가 소리를 분류했을 때 놀라웠나요?"</p>
+  <p>"다섯 번째 — 팀 프로젝트를 떠올려보세요. 팀에서 나의 역할은 무엇이었고, 다음에는 어떤 역할을 해보고 싶나요?"</p>
+  <p>"10분 드릴게요. 조용히 적어보세요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"처음에는 I2C 포트가 뭔지도 몰랐는데&#126;"</span>
+  <span class="bubble">"바이브 코딩할 때 프롬프트를 구체적으로 써야 한다는 걸 배웠어요"</span>
+  <span class="bubble">"OLED에 내 이름 나올 때 진짜 뿌듯했어요"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"뭘 적어야 할지 모르겠어요"</div>
+    <span class="label">대응</span>
+    <span class="value">"가장 재미있었던 차시가 뭐였어요? 왜요?"부터 시작하게 하세요. 구체적 에피소드가 떠오르면 나머지도 자연스럽게 나옵니다</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>모든 학생이 최소 3개 질문에 답을 적고 있는가</li>
+    <li>조용한 분위기가 유지되고 있는가</li>
+    <li>기억이 안 나는 학생에게는 "2차시에서 빛 센서 썼잖아, 기억나?" 등 힌트를 주세요</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>성찰 활동은 <strong>충분한 시간과 조용한 환경</strong>이 필요합니다. 서둘러 넘기지 마세요. 기억이 나지 않는 학생에게는 해당 차시 페이지를 다시 찾아보도록 안내하세요. 짝과 서로의 성찰을 공유하는 시간(2분)을 주면 "나만 이렇게 느낀 게 아니구나"라는 안도감이 생깁니다. 친구의 회상을 도와주는 행동도 관찰하세요.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">센서 패스포트 완성</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이제 <strong>센서 패스포트</strong>를 완성할 시간입니다. 15주 동안 사용한 센서들을 정리하세요."</p>
+  <p>"센서 이름, 사용 차시, 측정한 것, 배운 코드/도구, 기억에 남는 발견 — 이 다섯 칸을 채워보세요."</p>
+  <p>"다 기억 안 나도 괜찮아요. 기억나는 것부터 적고, 옆 친구와 상의해도 좋습니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"온습도 센서가 제일 먼저 쓴 거잖아"</span>
+  <span class="bubble">"빛 센서는 2차시였지?"</span>
+  <span class="bubble">"가속도 센서에서 3축 데이터 나왔을 때 신기했어"</span>
+  <span class="bubble">"OLED은 센서는 아니고 출력 장치인데 넣어도 되나요?"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"OLED은 센서가 아닌데 넣어요?"</div>
+    <span class="label">대응</span>
+    <span class="value">"좋은 질문이에요! OLED은 출력 장치예요. 하지만 우리 프로젝트에서 중요한 부품이었으니 패스포트에 넣어도 돼요. '(출력 장치)'라고 표시하면 정확합니다"</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>최소 5개 이상의 센서/장치를 기록하고 있는가</li>
+    <li>"기억에 남는 발견" 칸에 구체적 내용을 적고 있는가</li>
+    <li>친구와 서로 기억을 보충해 주고 있는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>센서 패스포트는 <strong>성취의 시각적 증거</strong>입니다. "와, 이렇게 많은 센서를 다뤘구나!"라는 자각이 일어나도록 격려하세요. 성공한 경험뿐 아니라 <strong>실패한 경험</strong>도 적도록 안내하세요. "처음에 OSError 났을 때 당황했지만, i2c.scan()으로 해결했다" — 이런 기록이 진짜 성장의 증거입니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">Python 개념 자가 점검 및 성장 시각화</span>
+  <span class="step-time">8분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"교재에 <strong>Python 개념 14가지</strong>가 정리되어 있어요. 변수, 리스트, 조건문, while, for, f-string, 함수, 딕셔너리, 에러 핸들링, 파일 입출력, 중첩 딕셔너리, 리스트 컴프리헨션, 2차원 리스트, lambda와 정렬."</p>
+  <p>"각각에 대해 '익숙하다/보통이다/아직 어렵다'를 체크해 보세요. 이게 코스 B에서의 출발점이 됩니다."</p>
+  <p>"시간이 되면, 교재의 <strong>성장 시각화 코드</strong>를 실행해 보세요. before(1차시 때)와 after(지금) 점수를 넣으면 성장 그래프가 나옵니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"while은 잘 알겠는데 lambda는 아직 어려워요"</span>
+  <span class="bubble">"딕셔너리 진짜 많이 썼다"</span>
+  <span class="bubble">"평균 성장이 +2.5점이래요!"</span>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>14가지 개념을 체크하고 있는가</li>
+    <li>성장 시각화 코드를 실행했는가 (시간이 부족하면 숙제)</li>
+    <li>"어려운 것"을 표시하는 것을 부끄러워하지 않는가 — "모르는 걸 아는 게 진짜 실력"</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>"어려운 것"에 표시하는 것을 긍정적으로 프레이밍하세요. "모르는 걸 정확히 아는 것이 메타인지, 그게 진짜 실력이에요." 수학/과학/국어/기술/사회 등 <strong>다른 교과와의 연결</strong>을 짚어주면 좋습니다. "과학 시간에 실험 보고서 쓸 때 데이터 분석이 쉬워졌죠?", "수학 시간에 평균/그래프가 나오면 이제 감이 오죠?" 등.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">코스 B 안내</span>
+  <span class="step-time">3분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"코스 A를 마쳤으니 두 가지 선택지가 있어요."</p>
+  <p>"첫째, <strong>코스 B로 진행하기</strong> — 레벨 1(탐험가)부터 레벨 4(마스터)까지 자기 주도 프로젝트를 해요. 더 깊이, 더 자유롭게."</p>
+  <p>"둘째, <strong>코스 A 심화하기</strong> — 관심 있는 차시를 다시 도전하며 도전 코드를 완성해요."</p>
+  <p>"어떤 선택이든 여러분은 이미 <strong>센서로 세상을 읽고, 대시보드로 보여주고, AI로 분석하는 사람</strong>이 되었어요."</p>
+</div>
+
+---
+
+## 정리 (10분)
+
+<div class="teacher-script">
+  <p>"15주 전, 여러분은 아마 이런 상태였을 거예요. '센서가 뭐지?', 'print가 뭐지?', 'MicroPython이 뭐지?'"</p>
+  <p>"지금 여러분은 — 센서를 연결하고, 코드로 데이터를 읽고, AI에게 코드를 요청하고, 대시보드를 만들고, ML 모델을 학습시키고, 그 결과를 발표까지 할 수 있어요."</p>
+  <p>"<strong>1막</strong>에서는 센서와 Python의 기초를 배웠어요. <strong>2막</strong>에서는 바이브 코딩으로 더 복잡한 것에 도전했어요. <strong>3막</strong>에서는 팀 프로젝트로 문제를 발견하고, 대시보드를 만들고, ML까지 경험했어요."</p>
+  <p>"여러분은 더 이상 코드를 '배우는 사람'이 아니에요. 코드와 AI를 <strong>'사용하는 사람'</strong>이 되었습니다."</p>
+  <p>(잠시 멈추며)</p>
+  <p>"15주 동안 정말 수고했어요. 자랑스럽습니다."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>마지막 정리는 <strong>축하와 격려</strong>에 집중하세요. 기술적 내용보다 학생들의 성장 스토리가 중요합니다. "&#126; 학생은 1차시에 케이블 연결도 못 했는데, 지금은 팀의 센서 담당이 됐어요" 같은 개인별 에피소드를 언급하면 큰 감동을 줍니다 (사전에 2&#126;3명분 준비). "센서→데이터→시각화→AI→ML" 파이프라인이 환경 모니터링, 건강 관리, 스마트 농업 등 다양한 분야에 적용된다는 점을 언급하여 배움의 가치를 확장하세요.</p>
+</div>
+
+---
+
+## 차별화 전략
+
+<div class="differentiation">
+  <div class="fast-learner">
+    <p><strong>빠른 학생에게:</strong></p>
+    <ul>
+      <li>15주 성장을 구체적 에피소드와 함께 서술하세요</li>
+      <li>센서 패스포트에 성공뿐 아니라 실패 경험도 기록하세요</li>
+      <li>Python 14가지 개념 중 부족한 영역을 표시하고 코스 B 학습 계획을 세우세요</li>
+      <li>"센서→데이터→시각화→AI→ML" 파이프라인을 다른 분야(환경, 건강, 농업 등)에 어떻게 적용할 수 있을지 설명해 보세요</li>
+      <li>기억이 나지 않는 친구의 회상을 도와주세요</li>
+    </ul>
+  </div>
+  <div class="slow-learner">
+    <p><strong>느린 학생에게:</strong></p>
+    <ul>
+      <li>성찰 질문에 가장 재미있었던 차시와 이유만 적어도 충분합니다</li>
+      <li>센서 패스포트는 기억나는 3&#126;4개만 적어도 괜찮아요</li>
+      <li>교사가 "이거 기억나?"라고 힌트를 주며 함께 채워가세요</li>
+      <li>15주를 마친 것 자체가 대단한 성취입니다 — 이 점을 꼭 인정해 주세요</li>
+    </ul>
+  </div>
+</div>
+
+---
+
+## 평가 루브릭
+
+<table class="rubric-table">
+  <thead>
+    <tr><th>등급</th><th>관찰 기록 예시</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="badge badge-purple">S</span></td>
+      <td>15주 성장을 구체적 에피소드와 함께 서술함. 센서 패스포트에 성공과 실패 경험을 모두 기록함. Python 14가지 개념 중 부족한 영역을 표시하고 코스 B 학습 계획을 세움. "센서→데이터→시각화→AI→ML" 파이프라인의 다양한 적용(환경 모니터링, 건강 관리, 스마트 농업 등)을 설명함. 수학/과학/국어/기술/사회 교과와 통합하여 성찰함. 친구의 회상을 도와줌.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">A</span></td>
+      <td>15주 성장을 구체적 에피소드와 함께 서술함. 센서 패스포트에 핵심 발견과 실패 경험을 기록함. Python 개념을 자기 평가함. 파이프라인을 환경 모니터링, 건강 관리, 스마트 농업 등에 전이하여 설명함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">B</span></td>
+      <td>5개 성찰 질문에 구체적으로 기술함. 센서 패스포트를 완성함. Python 14가지 개념을 자가 점검함. 1차시와 현재 역량을 비교함. 코스 B 프로젝트 아이디어를 제시함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-amber">C</span></td>
+      <td>성찰 질문에 인상 깊었던 차시와 이유를 기술함. 센서 패스포트를 대부분 완성함. 익숙한 것과 어려운 것을 구분함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">D</span></td>
+      <td>성찰 질문에 짧게 답함. 가장 재미있었던 활동과 어려웠던 활동을 기록함. 센서 패스포트를 부분적으로 작성함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">E</span></td>
+      <td>교사 질문에 따라 기억나는 활동 하나를 말함. 15주를 마친 성취감을 표현함.</td>
+    </tr>
+  </tbody>
+</table>

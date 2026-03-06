@@ -1,0 +1,384 @@
+---
+title: "6차시: 환경 모니터링 대시보드"
+description: "바이브 코딩으로 CO2, 온습도 센서와 OLED를 조합한 교실 환경 대시보드 — 교사용 지도서"
+---
+
+<a class="student-link" href="https://greatsong.github.io/ai-physical-computing/course-a/act2/lesson-06/" target="_blank" rel="noopener">
+  <span class="link-icon">📖</span>
+  <span class="link-body">
+    <span class="link-label">학생 교재 보기</span>
+    <span class="link-title">6차시: 환경 모니터링 대시보드 — 학생용 페이지</span>
+  </span>
+  <span class="link-arrow">→</span>
+</a>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">성취기준</div>
+      바이브 코딩으로 복합 센서 대시보드를 제작하고, 환기 전후 CO2 데이터를 비교 분석할 수 있다
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">센서</div>
+      SCD41 (CO2, I2C) + DHT20 (온습도, I2C) + OLED SSD1306 (I2C)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">난이도</div>
+      ● ● ● ○ ○
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">오늘의 질문</div>
+      바이브 코딩으로 교실 환경 대시보드를 만들 수 있을까?
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">과학적 사고</span> <span class="badge badge-amber">컴퓨팅 사고력</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (팀별 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH + Grove Shield</li>
+    <li>SCD41 CO2 센서 (I2C, 주소 0x62)</li>
+    <li>DHT20 온습도 센서 (I2C, 주소 0x38)</li>
+    <li>OLED 디스플레이 SSD1306 (I2C, 주소 0x3C)</li>
+    <li>Grove 케이블 3개 (또는 2개 + Y-스플리터)</li>
+    <li>USB 데이터 케이블</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE + MicroPython 펌웨어</li>
+    <li>ssd1306 라이브러리가 Pico에 설치되어 있는지 확인</li>
+    <li>AI 챗봇 접속 확인</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>SCD41 센서를 미리 한 번 테스트 — 첫 측정까지 약 5초 소요됨을 확인</li>
+    <li>I2C 포트가 2개뿐이므로, 3개 장치 연결 방법을 미리 파악 (Y-스플리터 또는 I2C 허브)</li>
+    <li>I2C 스캔 코드를 교사 PC에 준비: <code>i2c.scan()</code>으로 0x38, 0x3C, 0x62 확인</li>
+    <li>교실 환기가 가능한지 확인 (창문 개폐 여부)</li>
+    <li>환기 전후 기록표 인쇄</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 1">도입 5분</div>
+  <div class="main" style="flex: 7">전개 35분</div>
+  <div class="wrap-up" style="flex: 2">정리 10분</div>
+</div>
+
+---
+
+## 도입 (5분)
+
+<div class="teacher-script">
+  <p>"지난 시간에 바이브 코딩을 처음 해봤죠? AI에게 프롬프트를 보내서 코드를 받고, 오류를 검증하고 수정하는 경험을 했어요."</p>
+  <p>"오늘은 바이브 코딩의 진짜 힘을 보여드릴 차례입니다. 센서를 <strong>세 개</strong> 동시에 제어하는 코드를 만들 거예요."</p>
+  <p>"CO2 센서, 온습도 센서, OLED 디스플레이 — 이 세 가지를 하나로 합쳐서 <strong>교실 환경 대시보드</strong>를 만듭니다."</p>
+  <p>"1막에서 직접 코딩으로 이걸 만들려면 한 시간 넘게 걸렸을 거예요. 오늘은 바이브 코딩으로 빠르게 완성합니다. 대신, AI가 준 코드를 <strong>반드시 검증</strong>해야 합니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"센서 세 개를 동시에요?"</span>
+  <span class="bubble">"CO2도 측정할 수 있어요?"</span>
+  <span class="bubble">"OLED에 다 보여줄 수 있어요?"</span>
+</div>
+
+<div class="teaching-tip">
+  <p>"1막이라면 어려웠겠지만, 바이브 코딩이니까 가능합니다"라는 흐름으로 2막의 가치를 자연스럽게 전달하세요. 동시에 "AI 코드를 그대로 믿으면 안 된다"는 5차시의 교훈도 환기시키세요.</p>
+</div>
+
+---
+
+## 전개 (35분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">센서 3개 연결 + I2C 스캔</span>
+  <span class="step-time">7분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"오늘 가장 중요한 포인트는 <strong>연결</strong>입니다. 세 장치 모두 I2C 통신을 사용하는데, Grove Shield에 I2C 포트는 2개뿐이에요."</p>
+  <p>"SCD41을 I2C0, DHT20을 I2C1에 꽂으세요. OLED는 — 여분 케이블이 있으면 Y-스플리터로 같은 포트에 연결하거나, UART1 포트에 연결해도 됩니다. 같은 I2C 버스이니까요."</p>
+  <p>"연결이 끝나면, 먼저 I2C 스캔 코드를 실행해서 세 장치가 다 보이는지 확인합시다."</p>
+</div>
+
+<details class="student-content">
+  <summary>I2C 스캔 코드</summary>
+  <div class="content">
+
+```python
+from machine import I2C, Pin
+i2c = I2C(0, sda=Pin(8), scl=Pin(9))
+devices = i2c.scan()
+print("발견된 I2C 장치:", [hex(d) for d in devices])
+# 예상: ['0x38', '0x3c', '0x62']
+```
+
+  </div>
+</details>
+
+<div class="student-voice">
+  <span class="bubble">"0x38, 0x3c, 0x62 세 개 다 나와요!"</span>
+  <span class="bubble">"저는 두 개만 나와요..."</span>
+  <span class="bubble">"케이블이 하나 빠져 있었어요"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"I2C 스캔에 장치가 2개만 보여요"</div>
+    <span class="label">원인</span>
+    <span class="value">Grove 케이블이 제대로 꽂히지 않았거나, 같은 I2C 버스에 연결되지 않은 경우</span>
+    <span class="label">대응</span>
+    <span class="value">케이블을 뺐다가 다시 꽂고, 모든 장치가 I2C0 버스(SDA=GP8, SCL=GP9)에 연결되었는지 확인하세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"I2C 스캔에 같은 주소가 두 개 나와요"</div>
+    <span class="label">원인</span>
+    <span class="value">같은 센서가 두 개 연결되었거나, 주소 충돌이 발생한 경우</span>
+    <span class="label">대응</span>
+    <span class="value">센서를 하나씩 뺐다가 꽂으면서 어떤 장치가 어떤 주소인지 확인하세요</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>이 시점에 순회하며 확인:</strong></p>
+  <ol>
+    <li>I2C 스캔에서 0x38, 0x3C, 0x62 세 개가 모두 보이는가</li>
+    <li>케이블이 단단히 꽂혀 있는가 (느슨한 연결은 간헐적 오류의 원인)</li>
+    <li>SCD41 센서의 방향이 올바른가 (센서면이 위를 향하도록)</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>I2C 스캔 코드를 먼저 실행하는 것이 핵심입니다. 하드웨어 연결이 확인되지 않은 상태에서 복잡한 코드를 실행하면 디버깅이 어렵습니다. "연결 먼저, 코드는 그 다음"이라는 원칙을 강조하세요.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">AI에게 대시보드 코드 요청 + 검증</span>
+  <span class="step-time">13분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"세 장치가 다 보이는 팀은, 이제 AI에게 대시보드 코드를 요청합시다."</p>
+  <p>"교재에 있는 프롬프트를 참고하세요. 5차시에서 배운 대로, <strong>하드웨어 정보, 센서 주소, 원하는 기능</strong>을 구체적으로 적어야 합니다."</p>
+  <p>"AI가 코드를 주면, 바로 실행하지 말고 먼저 <strong>세 가지</strong>를 확인하세요. 첫째, I2C 설정이 맞는지. 둘째, SCD41 주소가 0x62인지. 셋째, ssd1306 라이브러리를 쓰고 있는지."</p>
+</div>
+
+<details class="student-content">
+  <summary>학생 교재 — 프롬프트 예시</summary>
+  <div class="content">
+
+```
+Pico 2 WH에 Grove SCD41 CO2 센서와 DHT20 온습도 센서를 I2C0(SDA=GP8, SCL=GP9)에,
+OLED SSD1306도 같은 I2C에 연결했어.
+
+CO2 농도, 온도, 습도를 OLED 대시보드에 실시간 표시하고,
+CO2가 1000ppm 넘으면 'VENTILATE!' 경고를 표시하는 MicroPython 코드 만들어줘.
+
+조건:
+- SCD41 I2C 주소는 0x62
+- 측정 시작 명령: bytes([0x21, 0xB1])
+- 5초 대기 후 읽기 명령: bytes([0xEC, 0x05])
+- 9바이트 읽기
+- CO2 = (data[0]<<8)|data[1]
+- DHT20 주소 0x38
+- OLED 주소 0x3C, ssd1306 라이브러리 사용
+```
+
+  </div>
+</details>
+
+<div class="student-voice">
+  <span class="bubble">"코드가 엄청 길어요!"</span>
+  <span class="bubble">"OLED에 글자가 떴어요!"</span>
+  <span class="bubble">"CO2가 680ppm이라고 나와요"</span>
+  <span class="bubble">"저는 에러가 나요... ssd1306이 없대요"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"ImportError: no module named 'ssd1306'"</div>
+    <span class="label">원인</span>
+    <span class="value">Pico에 ssd1306 라이브러리가 설치되어 있지 않음</span>
+    <span class="label">대응</span>
+    <span class="value">Thonny에서 Tools → Manage Packages → ssd1306 검색 후 설치. 또는 ssd1306.py 파일을 Pico에 직접 업로드</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"SCD41에서 값이 0으로 나와요"</div>
+    <span class="label">원인</span>
+    <span class="value">측정 시작 명령 후 대기 시간이 부족하거나, 센서가 아직 워밍업 중</span>
+    <span class="label">대응</span>
+    <span class="value">"SCD41은 첫 측정까지 5초가 필요합니다. time.sleep(5) 확인하고, 처음 1&#126;2회 측정은 0이 나올 수 있어요. 잠시 기다려보세요."</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"OLED 화면이 깨져요"</div>
+    <span class="label">원인</span>
+    <span class="value">OLED 해상도가 128x64가 아니거나, AI 코드의 화면 좌표가 잘못된 경우</span>
+    <span class="label">대응</span>
+    <span class="value">oled = ssd1306.SSD1306_I2C(128, 64, i2c, addr=0x3C)에서 128x64 확인. AI가 좌표를 잘못 잡았으면 직접 수정하세요.</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>AI 코드를 실행하기 전에 I2C 설정과 센서 주소를 확인했는가</li>
+    <li>OLED에 CO2, 온도, 습도가 모두 표시되는가</li>
+    <li>에러가 나는 팀은 에러 메시지를 AI에게 다시 보내는 방법을 알고 있는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>AI가 SCD41의 데이터 파싱 코드를 틀리는 경우가 많습니다. 특히 온도/습도 변환 공식이 잘못되거나 CRC 체크 바이트를 처리하지 않는 경우가 있습니다. 학생 교재의 기본 코드 탭에 정확한 코드가 있으므로, 막히는 팀에게는 해당 탭을 참고하도록 안내하세요.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">환기 전후 비교 실험</span>
+  <span class="step-time">15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"대시보드가 잘 동작하는 팀, 이제 진짜 실험을 합시다."</p>
+  <p>"먼저 <strong>창문을 닫은 상태</strong>에서 5분간 CO2 수치를 관찰하세요. 2분마다 기록표에 적습니다."</p>
+  <p>"5분 후에 창문을 열어서 환기합니다. 그리고 CO2가 얼마나 빨리 떨어지는지 관찰하세요."</p>
+  <p>"여러분이 지금 하고 있는 게 뭔지 아세요? <strong>데이터 기반 의사결정</strong>이에요. '창문 열까 말까'를 느낌이 아니라 숫자로 판단하는 겁니다."</p>
+</div>
+
+<details class="student-content">
+  <summary>학생 교재 — 환기 전후 기록표</summary>
+  <div class="content">
+
+| 시간 | CO2 (ppm) | 온도 (°C) | 습도 (%) | 상태 |
+|------|----------|----------|---------|------|
+| 0분 (시작) | | | | 창문 닫힘 |
+| 2분 | | | | |
+| 4분 | | | | |
+| 5분 (환기 시작) | | | | 창문 열기 |
+| 7분 | | | | |
+| 9분 | | | | |
+| 10분 | | | | |
+
+  </div>
+</details>
+
+<div class="student-voice">
+  <span class="bubble">"CO2가 계속 올라가요! 850에서 925까지!"</span>
+  <span class="bubble">"창문 열었더니 진짜 떨어져요!"</span>
+  <span class="bubble">"5분 만에 600ppm까지 내려갔어요!"</span>
+  <span class="bubble">"근데 온도도 같이 떨어지네요..."</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"CO2가 안 올라가요"</div>
+    <span class="label">원인</span>
+    <span class="value">교실이 넓거나, 창문이 이미 열려 있거나, 학생 수가 적은 경우</span>
+    <span class="label">대응</span>
+    <span class="value">센서를 학생들 가까이에 두거나, 센서 주변에 3&#126;4명이 모여 호흡하면 CO2가 빠르게 올라갑니다</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>기록표에 시간별 데이터를 적고 있는가</li>
+    <li>환기 전후의 CO2 변화를 관찰하고 있는가</li>
+    <li>온도와 CO2의 관계(트레이드오프)를 인식하는 팀이 있는가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>환기 실험은 이 수업의 <strong>핵심 활동</strong>입니다. 시간이 부족하면 Step 2의 코드 검증 시간을 줄이더라도 환기 실험에 최소 10분을 확보하세요. CO2 변화를 직접 눈으로 확인하는 경험이 "데이터 기반 사고"의 출발점입니다. 창문을 열 수 없는 교실이라면, 센서 주변에 학생들이 모여 호흡하다가 흩어지는 방식으로 대체할 수 있습니다.</p>
+</div>
+
+---
+
+## 정리 (10분)
+
+<div class="teacher-script">
+  <p>"자, 환기 실험 결과를 한 팀씩 발표해 봅시다. 창문 닫았을 때 CO2가 가장 높았던 팀은?"</p>
+  <p>"창문 열고 나서 CO2가 600ppm 이하로 떨어지는 데 몇 분 걸렸나요?"</p>
+  <p>"'20분마다 5분 환기'라는 규칙이 있는데, 오늘 데이터를 보면 이게 적절한 것 같나요?"</p>
+  <p>"오늘 여러분이 한 일을 정리하면 이렇습니다. AI에게 프롬프트로 <strong>세 개 센서를 제어하는 코드</strong>를 요청했고, 그 코드를 검증하고 수정해서 돌렸고, 그걸로 <strong>실제 교실 환경을 모니터링</strong>했습니다."</p>
+  <p>"1막에서 센서 하나 읽는 코드를 직접 작성하는 데 한 시간 걸렸는데, 오늘은 바이브 코딩으로 센서 세 개짜리 대시보드를 50분 안에 만들었어요. 이것이 2막의 힘입니다."</p>
+  <p>"다음 시간에는 <strong>심박 센서</strong>를 씁니다. 여러분의 심장 박동을 OLED에 파형과 BPM으로 표시하는 대시보드를 바이브 코딩으로 만들어 볼 거예요."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>팀별 데이터를 칠판이나 화면에 모아서 비교하면 효과적입니다. "같은 교실인데 팀마다 CO2가 다른 이유는?" (센서 위치, 주변 인원수 차이)로 이어가면 과학적 사고를 자연스럽게 이끌 수 있습니다.</p>
+</div>
+
+---
+
+## 차별화 전략
+
+<div class="differentiation">
+  <div class="fast-learner">
+    <p><strong>빠른 학생에게:</strong></p>
+    <ul>
+      <li>환기 실험 CO2 감소 곡선의 기울기를 분석해 보세요 — 선형인가요, 비선형인가요?</li>
+      <li>I2C 스캔 코드로 다른 팀의 연결 문제를 디버깅해 주세요</li>
+      <li>교실 인원수와 CO2 증가 속도의 관계를 예측하는 실험을 설계해 보세요</li>
+      <li>도전 코드(CO2 히스토리 그래프)를 실행해 보세요</li>
+    </ul>
+  </div>
+  <div class="slow-learner">
+    <p><strong>느린 학생에게:</strong></p>
+    <ul>
+      <li>학생 교재의 기본 코드 탭을 그대로 복사하여 실행하기</li>
+      <li>I2C 스캔은 교사가 함께 진행하고, 세 주소가 나오는 것을 확인하기</li>
+      <li>환기 실험에 참여하면서 OLED 화면의 CO2 숫자 변화를 관찰하고 기록하기</li>
+    </ul>
+  </div>
+</div>
+
+---
+
+## 평가 루브릭
+
+<table class="rubric-table">
+  <thead>
+    <tr><th>등급</th><th>관찰 기록 예시</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="badge badge-purple">S</span></td>
+      <td>환기 실험 CO2 감소 곡선의 기울기를 분석하여 비선형 패턴을 발견함. 수학 시간 감소 함수와 연결하여 설명함. 다른 반 담임에게 데이터 기반 환기 제안을 함. I2C 스캔 코드로 다른 팀의 디버깅을 도움.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">A</span></td>
+      <td>환기 실험 데이터의 시간-CO2 그래프에서 비선형 패턴을 분석함. 교실 인원수와 CO2 증가 속도 관계의 비교 실험을 제안함. I2C 주소 충돌을 사전 예측하고 스캔 코드로 검증함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">B</span></td>
+      <td>CO2(SCD41), DHT20, OLED 3개 장치를 I2C로 동시 연결함. 창문 닫고 5분 관찰 후 환기 시 925ppm에서 600ppm으로 감소를 확인함. 20분마다 5분 환기를 제안함. I2C 주소 충돌 오류를 수정함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-amber">C</span></td>
+      <td>바이브 코딩으로 3개 센서 대시보드를 실행함. 환기 전후 CO2 변화를 관찰함. AI 코드 오류를 교사 힌트와 함께 수정함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">D</span></td>
+      <td>교사 안내에 따라 환기 실험에 참여함. OLED에 표시되는 CO2 수치 변화를 관찰함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">E</span></td>
+      <td>교사 지원으로 장치를 연결하고 코드를 실행함. 환기 실험에 참여하며 숫자 변화를 관찰함.</td>
+    </tr>
+  </tbody>
+</table>
