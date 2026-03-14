@@ -122,7 +122,7 @@ description: "바이브 코딩으로 AI에게 MicroPython 코드를 요청하고
 
 ```
 Raspberry Pi Pico 2 WH에 Grove Shield를 사용하고 있어.
-Grove DHT20 온습도 센서를 I2C0 포트(SDA=GP8, SCL=GP9)에 연결했어.
+Grove DHT20 온습도 센서를 I2C1 포트(SDA=GP6, SCL=GP7)에 연결했어.
 2초마다 온도와 습도를 측정해서 출력하는 MicroPython 코드를 만들어줘.
 ```
 
@@ -155,7 +155,7 @@ Grove DHT20 온습도 센서를 I2C0 포트(SDA=GP8, SCL=GP9)에 연결했어.
     <span class="label">원인</span>
     <span class="value">AI가 다른 보드의 핀 번호를 사용했거나, SDA/SCL을 바꿔 쓴 경우</span>
     <span class="label">대응</span>
-    <span class="value">"프롬프트에 핀 번호를 명시했는데도 틀렸나요? AI는 항상 맞는 게 아닙니다. SDA=GP8, SCL=GP9로 직접 수정하세요."</span>
+    <span class="value">"프롬프트에 핀 번호를 명시했는데도 틀렸나요? AI는 항상 맞는 게 아닙니다. SDA=GP6, SCL=GP7로 직접 수정하세요."</span>
   </div>
   <div class="trouble-card">
     <div class="symptom">"I2C 주소가 달라요 (0x38이 아닌 다른 주소)"</div>

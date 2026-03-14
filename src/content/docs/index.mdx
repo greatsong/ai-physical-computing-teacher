@@ -16,6 +16,10 @@ hero:
       link: https://greatsong.github.io/ai-physical-computing/
       icon: external
       variant: minimal
+    - text: Pico Makers 앱
+      link: https://pico-makers.vercel.app
+      icon: external
+      variant: minimal
 ---
 
 import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
@@ -82,5 +86,34 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
     title="평가 루브릭"
     description="S~E 등급 관찰 기록 예시. 생기부 작성에 직접 활용 가능."
     href="/ai-physical-computing-teacher/appendix/rubric/"
+  />
+</CardGrid>
+
+---
+
+## 디지털 학습 도구
+
+학생과 교사가 활용할 수 있는 연동 웹 앱입니다.
+
+<CardGrid>
+  <LinkCard
+    title="📖 학생용 교재"
+    description="코스 A(15차시) + 코스 B(프로젝트) 전체 교재. 코드 예제, 배선 가이드, 클릭-바이-클릭 가이드 포함."
+    href="https://greatsong.github.io/ai-physical-computing/"
+  />
+  <LinkCard
+    title="🛠️ Pico Makers"
+    description="커리큘럼 연동 AI 코딩 동반자. 33종 센서 코드 생성, Web Serial 업로드, 전시 모드 지원."
+    href="https://pico-makers.vercel.app"
+  />
+  <LinkCard
+    title="🤖 Pico Buddy"
+    description="AI 피코 학습 도우미. 33종 센서별 배선 가이드, 에러 자동 진단, 1:1 AI 튜터."
+    href="https://visual-pico.vercel.app"
+  />
+  <LinkCard
+    title="코스 B 지도 가이드"
+    description="프로젝트 기반 코스 B의 레벨별 상세 지도 전략과 앱 활용법."
+    href="/ai-physical-computing-teacher/course-b/guide/"
   />
 </CardGrid>
