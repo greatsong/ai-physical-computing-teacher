@@ -1,23 +1,23 @@
 ---
 title: "AI 피지컬 컴퓨팅 교사용 지도서"
-description: "센서+바이브코딩+대시보드+머신러닝 — 15차시 수업 지도서"
+description: "센서+바이브코딩+대시보드+머신러닝 — 코스 A(15차시) + 코스 B(프로젝트) 수업 지도서"
 template: splash
 hero:
-  tagline: "15차시 수업의 교사 스크립트, 예상 학생 반응, 지도 팁을 한곳에"
+  tagline: "코스 A(15차시) + 코스 B(프로젝트 레벨업) — 교사 스크립트, 예상 학생 반응, 지도 팁을 한곳에"
   actions:
-    - text: 1차시부터 보기
+    - text: 코스 A 시작하기
       link: /ai-physical-computing-teacher/course-a/act1/lesson-01/
       icon: right-arrow
+    - text: 코스 B 시작하기
+      link: /ai-physical-computing-teacher/course-b/guide/
+      icon: rocket
+      variant: secondary
     - text: 수업 전 준비
       link: /ai-physical-computing-teacher/guide/preparation/
       icon: seti:config
-      variant: secondary
+      variant: minimal
     - text: 학생용 교재
       link: https://greatsong.github.io/ai-physical-computing/
-      icon: external
-      variant: minimal
-    - text: Pico Makers 앱
-      link: https://pico-makers.vercel.app
       icon: external
       variant: minimal
 ---
@@ -58,7 +58,43 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 ---
 
-## 수업 전체 흐름
+## 코스 선택
+
+같은 장비, 같은 센서를 사용하지만 수업 운영 방식이 다릅니다.
+학교 상황과 학생 수준에 맞는 코스를 선택하세요.
+
+<CardGrid>
+  <Card title="코스 A: 15차시 수업" icon="open-book">
+    **매주 50분, 3막 구성으로 단계별 성장**
+
+    - **1막** — 센서와 친해지기 (4차시)
+    - **2막** — 바이브 코딩으로 확장 (6차시)
+    - **3막** — 대시보드와 머신러닝 (5차시)
+
+    직접 코딩 → 바이브 코딩 → ML 프로젝트까지,
+    15주에 걸쳐 교사 주도로 체계적으로 진행합니다.
+
+    [코스 A 1차시 지도안으로 이동 →](/ai-physical-computing-teacher/course-a/act1/lesson-01/)
+  </Card>
+
+  <Card title="코스 B: 프로젝트 레벨업" icon="rocket">
+    **3시간씩, 레벨업하며 만들기**
+
+    - **Lv.1 탐험가** — 센서 1개 대시보드
+    - **Lv.2 발명가** — 복합 센서 스마트 시스템
+    - **Lv.3 연구자** — 바이브 코딩 + AI 분석
+    - **Lv.4 마스터** — 머신러닝 + 실제 문제 해결
+
+    학생 자기주도 프로젝트 중심,
+    교사는 퍼실리테이터로 레벨별 지도 전략을 활용합니다.
+
+    [코스 B 지도 가이드로 이동 →](/ai-physical-computing-teacher/course-b/guide/)
+  </Card>
+</CardGrid>
+
+---
+
+## 수업 전체 흐름 (코스 A)
 
 | 단계 | 1막 (1~4차시) | 2막 (5~10차시) | 3막 (11~15차시) |
 |------|--------------|----------------|-----------------|
@@ -97,17 +133,17 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 <CardGrid>
   <LinkCard
-    title="📖 학생용 교재"
+    title="학생용 교재"
     description="코스 A(15차시) + 코스 B(프로젝트) 전체 교재. 코드 예제, 배선 가이드, 클릭-바이-클릭 가이드 포함."
     href="https://greatsong.github.io/ai-physical-computing/"
   />
   <LinkCard
-    title="🛠️ Pico Makers"
+    title="Pico Makers"
     description="커리큘럼 연동 AI 코딩 동반자. 33종 센서 코드 생성, Web Serial 업로드, 전시 모드 지원."
     href="https://pico-makers.vercel.app"
   />
   <LinkCard
-    title="🤖 Pico Buddy"
+    title="Pico Buddy"
     description="AI 피코 학습 도우미. 33종 센서별 배선 가이드, 에러 자동 진단, 1:1 AI 튜터."
     href="https://visual-pico.vercel.app"
   />

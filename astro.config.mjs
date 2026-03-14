@@ -60,7 +60,7 @@ export default defineConfig({
           ],
         },
         {
-          label: '코스 B: 프로젝트',
+          label: '코스 B: 프로젝트 레벨업',
           items: [
             { label: '코스 B 지도 가이드', slug: 'course-b/guide' },
             { label: 'Lv.1 탐험가: 대시보드', slug: 'course-b/lv1' },
