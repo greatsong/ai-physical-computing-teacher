@@ -63,6 +63,10 @@ export default defineConfig({
           label: '코스 B: 프로젝트',
           items: [
             { label: '코스 B 지도 가이드', slug: 'course-b/guide' },
+            { label: 'Lv.1 탐험가: 대시보드', slug: 'course-b/lv1' },
+            { label: 'Lv.2 발명가: 클라우드', slug: 'course-b/lv2' },
+            { label: 'Lv.3 연구자: 서버+AI', slug: 'course-b/lv3' },
+            { label: 'Lv.4 마스터: ML+DB', slug: 'course-b/lv4' },
           ],
         },
         {

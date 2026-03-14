@@ -1,0 +1,565 @@
+---
+title: "Lv.3 연구자: 실시간 서버 + AI 분석"
+description: "Flask 서버 실시간 대시보드 + 장기 데이터 수집 + AI 분석 — 교사용 지도서"
+---
+
+<a class="student-link" href="https://greatsong.github.io/ai-physical-computing/course-b/lv3/" target="_blank" rel="noopener">
+  <span class="link-icon">📖</span>
+  <span class="link-body">
+    <span class="link-label">학생 교재 보기</span>
+    <span class="link-title">Lv.3 연구자: 가설 기반 + 장기 데이터 수집 + AI 분석 — 학생용 페이지</span>
+  </span>
+  <span class="link-arrow">→</span>
+</a>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">성취기준</div>
+      Flask 서버를 구축하여 Pico 센서 데이터를 WiFi로 실시간 수신하고, 장기 데이터를 수집·시각화하여 AI 분석으로 가설을 검증할 수 있다
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      150분 (3차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">센서</div>
+      DHT20 (온습도, I2C) + LIGHT (ADC) + MPU6050 (가속도, I2C) — 프로젝트별 선택
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">난이도</div>
+      ● ● ● ● ○
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">오늘의 질문</div>
+      PC Flask 서버와 Pico를 WiFi로 연결하여 실시간 데이터 수집·분석 시스템을 구축할 수 있을까?
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">클라이언트-서버 통신</span> <span class="badge badge-amber">실시간 데이터 스트리밍</span> <span class="badge badge-purple">AI 분석</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (팀별 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH + Grove Shield</li>
+    <li>OLED 디스플레이 SSD1306 (I2C, 주소 0x3C)</li>
+    <li>센서 (프로젝트별 선택): DHT20 (0x38) + LIGHT (ADC, GP26) 또는 MPU6050 (0x68)</li>
+    <li>Grove 케이블 2~3개</li>
+    <li>USB 데이터 케이블</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE + MicroPython 펌웨어</li>
+    <li>ssd1306 라이브러리가 Pico에 설치되어 있는지 확인</li>
+    <li>micropython-urequests 라이브러리가 Pico에 설치되어 있는지 확인</li>
+    <li>PC에 Python 설치 (python.org) + pip install flask flask-cors matplotlib</li>
+    <li>AI 챗봇 접속 확인 (ChatGPT 또는 Claude)</li>
+  </ul>
+  <h5>수업 전 확인 (중요!)</h5>
+  <ul>
+    <li>교사 PC에 Python + Flask가 정상 설치되어 있는지 사전 테스트</li>
+    <li>교실 WiFi가 기기 간 통신을 허용하는지 확인 — 차단 시 핸드폰 핫스팟 대안 준비</li>
+    <li>교사 PC의 IP 주소 확인: Windows <code>ipconfig</code> / Mac 시스템 설정 → WiFi → 세부사항</li>
+    <li>Flask 서버를 미리 한 번 실행하여 <code>http://IP주소:5000</code> 접속 확인</li>
+    <li>학생 수만큼 WiFi SSID와 비밀번호를 칠판에 적어 둘 것</li>
+    <li>방화벽이 포트 5000을 차단하지 않는지 확인 (Mac은 포트 5001 사용 권장)</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 1">1차시 50분</div>
+  <div class="main" style="flex: 1">2차시 50분</div>
+  <div class="wrap-up" style="flex: 1">3차시 50분</div>
+</div>
+
+---
+
+## 1차시: Flask 서버 설치 + 기본 라우트 (50분)
+
+### 도입 (5분)
+
+<div class="teacher-script">
+  <p>"Lv.2까지 우리는 Pico 안에서만 데이터를 저장했어요. CSV 파일에 기록하고, 나중에 Thonny로 다운로드해서 PC에서 분석했죠."</p>
+  <p>"그런데 이 방식에는 불편한 점이 있어요. USB를 꽂아야 하고, 측정하는 동안 PC에서 실시간으로 확인할 수가 없죠."</p>
+  <p>"오늘부터 3차시에 걸쳐 <strong>WiFi 실시간 통신 시스템</strong>을 만듭니다. Pico가 센서 데이터를 무선으로 PC 서버에 전송하고, 웹 브라우저에서 실시간 대시보드를 확인할 수 있어요."</p>
+  <p>"이건 실제로 IoT 회사에서 쓰는 방식과 동일합니다. <strong>클라이언트-서버 구조</strong>라고 합니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"WiFi로 데이터를 보낸다고요?"</span>
+  <span class="bubble">"웹 브라우저에서 볼 수 있어요?"</span>
+  <span class="bubble">"Flask가 뭐예요?"</span>
+</div>
+
+<div class="teaching-tip">
+  <p>클라이언트-서버 개념을 "음식 배달"에 비유하면 효과적입니다. Pico = 음식점(데이터를 만들어 보냄), Flask 서버 = 배달 플랫폼(데이터를 받아 저장), 웹 브라우저 = 고객(데이터를 확인). 학생 교재의 클라이언트-서버 다이어그램을 칠판에 그려주세요.</p>
+</div>
+
+---
+
+### 전개 (40분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">Python + Flask 설치</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"먼저 PC에 Flask를 설치합니다. 터미널(명령 프롬프트)을 열고 아래 명령어를 입력하세요."</p>
+  <p>"Windows는 시작 메뉴에서 'cmd'를 검색, Mac은 Spotlight에서 '터미널'을 검색하면 됩니다."</p>
+  <p><code>pip install flask flask-cors</code></p>
+  <p>"'Successfully installed'가 나오면 성공입니다. 만약 'pip가 안 된다'고 나오면, Python이 PATH에 등록되지 않은 거예요."</p>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"pip가 안 돼요" / "'pip' is not recognized"</div>
+    <span class="label">원인</span>
+    <span class="value">Python 설치 시 "Add Python to PATH" 체크를 안 한 경우</span>
+    <span class="label">대응</span>
+    <span class="value">Python 재설치 시 PATH 체크박스 반드시 체크. 또는 <code>py -m pip install flask flask-cors</code> 시도. Mac은 <code>pip3</code> 사용</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"Permission denied" / 권한 오류</div>
+    <span class="label">원인</span>
+    <span class="value">시스템 Python에 직접 설치하려는 경우 (Mac에서 자주 발생)</span>
+    <span class="label">대응</span>
+    <span class="value"><code>pip3 install --user flask flask-cors</code> 또는 관리자 권한으로 터미널 실행</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>이 시점에 순회하며 확인:</strong></p>
+  <ol>
+    <li>모든 팀의 PC에 Flask가 정상 설치되었는가 ("Successfully installed..." 메시지 확인)</li>
+    <li>터미널에서 <code>python -c "import flask; print(flask.__version__)"</code>이 실행되는가</li>
+    <li>설치가 안 되는 팀은 교사 PC에서 서버를 공유하는 것을 대안으로 안내</li>
+  </ol>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">Flask 서버 코드 작성 + 실행</span>
+  <span class="step-time">15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"학생 교재에 있는 server.py 코드를 그대로 복사해서 파일로 저장합니다."</p>
+  <p>"중요한 포인트가 하나 있어요. 서버 코드 맨 아래에 <code>app.run(host='0.0.0.0', port=5000)</code>이라고 써 있죠? 여기서 <strong>'0.0.0.0'이 핵심</strong>입니다."</p>
+  <p>"만약 'localhost'나 '127.0.0.1'로 쓰면 자기 PC에서만 접속 가능하고, 다른 기기(Pico)에서 보낼 수 없어요. 반드시 '0.0.0.0'이어야 합니다."</p>
+  <p>"저장 후 터미널에서 <code>python server.py</code>를 실행하면, 서버 IP 주소가 화면에 나타납니다. 이 IP를 메모하세요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"server.py를 어디에 저장해요?"</span>
+  <span class="bubble">"실행했더니 IP 주소가 나왔어요!"</span>
+  <span class="bubble">"Mac인데 포트 5000이 이미 사용 중이래요"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"Address already in use" (Mac에서 포트 5000 충돌)</div>
+    <span class="label">원인</span>
+    <span class="value">macOS Monterey 이상에서 AirPlay Receiver가 포트 5000을 사용</span>
+    <span class="label">대응</span>
+    <span class="value">server.py에서 <code>port=5000</code>을 <code>port=5001</code>로 변경. 이후 Pico 코드의 SERVER 주소에서도 포트를 5001로 맞출 것</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"server.py를 어디에 저장하는지 모르겠어요"</div>
+    <span class="label">원인</span>
+    <span class="value">파일 저장 경로와 터미널 작업 디렉토리가 다른 경우</span>
+    <span class="label">대응</span>
+    <span class="value">바탕화면에 'pico-server' 폴더를 만들고 그 안에 저장. 터미널에서 <code>cd Desktop/pico-server</code> 후 실행</span>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p><code>host='0.0.0.0'</code>은 이 수업에서 가장 자주 빠뜨리는 부분입니다. 학생 교재 코드에는 이미 포함되어 있지만, AI에게 Flask 코드를 요청하면 <code>host='127.0.0.1'</code>로 생성하는 경우가 많습니다. 칠판에 크게 써두세요: <strong>"0.0.0.0 = 모든 기기 접속 허용"</strong></p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">IP 주소 확인 + 브라우저 테스트</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"서버가 실행되고 있죠? 이제 IP 주소를 확인합니다."</p>
+  <p>"Windows 팀은 <strong>새 터미널 창</strong>을 열고(서버 터미널은 닫지 마세요!) <code>ipconfig</code>를 입력합니다. 'IPv4 주소'를 찾으세요. 보통 192.168로 시작합니다."</p>
+  <p>"Mac 팀은 시스템 설정 → WiFi → 연결된 네트워크 옆 ⓘ 클릭 → IP 주소를 확인합니다."</p>
+  <p>"확인한 IP로 브라우저에 <code>http://IP주소:5000</code>을 입력해 보세요. 대시보드 화면이 보이면 성공입니다!"</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"192.168.0.15가 제 IP예요!"</span>
+  <span class="bubble">"브라우저에 대시보드가 떴어요!"</span>
+  <span class="bubble">"아직 데이터가 0개라고 나와요"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"브라우저에서 접속이 안 돼요"</div>
+    <span class="label">원인</span>
+    <span class="value">방화벽이 포트를 차단하거나, 서버가 실행 중이 아닌 경우</span>
+    <span class="label">대응</span>
+    <span class="value">서버 터미널이 열려 있는지 확인. Windows 방화벽 알림에서 "허용" 클릭. IP 주소와 포트 번호 다시 확인</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>Flask 서버가 실행 중인 터미널이 열려 있는가 (닫으면 서버도 종료됨)</li>
+    <li>브라우저에서 대시보드 페이지가 정상 표시되는가</li>
+    <li>각 팀의 PC IP 주소를 메모해 두었는가 (2차시에 필요)</li>
+  </ol>
+</div>
+
+### 정리 (5분)
+
+<div class="teacher-script">
+  <p>"1차시 정리합니다. 오늘 우리가 한 일은 세 가지입니다."</p>
+  <p>"첫째, Flask를 설치했습니다. 둘째, 서버 코드를 작성하고 실행했습니다. 셋째, 브라우저에서 대시보드에 접속했습니다."</p>
+  <p>"다음 시간에는 Pico에서 WiFi로 이 서버에 데이터를 보내고, 실시간 그래프를 확인합니다. 오늘 확인한 <strong>IP 주소를 반드시 메모</strong>해 두세요!"</p>
+</div>
+
+---
+
+## 2차시: Pico → Flask 통신 + 실시간 그래프 (50분)
+
+### 도입 (5분)
+
+<div class="teacher-script">
+  <p>"지난 시간에 Flask 서버를 만들었죠? 오늘은 Pico를 서버에 연결합니다."</p>
+  <p>"Pico가 WiFi에 접속하고, 센서 데이터를 JSON 형식으로 서버에 POST 전송합니다. 서버는 데이터를 받아 저장하고, 웹 대시보드에 표시합니다."</p>
+  <p>"먼저 Flask 서버를 다시 실행해 주세요. <code>python server.py</code>요."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>2차시 시작 전에 반드시 Flask 서버를 먼저 실행해야 합니다. 학생들이 서버 없이 Pico 코드를 실행하면 "Connection refused" 오류가 나옵니다. "서버 먼저, Pico 나중"을 칠판에 적어두세요.</p>
+</div>
+
+---
+
+### 전개 (40분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">Pico WiFi 연결 + JSON POST 코드</span>
+  <span class="step-time">15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"학생 교재의 WiFi 통신 코드를 Pico에 업로드합니다. 세 곳을 수정해야 해요."</p>
+  <p>"첫째, <code>WIFI_SSID</code>에 WiFi 이름을 넣으세요. 둘째, <code>WIFI_PASS</code>에 비밀번호를 넣으세요. 셋째, <code>SERVER</code>에 지난 시간 메모한 PC의 IP 주소를 넣으세요."</p>
+  <p>"WiFi 연결 타임아웃은 20초입니다. 연결되면 Pico의 IP 주소가 출력되고, 10초마다 서버에 데이터를 전송합니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"WiFi 연결 성공이라고 나왔어요!"</span>
+  <span class="bubble">"서버에서 '수신' 메시지가 뜨고 있어요!"</span>
+  <span class="bubble">"연결 실패래요..."</span>
+  <span class="bubble">"서버에서 안 받아요"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"WiFi 연결 실패!" — 20초 타임아웃</div>
+    <span class="label">원인</span>
+    <span class="value">SSID/비밀번호 오타, 5GHz WiFi 사용, 또는 WiFi 신호 약함</span>
+    <span class="label">대응</span>
+    <span class="value">SSID 철자 확인 (대소문자 구분). Pico는 <strong>2.4GHz만 지원</strong> — 5GHz WiFi는 안 됨. 핸드폰 핫스팟(2.4GHz 설정)을 대안으로 사용</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"서버에서 안 받아요" / "Connection refused"</div>
+    <span class="label">원인</span>
+    <span class="value">Pico와 PC가 같은 네트워크에 있지 않거나, 서버가 실행 중이 아닌 경우</span>
+    <span class="label">대응</span>
+    <span class="value">① Pico와 PC가 <strong>같은 WiFi</strong>에 연결되어 있는지 확인 ② Flask 서버 터미널이 열려 있는지 확인 ③ IP 주소가 정확한지 확인 ④ 학교 WiFi가 기기 간 통신을 차단하면 핫스팟 사용</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"urequests 모듈이 없어요"</div>
+    <span class="label">원인</span>
+    <span class="value">micropython-urequests 라이브러리가 Pico에 설치되지 않음</span>
+    <span class="label">대응</span>
+    <span class="value">Thonny → 도구 → 패키지 관리 → <code>micropython-urequests</code> 검색 후 설치</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>이 시점에 순회하며 확인:</strong></p>
+  <ol>
+    <li>Pico 시리얼 콘솔에 "WiFi 연결 성공"이 표시되는가</li>
+    <li>Flask 서버 터미널에 "[수신]" 메시지가 반복 출력되는가</li>
+    <li>SSID, 비밀번호, SERVER IP 세 값이 정확하게 입력되었는가</li>
+  </ol>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">Flask 실시간 대시보드 확인</span>
+  <span class="step-time">15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"서버에 데이터가 들어오고 있죠? 이제 웹 브라우저에서 확인합시다."</p>
+  <p>"브라우저에 <code>http://서버IP:5000</code>을 입력하세요. 5초마다 자동 새로고침되며 최근 20개 데이터가 테이블로 표시됩니다."</p>
+  <p>"데이터가 계속 쌓이는 걸 확인했으면, 이제 <strong>실시간 그래프</strong>를 추가해 봅시다. 학생 교재의 PC 실시간 시리얼 대시보드 코드를 참고하거나, AI에게 Chart.js 대시보드를 요청할 수도 있어요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"브라우저에 데이터가 계속 올라와요!"</span>
+  <span class="bubble">"다른 팀 PC에서도 접속할 수 있어요?"</span>
+  <span class="bubble">"온도가 교실 안에서 계속 변하네요"</span>
+</div>
+
+<div class="teaching-tip">
+  <p>같은 네트워크에 있는 다른 PC나 핸드폰에서도 대시보드에 접속할 수 있다는 것을 보여주면 학생들이 크게 흥미를 느낍니다. "여러분 핸드폰으로 이 주소를 입력해 보세요" — 이것이 실제 IoT 시스템과 동일한 구조입니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">통합 테스트 + 안정성 확인</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"통합 테스트를 합시다. Pico가 10초마다 데이터를 보내고, 서버가 받고, 브라우저에 표시되는 전체 흐름이 5분 이상 안정적으로 동작하는지 확인하세요."</p>
+  <p>"WiFi가 끊기면 어떻게 될까요? Pico 코드에 <code>try/except</code>가 있어서, 전송 실패해도 프로그램이 죽지 않고 다음 주기에 다시 시도합니다."</p>
+  <p>"안정성을 위해 WiFi 전송과 Pico 내부 CSV 저장을 <strong>동시에</strong> 하는 것이 좋습니다. WiFi가 끊겨도 CSV에는 데이터가 남으니까요."</p>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"5분쯤 지나면 데이터가 안 와요"</div>
+    <span class="label">원인</span>
+    <span class="value">WiFi 연결이 불안정하거나, Pico의 메모리 부족으로 urequests가 실패</span>
+    <span class="label">대응</span>
+    <span class="value"><code>res.close()</code>를 반드시 호출하여 메모리 해제. 전송 간격을 10초에서 30초로 늘려보기. try/except에서 gc.collect() 호출</span>
+  </div>
+</div>
+
+### 정리 (5분)
+
+<div class="teacher-script">
+  <p>"2차시 정리입니다. Pico에서 WiFi로 데이터를 서버에 보내고, 웹 브라우저에서 실시간 확인하는 시스템을 완성했습니다."</p>
+  <p>"다음 시간에는 이 시스템으로 <strong>30분 이상 장기 데이터를 수집</strong>하고, AI에게 분석을 맡기고, 연구 보고서를 작성합니다. 연구 질문과 가설을 미리 생각해 오세요!"</p>
+</div>
+
+---
+
+## 3차시: 장기 데이터 수집 + AI 분석 + 보고서 (50분)
+
+### 도입 (5분)
+
+<div class="teacher-script">
+  <p>"마지막 차시입니다. 오늘은 여러분이 <strong>연구자</strong>가 됩니다."</p>
+  <p>"연구자에게 필요한 것은 세 가지입니다. 첫째, 연구 질문과 가설. 둘째, 데이터. 셋째, 분석과 결론."</p>
+  <p>"질문과 가설은 여러분이 세우고, 데이터는 우리가 만든 시스템이 수집하고, 분석은 AI가 도와줍니다."</p>
+  <p>"좋은 연구 질문은 <strong>측정 가능</strong>해야 합니다. '교실이 불편한가?'가 아니라 '교실 온도가 30도를 넘는 시간은 하루에 몇 분인가?'처럼요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"가설이 뭐예요?"</span>
+  <span class="bubble">"어떤 질문을 해야 하죠?"</span>
+  <span class="bubble">"AI가 분석도 해줘요?"</span>
+</div>
+
+<div class="teaching-tip">
+  <p>가설 개념이 어려운 학생에게는 "예상"이라는 단어로 대체해도 됩니다. "네 예상은 뭐야?" → "그걸 데이터로 확인해 보자" 흐름이면 충분합니다. 학생 교재의 좋은 질문 vs 나쁜 질문 비교표를 화면에 보여주세요.</p>
+</div>
+
+---
+
+### 전개 (35분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">연구 설계 + 장기 데이터 수집 시작</span>
+  <span class="step-time">15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"학생 교재의 연구 계획서 양식을 채워 봅시다. 연구 제목, 질문, 가설, 변인을 적으세요."</p>
+  <p>"계획서를 완성한 팀은 Flask 서버를 실행하고, Pico 데이터 수집을 시작하세요. 최소 15분 이상 데이터를 모읍니다."</p>
+  <p>"수집하는 동안 브라우저에서 대시보드를 관찰하면서 기록표를 작성하세요."</p>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"연구 질문을 못 만들겠어요"</div>
+    <span class="label">원인</span>
+    <span class="value">측정 가능한 질문으로 바꾸는 것이 어려운 경우</span>
+    <span class="label">대응</span>
+    <span class="value">학생 교재의 예시 프로젝트 3가지 중 하나를 선택하게 하세요. 식물 환경 분석, CO2 농도, 운동 가속도 중 택1</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>연구 계획서의 가설이 측정 가능한 형태인가 (숫자가 포함되어 있는가)</li>
+    <li>Flask 서버와 Pico 데이터 전송이 정상 동작하는가</li>
+    <li>데이터가 실제로 쌓이고 있는가 (서버 터미널에 [수신] 메시지 확인)</li>
+  </ol>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">AI 분석</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"데이터가 충분히 모였으면, AI에게 분석을 맡깁니다."</p>
+  <p>"서버의 API 엔드포인트 <code>/api/data</code>에서 JSON 데이터를 복사하거나, CSV 파일로 내보내서 ChatGPT나 Claude에 붙여넣으세요."</p>
+  <p>"AI에게 이렇게 요청합니다: '이 데이터를 분석해 줘. 평균, 최대, 최소를 구하고, 시간에 따른 추세를 설명해 줘. 그래프를 그리는 Python 코드도 만들어 줘.'"</p>
+  <p>"AI가 분석 결과와 그래프 코드를 주면, PC에서 실행해 보세요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"AI가 평균 온도를 계산해 줬어요!"</span>
+  <span class="bubble">"그래프 코드도 줬어요, 실행해 볼게요"</span>
+  <span class="bubble">"가설이 맞았는지 AI에게 물어봐도 돼요?"</span>
+</div>
+
+<div class="teaching-tip">
+  <p>AI가 분석 결과를 줄 때, 학생에게 "AI의 분석이 맞는 것 같아? 데이터를 직접 확인해 봐"라고 질문하세요. AI를 무비판적으로 수용하지 않고 검증하는 태도가 Lv.3의 핵심 역량입니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">연구 보고서 작성 + 발표</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"마지막으로 연구 보고서를 작성합니다. 학생 교재의 가설 검증 보고서 양식을 채우세요."</p>
+  <p>"핵심은 <strong>'가설이 지지되었는가, 기각되었는가'</strong>입니다. 데이터에 기반해서 결론을 내리세요."</p>
+  <p>"한계점도 중요합니다. '측정 시간이 짧았다', '센서 위치가 고정이었다' 같은 것도 적어 보세요."</p>
+  <p>"다 쓴 팀은 1분씩 발표합니다. 질문, 가설, 결과, 결론을 간단히 말해 주세요."</p>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>보고서에 데이터 요약(평균, 최대, 최소 등)이 포함되어 있는가</li>
+    <li>결론이 데이터에 근거하는가 (느낌이 아닌 숫자)</li>
+    <li>한계점을 인식하고 다음 연구를 제안하는가</li>
+  </ol>
+</div>
+
+### 정리 (10분)
+
+<div class="teacher-script">
+  <p>"3차시에 걸쳐 완성한 것을 돌아봅시다."</p>
+  <p>"1차시에 Flask 서버를 만들었고, 2차시에 Pico와 WiFi로 연결했고, 3차시에 데이터를 모아 AI로 분석하고 연구 보고서를 작성했습니다."</p>
+  <p>"여러분이 한 일은 실제 데이터 과학자, IoT 엔지니어가 하는 일의 축소판입니다. 센서로 데이터를 수집하고, 서버에 전송하고, 시각화하고, AI로 분석하는 전체 파이프라인을 직접 구축한 거예요."</p>
+  <p>"다음 레벨인 Lv.4+ 마스터에서는 다중 센서 + ML 모델로 실제 문제를 해결하는 종합 시스템에 도전합니다."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>시간이 부족하면 발표를 줄이고 보고서 작성에 집중하세요. 보고서는 사진으로 찍어 제출하게 하면 됩니다. 핵심은 "가설 → 데이터 → 결론"이라는 과학적 사고의 흐름을 경험하는 것입니다.</p>
+</div>
+
+---
+
+## 차별화 전략
+
+<div class="differentiation">
+  <div class="fast-learner">
+    <p><strong>빠른 학생에게:</strong></p>
+    <ul>
+      <li>Flask 서버에 Chart.js 실시간 그래프를 추가해 보세요 — AI에게 HTML 템플릿을 요청</li>
+      <li>여러 Pico에서 동시에 데이터를 받는 멀티 클라이언트 서버로 확장</li>
+      <li>matplotlib 대신 pandas + seaborn으로 고급 분석을 시도</li>
+      <li>WiFi 전송 + CSV 로컬 저장을 동시에 구현하여 데이터 안정성 확보</li>
+      <li>다른 팀의 WiFi 연결 문제를 디버깅해 주세요</li>
+    </ul>
+  </div>
+  <div class="slow-learner">
+    <p><strong>느린 학생에게:</strong></p>
+    <ul>
+      <li>학생 교재의 서버 코드와 Pico 코드를 그대로 복사하여 실행하기</li>
+      <li>교사가 미리 실행한 서버에 Pico를 연결하기 (서버 설정 단계 생략)</li>
+      <li>예시 프로젝트 3가지 중 하나를 선택하여 코드를 그대로 사용하기</li>
+      <li>AI 분석은 교사가 시범을 보이고, 결과를 함께 해석하기</li>
+      <li>연구 보고서는 빈칸 채우기 형태로 안내</li>
+    </ul>
+  </div>
+</div>
+
+---
+
+## 평가 루브릭
+
+<table class="rubric-table">
+  <thead>
+    <tr><th>등급</th><th>관찰 기록 예시</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="badge badge-purple">S</span></td>
+      <td>Flask 서버를 자체 확장하여 Chart.js 실시간 그래프를 구현함. 30분 이상 장기 데이터를 수집하고 pandas로 통계 분석 수행. 가설을 데이터로 검증한 후 한계점을 인식하고 개선된 후속 연구를 구체적으로 제안함. 다른 팀의 네트워크 문제를 진단하고 해결함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">A</span></td>
+      <td>Flask 서버 + Pico WiFi 통신 시스템을 완성하고 15분 이상 안정적으로 운영함. 수집 데이터를 AI에게 분석 요청하여 그래프와 통계를 산출함. 가설 검증 결론을 데이터에 근거하여 논리적으로 작성함. WiFi 전송과 CSV 저장을 동시에 구현하여 데이터 안정성을 확보함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">B</span></td>
+      <td>Flask 서버를 설치·실행하고 Pico에서 WiFi로 데이터를 전송하여 웹 대시보드에서 확인함. 연구 질문과 가설을 세우고 데이터를 수집함. AI에게 분석을 요청하고 결과를 보고서에 작성함. host='0.0.0.0' 설정의 의미를 이해함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-amber">C</span></td>
+      <td>교사 안내에 따라 Flask 서버와 Pico WiFi 코드를 실행함. 웹 대시보드에서 데이터 수신을 확인함. 예시 프로젝트를 참고하여 간단한 연구 보고서를 작성함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">D</span></td>
+      <td>교사가 실행한 서버에 Pico를 연결하여 데이터 전송을 경험함. 대시보드에서 숫자 변화를 관찰하고 기록함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">E</span></td>
+      <td>교사 지원으로 Pico 코드를 실행하고 WiFi 연결을 경험함. 팀원의 도움으로 대시보드를 관찰함.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 기술 참조 (교사용)
+
+### Flask 서버 핵심 설정
+
+| 항목 | 값 | 주의사항 |
+|------|-----|---------|
+| Flask 설치 | `pip install flask flask-cors` | Mac: `pip3` 사용 |
+| 서버 실행 | `app.run(host='0.0.0.0', port=5000)` | **반드시** `0.0.0.0` — localhost 사용 금지 |
+| PC IP 확인 | Windows: `ipconfig` / Mac: 시스템 설정 → WiFi | IPv4 주소 (192.168.x.x) |
+| Mac 포트 충돌 | 포트 5000 → 5001로 변경 | AirPlay Receiver가 5000 사용 |
+
+### Pico WiFi 핵심 설정
+
+| 항목 | 값 | 주의사항 |
+|------|-----|---------|
+| WiFi 주파수 | 2.4GHz만 지원 | 5GHz WiFi는 연결 불가 |
+| WiFi 타임아웃 | 20초 (0.5초 x 40회) | 핫스팟 사용 시 연결 시간 더 걸릴 수 있음 |
+| 데이터 전송 | `urequests.post(url, json=data)` | 반드시 `res.close()` 호출 (메모리 해제) |
+| I2C 설정 | `I2C(1, sda=Pin(6), scl=Pin(7))` | 항상 I2C1 사용 |
+| MPU6050 | 주소 0x68, 슬립 해제: `0x6B` 레지스터에 `0x00` | 초기화 안 하면 데이터 0 |
+| CSV 헤더 | `os.stat()` 또는 `os.listdir()`로 존재 확인 | 새 파일일 때만 헤더 작성 |
+
+### 네트워크 요구사항
+
+- Pico와 PC가 **같은 WiFi 네트워크**에 연결되어 있어야 함
+- 학교 WiFi가 기기 간 통신(AP isolation)을 차단하면 핸드폰 핫스팟 사용
+- 서버 PC의 방화벽에서 포트 5000(또는 5001)을 허용해야 함

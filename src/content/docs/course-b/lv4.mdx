@@ -1,0 +1,574 @@
+---
+title: "Lv.4 마스터: ML 분류 + 클라우드"
+description: "규칙 기반 머신러닝 분류 + Supabase 클라우드 + 종합 대시보드 — 교사용 지도서"
+---
+
+<a class="student-link" href="https://greatsong.github.io/ai-physical-computing/course-b/lv4/" target="_blank" rel="noopener">
+  <span class="link-icon">📖</span>
+  <span class="link-body">
+    <span class="link-label">학생 교재 보기</span>
+    <span class="link-title">Lv.4 마스터: ML 분류 + 클라우드 — 학생용 페이지</span>
+  </span>
+  <span class="link-arrow">→</span>
+</a>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">성취기준</div>
+      다중 센서 데이터를 규칙 기반으로 분류하고, Supabase 클라우드에 저장하여 종합 대시보드를 구성할 수 있다
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      150분 (3차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">센서</div>
+      DHT20 + LIGHT + DUST(GP2Y) + SOUND — multi-sensor
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">난이도</div>
+      ● ● ● ● ●
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">오늘의 질문</div>
+      센서 데이터를 클라우드에 올리면, 어디서든 교실 환경을 확인할 수 있을까?
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">데이터 라벨링</span> <span class="badge badge-amber">규칙 기반 분류</span> <span class="badge badge-purple">클라우드 DB</span> <span class="badge badge-amber">종합 시스템 설계</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (팀별 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH + Grove Shield</li>
+    <li>DHT20 온습도 센서 (I2C, 0x38)</li>
+    <li>빛 센서 (ADC, GP26 — A0)</li>
+    <li>먼지 센서 GP2Y (ADC, GP28 — A2)</li>
+    <li>사운드 센서 (ADC, GP27 — A1)</li>
+    <li>OLED 디스플레이 SSD1306 (I2C, 0x3C)</li>
+    <li>USB 데이터 케이블</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE — MicroPython 코드 작성 및 업로드</li>
+    <li>크롬 브라우저 — Supabase 접속, 대시보드 확인</li>
+  </ul>
+  <h5>계정 / 네트워크</h5>
+  <ul>
+    <li>Supabase 무료 계정 (Free plan) — 사전에 교사가 1개 프로젝트를 만들어 흐름을 숙지할 것</li>
+    <li>학교 WiFi (2.4GHz 대역) — Pico는 5GHz를 지원하지 않음, 사전에 반드시 확인</li>
+    <li>GitHub 계정 (선택) — Supabase 가입 시 편리</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>supabase.com이 학교 네트워크에서 접속 가능한지 확인</li>
+    <li>학교 WiFi SSID와 비밀번호를 학생에게 공유할 준비</li>
+    <li>Pico가 학교 WiFi에 연결되는지 교사 기기로 사전 테스트</li>
+    <li>각 팀의 센서가 정상 작동하는지 간단 테스트 (I2C scan 등)</li>
+  </ul>
+</div>
+
+## 시간 배분 (3차시, 총 150분)
+
+<div class="time-block">
+  <div class="intro" style="flex: 1">1차시 50분</div>
+  <div class="main" style="flex: 1">2차시 50분</div>
+  <div class="wrap-up" style="flex: 1">3차시 50분</div>
+</div>
+
+---
+
+## 1차시: Supabase 가입 + 테이블 생성 + REST API (50분)
+
+<div class="teacher-script">
+  <p>"여러분, 지금까지 센서 데이터를 어디에 저장했죠? Pico 안의 CSV 파일이나, Serial로 PC에 보냈어요. 그런데 한 가지 문제가 있어요."</p>
+  <p>"과학실에서 측정한 공기질 데이터를, <strong>집에서 스마트폰으로</strong> 확인할 수 있나요? 안 되죠? USB 선으로 연결된 PC에서만 볼 수 있잖아요."</p>
+  <p>"오늘부터 3차시에 걸쳐 <strong>클라우드</strong>에 데이터를 올릴 거예요. 그러면 어디서든, 어떤 기기에서든 우리 센서 데이터를 확인할 수 있습니다. 이것이 진짜 IoT예요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"클라우드가 뭐예요?"</span>
+  <span class="bubble">"네이버 클라우드 같은 건가요?"</span>
+  <span class="bubble">"WiFi가 있어야 하나요?"</span>
+  <span class="bubble">"무료예요?"</span>
+</div>
+
+<div class="teacher-script">
+  <p>"맞아요, 네이버 클라우드처럼 인터넷에 데이터를 저장하는 거예요. 우리가 쓸 서비스는 <strong>Supabase</strong>라고 하는데, 무료 플랜으로도 충분합니다. 월 50만 번의 데이터 전송이 가능해요."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>"클라우드"라는 단어가 추상적일 수 있습니다. "인터넷에 있는 USB 메모리"로 비유하세요. "USB 메모리에 파일을 저장하면 그 USB가 있어야만 볼 수 있잖아요. 클라우드는 인터넷에 있는 USB라서, 인터넷만 되면 어디서든 볼 수 있어요."</p>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">Supabase 계정 생성</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"자, 크롬 브라우저에서 <strong>supabase.com</strong>을 열어주세요. 'Start your project'를 클릭합니다."</p>
+  <p>"GitHub 계정이 있는 사람은 'Continue with GitHub'로 빠르게 가입할 수 있어요. 없으면 이메일로 가입하세요. 학교 이메일도 됩니다."</p>
+  <p>"가입이 완료되면 Organization을 만들라고 나옵니다. 이름은 아무거나 괜찮아요. '우리 팀 이름'을 쓰세요."</p>
+  <p>"그다음 'New Project'를 만듭니다. Name은 'pico-sensors', Region은 <strong>Northeast Asia (Tokyo)</strong>를 선택하세요. 가장 가까운 서버입니다."</p>
+  <p>"Database Password는 반드시 메모해 두세요! 1~2분 기다리면 프로젝트가 만들어집니다."</p>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"가입이 안 돼요"</div>
+    <span class="label">원인</span>
+    <span class="value">이메일 인증을 하지 않았거나, 학교 네트워크에서 메일 수신이 차단됨</span>
+    <span class="label">대응</span>
+    <span class="value">스팸함을 확인하세요. 학교 이메일이 안 되면 개인 Gmail을 사용하세요. GitHub 가입이 가장 빠릅니다</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"프로젝트 생성이 안 끝나요"</div>
+    <span class="label">원인</span>
+    <span class="value">서버 초기 설정에 시간이 걸림 (보통 1~2분)</span>
+    <span class="label">대응</span>
+    <span class="value">새로고침하지 말고 기다리세요. 2분 이상 걸리면 페이지를 새로고침하고 대시보드를 확인하세요</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>이 시점에 순회하며 확인:</strong></p>
+  <ol>
+    <li>모든 팀이 Supabase에 로그인했는가</li>
+    <li>프로젝트가 정상적으로 생성되었는가 (녹색 상태 표시)</li>
+    <li>Database Password를 메모했는가 — 잊어버리면 재설정해야 함</li>
+  </ol>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">테이블 생성</span>
+  <span class="step-time">15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"프로젝트가 만들어졌으면, 이제 데이터를 저장할 <strong>테이블</strong>을 만들어야 해요."</p>
+  <p>"테이블은 엑셀 시트라고 생각하세요. 열(column)에 이름을 정하고, 데이터가 한 행씩 쌓이는 거예요."</p>
+  <p>"왼쪽 메뉴에서 <strong>SQL Editor</strong> 아이콘을 클릭하세요. 'New query'를 누르고, 교재의 SQL 코드를 <strong>전체 복사</strong>해서 붙여넣으세요."</p>
+  <p>"Run 버튼을 누르면 끝! 'Success. No rows returned'가 나오면 정상이에요. 테이블을 '만드는' 명령이라 돌려줄 데이터가 없는 거예요."</p>
+</div>
+
+<div class="teacher-script">
+  <p>"테이블의 각 컬럼을 설명해 줄게요."</p>
+  <p>"<strong>id</strong>는 BIGSERIAL — 자동으로 1, 2, 3... 번호가 매겨집니다. 엑셀의 행 번호 같은 거예요."</p>
+  <p>"<strong>created_at</strong>은 TIMESTAMPTZ — 데이터가 들어온 시각이 자동으로 기록돼요."</p>
+  <p>"<strong>temp, humi</strong>는 REAL — 소수점이 있는 숫자, 즉 실수(float)예요. 온도 24.5도, 습도 65.3% 같은 값을 저장합니다."</p>
+  <p>"<strong>co2</strong>는 INTEGER — 정수예요. CO2는 800ppm처럼 정수로 충분합니다."</p>
+  <p>"<strong>device_id</strong>는 TEXT — 문자열이에요. Pico가 여러 대일 때 구분하는 이름표입니다."</p>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"컬럼 타입이 뭐예요?"</div>
+    <span class="label">대응</span>
+    <span class="value">REAL = 소수점 숫자(온도, 습도), INTEGER = 정수(CO2), TEXT = 글자(기기 이름), TIMESTAMPTZ = 날짜+시간. 엑셀에서 셀 형식을 '숫자'나 '텍스트'로 지정하는 것과 같습니다</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"ERROR: relation already exists"</div>
+    <span class="label">원인</span>
+    <span class="value">이미 같은 이름의 테이블이 존재함 (아마 두 번 실행)</span>
+    <span class="label">대응</span>
+    <span class="value">정상입니다! 이미 테이블이 만들어져 있다는 뜻이니 그대로 진행하세요</span>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p>SQL이 어렵게 느껴질 수 있지만, 이 수업에서 학생이 직접 SQL을 작성할 필요는 없습니다. 교재의 코드를 복사+붙여넣기하면 됩니다. "SQL은 데이터베이스에 명령을 내리는 언어"라고 한 줄 설명하고, CREATE TABLE이 "엑셀에서 시트 만들기"에 대응된다고 비유하면 충분합니다.</p>
+</div>
+
+<div class="teacher-script">
+  <p>"테이블을 만들었으면, 이제 RLS 보안 설정을 합니다. <strong>새 쿼리</strong>를 열고, RLS SQL 코드를 붙여넣고 Run 하세요."</p>
+  <p>"RLS는 '누가 데이터를 볼 수 있고, 추가할 수 있는지' 정하는 규칙이에요. 우리는 누구나 읽고 추가할 수 있지만, 삭제는 못하게 설정합니다."</p>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">REST API 연동 코드</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이제 가장 중요한 단계입니다. Pico가 Supabase에 데이터를 보내려면 <strong>두 가지 열쇠</strong>가 필요해요."</p>
+  <p>"왼쪽 메뉴 맨 아래 <strong>Project Settings</strong>(톱니바퀴)를 클릭하고, <strong>API</strong>를 선택하세요."</p>
+  <p>"첫 번째: <strong>Project URL</strong> — 'https://xxxxx.supabase.co' 형태의 주소를 복사하세요."</p>
+  <p>"두 번째: <strong>anon public key</strong> — 'eyJhbGci...'로 시작하는 매우 긴 문자열을 복사하세요. 전체를 복사해야 합니다!"</p>
+  <p>"<strong>주의!</strong> 'service_role secret' 키는 절대 복사하지 마세요. 그건 관리자 전용이에요."</p>
+</div>
+
+<div class="teacher-script">
+  <p>"이 두 가지를 Pico 코드에 넣어야 합니다. 교재의 코드를 보세요. 헤더(headers)에 세 가지가 들어갑니다."</p>
+  <p>"<strong>apikey</strong>: 복사한 anon 키"</p>
+  <p>"<strong>Authorization</strong>: 'Bearer ' + 같은 anon 키 — 앞에 'Bearer '를 붙이는 게 포인트예요"</p>
+  <p>"<strong>Content-Type</strong>: 'application/json' — 데이터 형식이 JSON이라고 알려주는 거예요"</p>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"URL이랑 KEY를 어디서 찾아요?"</div>
+    <span class="label">대응</span>
+    <span class="value">Settings(톱니바퀴) → API → Project URL과 Project API keys 섹션. 화면을 보여주며 함께 찾으세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"키가 너무 길어서 다 복사가 안 돼요"</div>
+    <span class="label">대응</span>
+    <span class="value">키 옆의 복사 버튼(아이콘)을 클릭하면 전체가 자동 복사됩니다. 드래그로 선택하면 놓칠 수 있어요</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>이 시점에 순회하며 확인:</strong></p>
+  <ol>
+    <li>테이블 생성 SQL이 성공했는가 (Table Editor에서 sensor_data 테이블이 보이는가)</li>
+    <li>RLS 정책이 설정되었는가</li>
+    <li>Project URL과 anon key를 정확히 복사했는가</li>
+    <li>service_role 키를 실수로 복사하지 않았는가</li>
+  </ol>
+</div>
+
+<div class="teacher-script">
+  <p>"1차시 정리! 오늘 여러분은 클라우드 데이터베이스를 만들었어요. 테이블, 보안, API 키 — 이 세 가지가 클라우드의 기본 구성요소입니다."</p>
+  <p>"다음 시간에는 실제로 센서 데이터를 수집하고, Supabase에 전송한 뒤, 규칙 기반 분류까지 해볼 거예요."</p>
+</div>
+
+---
+
+## 2차시: 데이터 라벨링 + 규칙 기반 ML (50분)
+
+<div class="teacher-script">
+  <p>"지난 시간에 Supabase를 설정했어요. 오늘은 두 가지를 할 거예요. 첫째, 센서 데이터를 실제로 클라우드에 보냅니다. 둘째, 데이터를 보고 <strong>컴퓨터가 스스로 판단</strong>하게 만들어요."</p>
+  <p>"컴퓨터가 판단한다? 이게 바로 <strong>머신러닝</strong>의 시작이에요."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"머신러닝이요? 어려운 거 아니에요?"</span>
+  <span class="bubble">"AI가 알아서 하는 건가요?"</span>
+</div>
+
+<div class="teacher-script">
+  <p>"아니에요, 생각보다 간단해요. 여러분이 이미 했던 if문 — '온도가 28도 이상이면 덥다' — 이게 사실 머신러닝의 가장 기본 형태예요. 규칙을 데이터에서 찾아내는 것, 그게 ML이에요."</p>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">데이터 수집 + Supabase 전송</span>
+  <span class="step-time">15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"교재의 WiFi + Supabase 전송 코드를 Thonny에 붙여넣으세요."</p>
+  <p>"<strong>SSID</strong>에 학교 WiFi 이름을, <strong>PASSWORD</strong>에 WiFi 비밀번호를 넣으세요."</p>
+  <p>"<strong>SUPABASE_URL</strong>과 <strong>SUPABASE_KEY</strong>에는 지난 시간에 복사한 값을 넣으세요."</p>
+  <p>"실행하면 'WiFi 연결 완료!'가 뜨고, 30초마다 센서 데이터가 Supabase에 전송됩니다."</p>
+  <p>"Supabase 홈페이지에서 Table Editor를 열면 데이터가 쌓이는 걸 실시간으로 볼 수 있어요!"</p>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"WiFi 연결 실패!"</div>
+    <span class="label">원인</span>
+    <span class="value">SSID/비밀번호 오류 또는 5GHz WiFi</span>
+    <span class="label">대응</span>
+    <span class="value">Pico는 <strong>2.4GHz WiFi만</strong> 지원합니다. 학교 WiFi가 5GHz 전용이면 핫스팟을 사용하세요. SSID 철자를 정확히 확인하세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"전송 실패 반복"</div>
+    <span class="label">원인</span>
+    <span class="value">Supabase URL 또는 KEY 오류</span>
+    <span class="label">대응</span>
+    <span class="value">Settings → API에서 URL과 anon key를 다시 복사하세요. URL 끝에 슬래시(/)가 있으면 제거하세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"WiFi 연결에 시간이 너무 오래 걸려요"</div>
+    <span class="label">원인</span>
+    <span class="value">학교 네트워크 혼잡 또는 인증 방식 문제</span>
+    <span class="label">대응</span>
+    <span class="value">WiFi 타임아웃은 코드에서 10초(0.5초 x 20)로 설정되어 있습니다. 학교 WiFi에 별도 인증(로그인 페이지)이 있으면 사용할 수 없으니 핫스팟을 이용하세요</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>WiFi 연결에 성공했는가 (IP 주소가 출력되는가)</li>
+    <li>Supabase Table Editor에서 데이터가 들어오고 있는가</li>
+    <li>센서 값이 합리적인가 (온도가 -40도 같은 비정상 값이 아닌가)</li>
+    <li>DHT20 센서의 I2C 연결이 I2C1(SDA=GP6, SCL=GP7)인가</li>
+  </ol>
+</div>
+
+<div class="teaching-tip">
+  <p>WiFi 연결 문제가 가장 흔한 장애물입니다. 교사가 사전에 학교 WiFi에서 Pico 연결을 테스트하는 것이 필수입니다. 안 되는 경우를 대비하여 스마트폰 핫스팟(2.4GHz)을 백업 플랜으로 준비하세요. WiFi 연결이 모두 실패하면 CSV 로컬 저장으로 전환하고, 3차시에 PC에서 수동 업로드하는 방식으로 진행할 수 있습니다.</p>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">규칙 기반 분류 로직</span>
+  <span class="step-time">15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"데이터가 잘 들어가고 있죠? 이제 이 데이터를 보고 <strong>컴퓨터가 판단</strong>하게 만들어 봅시다."</p>
+  <p>"교재에 있는 air_quality_index 함수를 보세요. 100점에서 시작해서, 조건에 따라 점수를 깎는 방식이에요."</p>
+  <p>"예를 들어: 온도가 28도 이상이고 습도가 70% 이상이면? '불쾌' 등급이에요. 이것을 코드로 쓰면:"</p>
+  <p>"<code>if temp > 28 and humi > 70: label = '불쾌'</code>"</p>
+  <p>"이게 바로 <strong>규칙 기반 분류</strong>예요. 그리고 이것이 머신러닝의 가장 기본 형태입니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"if문이 머신러닝이에요?"</span>
+  <span class="bubble">"그럼 지금까지 한 거 다 ML이었어요?"</span>
+</div>
+
+<div class="teacher-script">
+  <p>"좋은 질문이에요! 차이가 있어요. 지금 우리가 하는 건 <strong>사람이 규칙을 정하는</strong> 거예요. '28도 이상이면 덥다'는 규칙을 우리가 만들었잖아요."</p>
+  <p>"진짜 머신러닝은 이 규칙을 <strong>데이터에서 자동으로 찾아내는</strong> 거예요. 하지만 원리는 같습니다 — 데이터를 보고 분류하는 것."</p>
+  <p>"규칙 기반은 ML의 출발점이에요. 먼저 규칙으로 해보고, 나중에 데이터가 충분히 쌓이면 자동 학습으로 발전시키는 거죠."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>"if문 = ML인가요?"라는 질문이 나오면, "규칙 기반 분류는 ML의 가장 단순한 형태"라고 설명하세요. ML의 핵심은 "데이터를 입력받아 분류/예측하는 것"이고, 규칙을 사람이 만들면 rule-based, 데이터에서 자동으로 학습하면 supervised learning입니다. 이 수업에서는 rule-based부터 시작하여 ML의 개념을 체험하는 것이 목표입니다. AQI 점수 체계에서 CO2 임계값(>2000: -50, >1500: -40, >1000: -30, >800: -15)이 계단식으로 설정된 이유를 함께 토론하면 "왜 이 값인지"를 생각하게 됩니다.</p>
+</div>
+
+<div class="teacher-script">
+  <p>"이제 분류 함수를 코드에 추가하세요. AQI 점수를 계산하고, 등급을 매기는 함수입니다."</p>
+  <p>"Good(80점 이상), Fair(60점 이상), Poor(40점 이상), Bad(40점 미만) — 이 네 가지 등급으로 분류합니다."</p>
+  <p>"분류된 등급을 Supabase에 함께 전송하면, 대시보드에서 등급별 필터링도 할 수 있어요."</p>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">분류 정확도 분석</span>
+  <span class="step-time">5분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"자, 분류가 되고 있죠? 그런데 중요한 질문이 있어요. 이 분류가 <strong>정확한지</strong> 어떻게 알까요?"</p>
+  <p>"체감과 비교해 보세요. 지금 교실이 쾌적한데 'Bad'라고 나오면? 규칙이 잘못된 거예요."</p>
+  <p>"10번 측정해서 몇 번 맞았는지 세 보세요. 7번 맞았으면 정확도 70%예요."</p>
+  <p>"정확도가 낮으면 다음 시간에 임계값을 조정합니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"8번 맞았어요! 80%!"</span>
+  <span class="bubble">"온도 기준을 좀 낮춰야 할 것 같아요"</span>
+  <span class="bubble">"먼지 센서가 좀 부정확한 것 같아요"</span>
+</div>
+
+<div class="teaching-tip">
+  <p>먼지 센서(GP2Y)의 정확도 한계를 미리 안내하세요. GP2Y는 전압 기반 근사식(<code>(voltage - 0.6) * 170</code>)을 사용하며, 전문 장비와 오차가 큽니다. ADC 핀은 GP26=A0(빛), GP27=A1(소리), GP28=A2(먼지)로 배정되어 있음을 확인하세요. "전문 미세먼지 측정기와 비교하면 차이가 있지만, 상대적 변화(먼지가 많아지는 추세)는 잘 잡아냅니다"라고 설명하세요.</p>
+</div>
+
+<div class="teacher-script">
+  <p>"2차시 정리! 오늘 여러분은 두 가지를 했어요. 센서 데이터를 클라우드에 보냈고, 규칙으로 공기질을 분류했습니다."</p>
+  <p>"다음 시간에는 OLED + 웹 종합 대시보드를 만들고, 분류 정확도를 개선하고, 최종 발표를 합니다."</p>
+</div>
+
+---
+
+## 3차시: 종합 대시보드 + 발표 (50분)
+
+<div class="teacher-script">
+  <p>"마지막 시간입니다. 오늘 세 가지를 완성합니다. 첫째, OLED와 웹 대시보드를 동시에 동작시킵니다. 둘째, 분류 임계값을 조정해서 정확도를 높입니다. 셋째, 결과를 발표합니다."</p>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">OLED + PC 종합 대시보드</span>
+  <span class="step-time">15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"교재의 OLED 대시보드 코드를 보세요. CO2, 먼지, 온습도, AQI 점수를 한 화면에 보여줍니다."</p>
+  <p>"동시에, 웹 대시보드(dashboard.html)를 크롬에서 열어 놓으면 Supabase를 통해 실시간으로 업데이트됩니다."</p>
+  <p>"OLED는 현장에서 즉시 확인하는 용도, 웹 대시보드는 원격에서 확인하는 용도예요. 이렇게 이중 대시보드를 만드는 거죠."</p>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"OLED에 아무것도 안 나와요"</div>
+    <span class="label">원인</span>
+    <span class="value">I2C 연결 문제 또는 ssd1306 라이브러리 미설치</span>
+    <span class="label">대응</span>
+    <span class="value">I2C1(SDA=GP6, SCL=GP7)에 연결했는지 확인하세요. Thonny에서 <code>i2c.scan()</code>을 실행하여 0x3C(60)이 나오는지 확인하세요. ssd1306.py가 Pico에 업로드되어 있는지도 확인하세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"웹 대시보드에 데이터가 안 나와요"</div>
+    <span class="label">원인</span>
+    <span class="value">dashboard.html의 URL/KEY가 교체되지 않음</span>
+    <span class="label">대응</span>
+    <span class="value">dashboard.html 파일 안의 SUPABASE_URL과 SUPABASE_KEY를 자신의 값으로 교체했는지 확인하세요. 크롬 개발자 도구(F12) Console에서 에러 메시지를 확인하세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"실시간 갱신이 안 돼요"</div>
+    <span class="label">원인</span>
+    <span class="value">REPLICA IDENTITY FULL 설정 누락</span>
+    <span class="label">대응</span>
+    <span class="value">SQL Editor에서 <code>ALTER TABLE sensor_data REPLICA IDENTITY FULL;</code>을 실행하세요. 이 설정 없이는 실시간 웹소켓이 동작하지 않습니다</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>OLED에 센서 값과 AQI 등급이 표시되는가</li>
+    <li>웹 대시보드에 최근 데이터가 보이는가</li>
+    <li>새 데이터가 들어올 때 웹 대시보드가 자동 갱신되는가</li>
+    <li>OLED와 웹의 값이 일치하는가</li>
+  </ol>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">정확도 최적화</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"지난 시간에 정확도를 측정했죠? 이제 임계값을 조정해서 정확도를 높여봅시다."</p>
+  <p>"예를 들어, CO2 기준이 1000ppm 이상에서 -30점이었는데, 교실 상황에 맞게 800ppm으로 바꿔보세요."</p>
+  <p>"바꾼 후 다시 10번 측정해서 정확도를 비교하세요. 올라갔나요, 내려갔나요?"</p>
+  <p>"이 과정이 바로 <strong>모델 튜닝</strong>이에요. 실제 ML 엔지니어가 하는 일의 핵심입니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"기준을 낮추니까 더 정확해졌어요!"</span>
+  <span class="bubble">"근데 너무 낮추면 다 'Bad'로 나와요"</span>
+  <span class="bubble">"균형이 중요하네요"</span>
+</div>
+
+<div class="teaching-tip">
+  <p>"너무 민감하면 오탐(false positive), 너무 둔감하면 미탐(false negative)"의 개념을 자연스럽게 소개하세요. "화재 경보기가 요리할 때마다 울리면? 너무 민감한 거예요. 반대로 진짜 불이 났는데 안 울리면? 너무 둔감한 거예요." 이 비유로 임계값 조정의 의미를 설명하면 학생들이 잘 이해합니다.</p>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">최종 발표 + 포트폴리오 정리</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"마지막으로 팀별 5분 발표를 합니다. 발표에 포함할 내용은 세 가지예요."</p>
+  <p>"첫째, <strong>시스템 아키텍처</strong> — 어떤 센서를 사용했고, 데이터가 어떤 경로로 흘러가는지."</p>
+  <p>"둘째, <strong>분류 결과</strong> — 어떤 규칙으로 분류했고, 정확도는 얼마인지."</p>
+  <p>"셋째, <strong>대시보드 시연</strong> — OLED와 웹 대시보드를 실제로 보여주세요."</p>
+</div>
+
+<div class="patrol-point">
+  <p><strong>발표 시 확인:</strong></p>
+  <ol>
+    <li>시스템의 전체 구조(센서 → Pico → WiFi → Supabase → 대시보드)를 설명할 수 있는가</li>
+    <li>규칙 기반 분류의 원리와 한계를 이해하고 있는가</li>
+    <li>정확도 측정과 개선 과정을 설명할 수 있는가</li>
+    <li>실제 대시보드를 시연할 수 있는가</li>
+  </ol>
+</div>
+
+---
+
+## 마무리
+
+<div class="teacher-script">
+  <p>"여러분이 이번에 만든 시스템을 정리해 봅시다."</p>
+  <p>"<strong>센서 계층</strong>: DHT20, 빛 센서, 먼지 센서, 사운드 센서 — 4개 센서에서 데이터를 동시에 수집했어요."</p>
+  <p>"<strong>처리 계층</strong>: 규칙 기반으로 공기질을 Good/Fair/Poor/Bad로 분류했어요."</p>
+  <p>"<strong>통신 계층</strong>: WiFi를 통해 Supabase 클라우드에 데이터를 전송했어요."</p>
+  <p>"<strong>표시 계층</strong>: OLED 대시보드와 웹 대시보드로 결과를 시각화했어요."</p>
+  <p>"이 네 가지 계층이 합쳐진 것이 바로 <strong>IoT 시스템</strong>입니다. 스마트 팩토리, 스마트 시티, 자율주행 — 모두 이 구조의 확장이에요."</p>
+  <p>"여러분은 Lv.1에서 LED 하나를 켜는 것으로 시작했는데, 이제 클라우드 IoT 시스템을 만들었습니다. 정말 대단해요."</p>
+</div>
+
+<div class="teaching-tip">
+  <p>마지막에 Lv.1부터 Lv.4까지의 성장 과정을 되짚어 주세요. "Lv.1: 센서 1개 → 숫자 표시, Lv.2: 센서 2개 → 스마트 판단, Lv.3: 데이터 수집 → 가설 검증, Lv.4: 다중 센서 + ML + 클라우드 → IoT 시스템" 이 흐름을 보여주면 학생들이 자신의 성장을 체감합니다.</p>
+</div>
+
+---
+
+## 차별화 전략
+
+<div class="differentiation">
+  <div class="fast-learner">
+    <p><strong>빠른 학생에게:</strong></p>
+    <ul>
+      <li>dashboard.html을 커스터마이징하여 차트(Chart.js)를 추가해 보세요</li>
+      <li>여러 대의 Pico에 다른 device_id를 설정하고, 교실별 데이터를 비교하는 대시보드를 만드세요</li>
+      <li>분류 등급을 4단계에서 6단계로 세분화하고, 임계값을 데이터 분석을 기반으로 결정해 보세요</li>
+      <li>Supabase Edge Functions를 활용하여 CO2가 1000ppm을 초과하면 자동 알림을 보내는 기능을 시도해 보세요</li>
+    </ul>
+  </div>
+  <div class="slow-learner">
+    <p><strong>느린 학생에게:</strong></p>
+    <ul>
+      <li>DHT20 센서 1개만 사용하여 온도+습도 데이터를 Supabase에 전송하는 것부터 시작하세요</li>
+      <li>분류는 "쾌적 / 불쾌" 2단계로 단순화하세요 (예: 온도 28도 이상이면 불쾌)</li>
+      <li>WiFi 연결이 안 되면 CSV 로컬 저장으로 진행하고, 교사가 데이터를 수동으로 Supabase에 업로드하세요</li>
+      <li>웹 대시보드는 교사가 만들어 둔 것을 함께 보면서 데이터가 들어오는 것을 확인하는 것만으로도 충분합니다</li>
+    </ul>
+  </div>
+</div>
+
+---
+
+## 평가 루브릭
+
+<table class="rubric-table">
+  <thead>
+    <tr><th>등급</th><th>관찰 기록 예시</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="badge badge-purple">S</span></td>
+      <td>다중 센서 + Supabase 클라우드 + 규칙 기반 분류를 완성하고, 분류 임계값을 데이터 분석 기반으로 최적화함. 웹 대시보드를 커스터마이징하여 차트를 추가하거나 다중 기기를 통합함. 시스템 아키텍처를 IoT 관점에서 논리적으로 설명하고, 규칙 기반과 자동 학습의 차이를 정확히 비교함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">A</span></td>
+      <td>다중 센서 데이터를 Supabase에 전송하고 규칙 기반 분류를 구현함. 정확도를 측정하고 임계값을 조정하여 개선함. OLED + 웹 이중 대시보드가 동작함. 발표에서 시스템 구조와 분류 원리를 설명함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">B</span></td>
+      <td>Supabase 설정을 완료하고, 센서 데이터를 클라우드에 전송함. 규칙 기반 분류(Good/Fair/Poor/Bad)를 구현하고 정확도를 측정함. OLED 또는 웹 대시보드 중 하나가 동작함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-amber">C</span></td>
+      <td>Supabase에 계정을 만들고 테이블을 생성함. WiFi로 데이터를 전송하는 코드를 실행함. 규칙 기반 분류의 개념을 이해하고 "if문으로 판단하는 것"이라고 설명함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">D</span></td>
+      <td>교사 안내로 Supabase 가입과 테이블 생성을 완료함. 교사가 준비한 코드로 데이터 전송을 시도함. 클라우드와 로컬의 차이를 인식함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">E</span></td>
+      <td>교사 지원으로 Supabase에 가입하고, 센서 데이터가 인터넷에 저장된다는 것을 체험함. IoT의 기본 개념("어디서든 데이터를 볼 수 있다")을 인식함.</td>
+    </tr>
+  </tbody>
+</table>

@@ -1,0 +1,613 @@
+---
+title: "Lv.1 탐험가: 센서 하나로 대시보드 만들기"
+description: "센서 1개 + OLED 대시보드 + CSV 저장 + 조건 판단 — 교사용 지도서"
+---
+
+<a class="student-link" href="https://greatsong.github.io/ai-physical-computing/course-b/lv1/" target="_blank" rel="noopener">
+  <span class="link-icon">📖</span>
+  <span class="link-body">
+    <span class="link-label">학생 교재 보기</span>
+    <span class="link-title">Lv.1 탐험가 — 학생용 페이지</span>
+  </span>
+  <span class="link-arrow">→</span>
+</a>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">성취기준</div>
+      센서 1개를 선택하여 데이터를 읽고, OLED 대시보드와 CSV 저장으로 측정 시스템을 구현할 수 있다
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      150분 (3차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">센서</div>
+      DHT20 / 소리 / 빛 중 택1
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">난이도</div>
+      ● ● ○ ○ ○
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">오늘의 질문</div>
+      센서 하나로 어떤 대시보드를 만들 수 있을까?
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">과학적 사고</span> <span class="badge badge-amber">컴퓨팅 사고력</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (팀별 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH + Grove Shield</li>
+    <li>센서 1개 — DHT20(I2C), 소리 센서(ADC), 빛 센서(ADC) 중 학생 선택</li>
+    <li>OLED 디스플레이 SSD1306 (128x64, I2C 주소 0x3C)</li>
+    <li>Grove 케이블 2개 (센서용 + OLED용)</li>
+    <li>USB 데이터 케이블 (충전 전용 불가!)</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE 설치 및 Pico 인식 확인</li>
+    <li>MicroPython 펌웨어 설치 완료</li>
+    <li>ssd1306 라이브러리 — Thonny 패키지 관리자에서 <code>micropython-ssd1306</code> 설치</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>한 세트라도 미리 테스트 — OLED에 텍스트가 표시되는가</li>
+    <li>3종 센서를 모두 준비하고, 팀 수에 맞게 배분 계획 수립</li>
+    <li>OLED 대시보드 스케치용 종이와 필기도구 준비</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 1">1차시 50분</div>
+  <div class="main" style="flex: 1">2차시 50분</div>
+  <div class="wrap-up" style="flex: 1">3차시 50분</div>
+</div>
+
+---
+
+## 1차시: 센서 선택과 기본 데이터 읽기 (50분)
+
+### 도입 (5분)
+
+<div class="teacher-script">
+  <p>"여러분, 스마트워치나 날씨 앱을 보면 숫자만 나오는 게 아니라 예쁜 화면에 정보가 정리되어 있죠? 그런 화면을 <strong>대시보드</strong>라고 합니다."</p>
+  <p>"오늘부터 3시간 동안, 여러분이 직접 센서를 골라서 OLED 화면에 나만의 대시보드를 만들 거예요. 온도, 소리, 빛 — 세 가지 센서 중 하나를 선택할 수 있습니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"온도 센서 할래요!"</span>
+  <span class="bubble">"소리 센서 재밌겠다!"</span>
+  <span class="bubble">"빛 센서로 밝기 측정하고 싶어요"</span>
+</div>
+
+<div class="teaching-tip">
+  <p>센서 선택의 자유를 강조하세요. 학생이 직접 고른 센서로 작업할 때 몰입도가 훨씬 높아집니다. 다만 팀별로 센서가 너무 한쪽에 몰리면 수급이 어려울 수 있으니, 사전에 수량을 안내하세요.</p>
+</div>
+
+### 전개 (35분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">센서 선택</span>
+  <span class="step-time">7분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"세 가지 센서를 소개합니다. 각각 측정하는 것이 다르고, 연결 방법도 조금 다릅니다."</p>
+  <p>"<strong>DHT20</strong> — 온도와 습도를 함께 측정합니다. I2C 포트에 연결해요. 교실 환경 모니터링에 좋습니다."</p>
+  <p>"<strong>소리 센서</strong> — 주변의 소음 크기를 측정합니다. A2 포트(GP27)에 연결해요. 교실 소음 측정에 재밌어요."</p>
+  <p>"<strong>빛 센서</strong> — 밝기를 측정합니다. A0 포트(GP26)에 연결해요. 자연광 변화 관찰에 좋습니다."</p>
+  <p>"팀별로 상의해서 하나를 선택하세요. 고르는 데 3분 드립니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"우리 팀은 소리 센서로 소음 측정기 만들래!"</span>
+  <span class="bubble">"온도 센서가 쉬워 보여요"</span>
+  <span class="bubble">"빛 센서로 교실 밝기 측정하자!"</span>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">배선 + 데이터 읽기</span>
+  <span class="step-time">15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"센서를 정했으면 배선부터 합시다. OLED와 센서, 두 가지를 연결해야 해요."</p>
+  <p>"<strong>OLED</strong>는 모든 팀이 동일하게 I2C 포트에 연결합니다. 주소가 0x3C예요."</p>
+  <p>"<strong>DHT20</strong>을 고른 팀은 같은 I2C 포트에 연결하세요. OLED(0x3C)와 DHT20(0x38)은 주소가 다르니 충돌 없이 공존합니다."</p>
+  <p>"<strong>소리 센서</strong>는 반드시 <strong>A2 포트(GP27)</strong>에, <strong>빛 센서</strong>는 <strong>A0 포트(GP26)</strong>에 연결하세요."</p>
+  <p>"연결이 끝나면, 센서 데이터 읽기 코드를 입력하고 실행해 보세요."</p>
+</div>
+
+<details class="student-content">
+  <summary>학생 교재 — DHT20 기본 코드</summary>
+  <div class="content">
+
+```python
+from machine import I2C, Pin
+import time
+
+i2c = I2C(1, sda=Pin(6), scl=Pin(7), freq=100000)
+sensor_addr = 0x38
+time.sleep(0.1)
+
+def read_dht20():
+    i2c.writeto(sensor_addr, bytes([0xAC, 0x33, 0x00]))
+    time.sleep(0.08)
+    data = i2c.readfrom(sensor_addr, 7)
+    humidity = ((data[1] << 12) | (data[2] << 4) | (data[3] >> 4)) / 1048576 * 100
+    temperature = (((data[3] & 0x0F) << 16) | (data[4] << 8) | data[5]) / 1048576 * 200 - 50
+    return round(temperature, 1), round(humidity, 1)
+
+while True:
+    temp, humi = read_dht20()
+    print(f"온도: {temp}°C, 습도: {humi}%")
+    time.sleep(2)
+```
+
+  </div>
+</details>
+
+<details class="student-content">
+  <summary>학생 교재 — 소리 센서 기본 코드</summary>
+  <div class="content">
+
+```python
+from machine import ADC, Pin
+import time
+
+sound = ADC(Pin(27))  # A2 포트
+
+while True:
+    raw = sound.read_u16()
+    pct = raw / 65535 * 100
+    print(f"소음: {pct:.0f}%")
+    time.sleep(0.5)
+```
+
+  </div>
+</details>
+
+<details class="student-content">
+  <summary>학생 교재 — 빛 센서 기본 코드</summary>
+  <div class="content">
+
+```python
+from machine import ADC, Pin
+import time
+
+light = ADC(Pin(26))  # A0 포트
+
+while True:
+    raw = light.read_u16()
+    pct = raw / 65535 * 100
+    print(f"밝기: {pct:.0f}%")
+    time.sleep(1)
+```
+
+  </div>
+</details>
+
+<div class="student-voice">
+  <span class="bubble">"온도 24.3도, 습도 52% 나와요!"</span>
+  <span class="bubble">"소리 센서 값이 막 바뀌어요!"</span>
+  <span class="bubble">"손으로 빛 센서를 가리면 값이 확 줄어요!"</span>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"OLED에 아무것도 안 나와요"</div>
+    <span class="label">원인</span>
+    <span class="value">ssd1306 라이브러리 미설치 또는 I2C 포트 연결 오류</span>
+    <span class="label">대응</span>
+    <span class="value">Thonny 패키지 관리자에서 <code>micropython-ssd1306</code> 설치, I2C 포트 연결 확인</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"센서 값이 0이나 65535만 나와요"</div>
+    <span class="label">원인</span>
+    <span class="value">ADC 센서를 디지털 포트나 잘못된 ADC 포트에 연결</span>
+    <span class="label">대응</span>
+    <span class="value">빛 센서는 A0(GP26), 소리 센서는 A2(GP27)에 연결했는지 확인</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"OSError가 나요"</div>
+    <span class="label">원인</span>
+    <span class="value">I2C 통신 실패 — 케이블 불량 또는 포트 오연결</span>
+    <span class="label">대응</span>
+    <span class="value">Grove 케이블을 뺐다가 다시 꽂고, <code>i2c.scan()</code>으로 장치 주소 확인</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>이 시점에 순회하며 확인:</strong></p>
+  <ol>
+    <li>OLED가 I2C 포트에 연결되어 있는가</li>
+    <li>DHT20 팀은 I2C 포트, ADC 센서 팀은 올바른 아날로그 포트(A0/A2)에 연결했는가</li>
+    <li>센서 데이터가 Shell 창에 정상 출력되고 있는가</li>
+  </ol>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">OLED 레이아웃 스케치</span>
+  <span class="step-time">13분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"코드를 바로 짜기 전에, 먼저 종이에 대시보드를 그려봅시다. OLED는 128x64 픽셀이에요. 가로 16글자, 세로 8줄 정도가 들어갑니다."</p>
+  <p>"어떤 정보를 보여줄지, 어디에 배치할지를 먼저 정하는 거예요. 헤더 바, 숫자, 상태 텍스트, 그래프 영역 등을 나눠보세요."</p>
+  <p>"학생 교재에 나온 3가지 예시 대시보드를 참고해도 좋고, 자기만의 레이아웃을 만들어도 됩니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"위에 제목, 가운데 숫자, 아래 그래프!"</span>
+  <span class="bubble">"레벨 미터처럼 막대로 하고 싶어요"</span>
+  <span class="bubble">"스파크라인이 멋있어 보여요"</span>
+</div>
+
+<div class="teaching-tip">
+  <p>종이 프로토타이핑은 코딩 시간을 크게 절약합니다. OLED의 128x64 크기를 종이에 실제 비율(약 3:1.5cm)로 그려보게 하세요. 8px 폰트 기준으로 한 줄에 16자, 총 8줄이 들어간다는 제약을 알려주면 현실적인 설계가 나옵니다.</p>
+</div>
+
+### 정리 (10분)
+
+<div class="teacher-script">
+  <p>"오늘 센서를 선택하고 데이터를 읽는 것까지 했어요. 그리고 대시보드 스케치도 그렸죠?"</p>
+  <p>"다음 시간에는 이 스케치를 OLED 화면에 실제로 구현합니다. <code>fill_rect</code>, <code>text</code>, <code>vline</code> 같은 OLED 명령어를 배울 거예요."</p>
+  <p>"스케치를 잘 보관해 오세요. 그게 다음 시간의 설계도입니다."</p>
+</div>
+
+---
+
+## 2차시: OLED 대시보드 구현 (50분)
+
+### 도입 (5분)
+
+<div class="teacher-script">
+  <p>"지난 시간에 그린 대시보드 스케치를 꺼내세요. 오늘은 이 스케치를 OLED 화면에 실제로 만들어볼 거예요."</p>
+  <p>"OLED에 그림을 그리는 건 좌표를 지정하는 거예요. 왼쪽 위가 (0,0), 오른쪽 아래가 (127,63)입니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"스케치 가져왔어요!"</span>
+  <span class="bubble">"좌표로 그리는 거군요"</span>
+</div>
+
+### 전개 (35분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">OLED 기본 출력</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"먼저 OLED에 글자와 숫자를 표시하는 기본 명령어를 연습합시다."</p>
+  <p>"<code>oled.text('Hello', 0, 0)</code> — 왼쪽 위에 Hello를 표시해요. 마지막에 <code>oled.show()</code>를 꼭 호출해야 화면에 나타납니다."</p>
+</div>
+
+<details class="student-content">
+  <summary>학생 교재 — OLED 기본 명령어</summary>
+  <div class="content">
+
+```python
+from machine import I2C, Pin
+from ssd1306 import SSD1306_I2C
+
+i2c = I2C(1, sda=Pin(6), scl=Pin(7), freq=100000)
+oled = SSD1306_I2C(128, 64, i2c)
+
+oled.fill(0)                         # 화면 지우기
+oled.text("Hello!", 0, 0)            # 텍스트 표시
+oled.fill_rect(0, 0, 128, 12, 1)     # 흰 사각형 (반전 헤더)
+oled.text("Title", 40, 2, 0)         # 검은 글씨 (반전 헤더 위)
+oled.hline(0, 13, 128, 1)            # 가로선
+oled.vline(64, 14, 50, 1)            # 세로선
+oled.show()                          # 화면 갱신
+```
+
+  </div>
+</details>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"글자가 안 보여요"</div>
+    <span class="label">원인</span>
+    <span class="value"><code>oled.show()</code>를 빠뜨린 경우가 대부분</span>
+    <span class="label">대응</span>
+    <span class="value">코드 마지막에 <code>oled.show()</code>가 있는지 확인하세요</span>
+  </div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">대시보드 레이아웃 구현</span>
+  <span class="step-time">15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이제 스케치를 보면서 대시보드를 만드세요. 반전 헤더, 데이터 영역, 그래프 영역을 차례로 코딩합니다."</p>
+  <p>"핵심 포인트 — 반전 헤더는 <code>fill_rect</code>로 흰 배경을 그린 뒤, 글자 색상을 0(검정)으로 지정해요."</p>
+  <p>"스파크라인을 그릴 때는 주의하세요. 흰 배경(<code>fill_rect</code>) 위에 그래프를 그리려면 색상을 0(검정)으로 해야 보입니다."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"반전 헤더 멋있어요!"</span>
+  <span class="bubble">"좌표 맞추기 어려워요..."</span>
+  <span class="bubble">"스파크라인이 나타났어요!"</span>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>OLED 좌표 디버깅 팁</strong> — 학생이 좌표를 맞추기 어려워하면, 먼저 <code>oled.rect(x, y, w, h, 1)</code>로 테두리만 그려서 영역을 확인한 뒤 내용을 채우게 하세요. 이렇게 하면 레이아웃 실수를 빠르게 잡을 수 있습니다.</p>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>반전 헤더가 제대로 표시되는가 (fill_rect + color 0 텍스트)</li>
+    <li>센서 데이터가 실시간으로 갱신되는가 (while 루프 안에서 oled.fill(0) 호출)</li>
+    <li>글자가 화면 밖으로 벗어나지 않는가 (최대 16자 x 8줄)</li>
+  </ol>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">조건 판단 + 상태 표시</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"대시보드에 숫자만 보여주는 것보다, <strong>의미</strong>를 함께 표시하면 더 유용해요. <code>if/else</code>로 상태를 판정해 봅시다."</p>
+  <p>"예를 들어 온도가 18도 미만이면 'Cold', 28도 초과면 'Hot', 그 사이면 'Good'이라고 표시하는 거예요."</p>
+  <p>"소리 센서 팀은 Quiet/Normal/Loud, 빛 센서 팀은 Dark/Normal/Bright — 이런 식으로 자기 센서에 맞는 상태를 정하세요."</p>
+</div>
+
+<details class="student-content">
+  <summary>학생 교재 — 조건 판단 함수 예시</summary>
+  <div class="content">
+
+```python
+# 온도 상태 판정
+def get_status(temp):
+    if temp < 18:
+        return "Cold"
+    elif temp > 28:
+        return "Hot"
+    else:
+        return "Good"
+
+# 소음 상태 판정
+def get_noise_level(pct):
+    if pct < 20:
+        return "Quiet"
+    elif pct < 50:
+        return "Normal"
+    elif pct < 75:
+        return "Loud"
+    else:
+        return "V.Loud"
+
+# 밝기 상태 판정
+def get_brightness(pct):
+    if pct < 20:
+        return "Dark"
+    elif pct < 60:
+        return "Normal"
+    else:
+        return "Bright"
+```
+
+  </div>
+</details>
+
+<div class="student-voice">
+  <span class="bubble">"[Good]이라고 나와요!"</span>
+  <span class="bubble">"소리를 지르면 V.Loud로 바뀌어요!"</span>
+  <span class="bubble">"손으로 가리면 바로 Dark가 돼요"</span>
+</div>
+
+### 정리 (10분)
+
+<div class="teacher-script">
+  <p>"오늘 OLED 대시보드를 완성했어요. 숫자도 나오고, 상태 판정도 나오죠?"</p>
+  <p>"다음 시간에는 두 가지를 추가합니다. 첫째, 데이터를 CSV 파일로 자동 저장하기. 둘째, 전체 시스템을 테스트하고 발표 준비하기."</p>
+  <p>"대시보드가 잘 돌아가는 팀은 코드를 <code>main.py</code>로 저장해 두세요."</p>
+</div>
+
+---
+
+## 3차시: CSV 저장 + 테스트 + 발표 (50분)
+
+### 도입 (5분)
+
+<div class="teacher-script">
+  <p>"지금까지 센서 데이터를 OLED에 표시했죠? 그런데 전원을 끄면 데이터가 사라져요. 오늘은 데이터를 <strong>파일로 저장</strong>하는 방법을 배웁니다."</p>
+  <p>"CSV라는 형식을 사용할 건데, 엑셀에서 바로 열 수 있는 표 형태의 텍스트 파일이에요."</p>
+</div>
+
+### 전개 (35분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">CSV 저장 코드</span>
+  <span class="step-time">15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"CSV 저장에서 중요한 포인트가 있어요. Pico를 껐다 켤 때마다 헤더 줄이 중복되면 안 되죠?"</p>
+  <p>"<code>os.stat()</code>으로 파일 크기를 확인하고, 크기가 0일 때만 헤더를 쓰는 방식을 사용합니다. 파일이 없으면 <code>except</code>로 빠져서 새로 만들고요."</p>
+</div>
+
+<details class="student-content">
+  <summary>학생 교재 — CSV 저장 패턴</summary>
+  <div class="content">
+
+```python
+import os
+
+# 파일이 이미 있으면 크기 확인, 없으면 0
+try:
+    size = os.stat("data_log.csv")[6]
+except:
+    size = 0
+
+f = open("data_log.csv", "a")
+if size == 0:
+    f.write("time_s,value,status\n")  # 헤더는 처음 한 번만
+
+start = time.ticks_ms()
+
+# 메인 루프 안에서
+elapsed = time.ticks_diff(time.ticks_ms(), start) // 1000
+f.write(f"{elapsed},{value},{status}\n")
+f.flush()  # 즉시 저장 — 없으면 꺼질 때 데이터 손실!
+```
+
+  </div>
+</details>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"CSV 파일이 비어있어요"</div>
+    <span class="label">원인</span>
+    <span class="value"><code>f.flush()</code>가 빠져서 버퍼에만 있고 실제 저장되지 않음</span>
+    <span class="label">대응</span>
+    <span class="value"><code>f.write()</code> 뒤에 반드시 <code>f.flush()</code> 추가</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"OSError: [Errno 28] ENOSPC"</div>
+    <span class="label">원인</span>
+    <span class="value">Pico 저장 공간이 가득 참</span>
+    <span class="label">대응</span>
+    <span class="value">Thonny에서 불필요한 파일을 삭제하세요</span>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p><code>os.stat()</code> 패턴은 실무에서도 자주 쓰는 기법입니다. "파일이 있는지 먼저 확인 → 없으면 새로 만들기"라는 논리를 학생이 이해하게 해 주세요. <code>try/except</code>가 처음인 학생에게는 "시도해보고, 실패하면 이렇게 해"라고 설명하면 됩니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">통합 테스트</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이제 센서 읽기 + OLED 대시보드 + CSV 저장을 모두 합쳐서 실행합니다. 코드를 <code>main.py</code>로 저장하세요. 그러면 USB만 꽂으면 자동으로 실행됩니다."</p>
+  <p>"30초 이상 돌려보고, CSV 파일에 데이터가 쌓이는지 확인하세요."</p>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>OLED에 센서 데이터 + 상태 판정이 모두 표시되는가</li>
+    <li>CSV 파일에 30회 이상 데이터가 기록되었는가</li>
+    <li>코드가 <code>main.py</code>로 Pico에 저장되었는가</li>
+  </ol>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">팀별 발표</span>
+  <span class="step-time">10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"각 팀이 30초씩 발표합니다. 세 가지를 말해주세요:"</p>
+  <p>"1. 어떤 센서를 골랐고, 2. 대시보드에서 어떤 정보를 보여주는지, 3. 만들면서 겪은 어려움과 해결 방법."</p>
+  <p>"그리고 한 줄 설명을 완성하세요 — '이 프로젝트는 ___을(를) 측정하여 ___을(를) 알 수 있는 측정기예요'."</p>
+</div>
+
+<div class="student-voice">
+  <span class="bubble">"우리는 교실 소음을 측정하는 소음 모니터예요. 7단 레벨 미터로 보여줍니다!"</span>
+  <span class="bubble">"빛 센서로 만든 조명 측정기예요. 스파크라인 그래프가 자랑이에요!"</span>
+  <span class="bubble">"온습도 대시보드인데, 환기가 필요한지 알려줘요!"</span>
+</div>
+
+### 정리 (10분)
+
+<div class="teacher-script">
+  <p>"여러분이 3시간 동안 한 일을 정리해볼게요."</p>
+  <p>"물리적 환경(온도, 소리, 빛)을 → 센서가 전기 신호로 바꾸고 → 코드가 디지털 데이터로 변환하고 → OLED 대시보드에 시각화하고 → CSV 파일로 기록했습니다."</p>
+  <p>"스마트워치, 공기청정기, 날씨 앱 — 모두 이 원리의 확장이에요. 여러분은 <strong>IoT 장치의 기본 구조</strong>를 직접 만든 겁니다."</p>
+  <p>"다음 레벨 Lv.2에서는 센서 2개 이상을 조합해서 스마트 시스템을 만들어볼 거예요!"</p>
+</div>
+
+<div class="teaching-tip">
+  <p>발표 시간이 부족하면 팀별 30초 발표 대신, 대시보드 사진을 공유 문서에 올리고 댓글로 한 줄 설명을 남기는 방식도 효과적입니다. <a href="https://pico-makers.vercel.app" target="_blank">Pico Makers</a>나 <a href="https://visual-pico.vercel.app" target="_blank">Pico Buddy</a>에서 코드와 배선을 확인하도록 안내해도 좋습니다.</p>
+</div>
+
+---
+
+## 차별화 전략
+
+<div class="differentiation">
+  <div class="fast-learner">
+    <p><strong>빠른 학생에게:</strong></p>
+    <ul>
+      <li>스파크라인이나 레벨 미터 같은 고급 시각화를 대시보드에 추가해 보세요</li>
+      <li>최고/최저 값을 기록하여 OLED에 함께 표시해 보세요</li>
+      <li><code>try/except</code>로 센서 오류 시 OLED에 경고 메시지를 표시해 보세요</li>
+      <li>PC 실시간 대시보드(pyserial + matplotlib)에 도전해 보세요</li>
+    </ul>
+  </div>
+  <div class="slow-learner">
+    <p><strong>느린 학생에게:</strong></p>
+    <ul>
+      <li>학생 교재의 예시 코드를 그대로 복사하여 실행하는 것부터 시작</li>
+      <li>OLED에 텍스트 한 줄 표시하는 것을 먼저 성공시킨 뒤 확장</li>
+      <li>대시보드 스케치를 간단하게 — 헤더 + 숫자 + 상태 3줄이면 충분</li>
+      <li>CSV 저장 부분은 교사가 코드를 제공하고 붙여넣기하게 안내</li>
+    </ul>
+  </div>
+</div>
+
+---
+
+## 평가 루브릭
+
+<table class="rubric-table">
+  <thead>
+    <tr><th>등급</th><th>관찰 기록 예시</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="badge badge-purple">S</span></td>
+      <td>센서를 직접 선택하고, 스파크라인과 반전 헤더가 포함된 OLED 대시보드를 독창적으로 설계함. CSV 저장에 os.stat() 헤더 중복 방지 패턴을 적용하고, try/except로 센서 에러 처리까지 구현함. 다른 팀의 배선 오류를 진단해주며, "스마트워치도 이런 구조겠다"는 전이적 사고를 보임.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">A</span></td>
+      <td>센서를 선택하여 그래프 요소(스파크라인 또는 레벨 미터)가 포함된 대시보드를 구현함. if/else 조건 판단과 CSV 자동 저장이 정상 동작하며, 최고/최저 값 기록 등 교재 범위를 넘는 기능을 자발적으로 추가함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">B</span></td>
+      <td>센서 데이터를 OLED에 반전 헤더, 숫자, 상태 텍스트로 표시하는 대시보드를 완성함. if/else로 3단계 이상의 상태 판정을 구현하고, CSV 파일에 30회 이상의 데이터를 저장함. 한 줄 설명을 명확하게 작성함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-amber">C</span></td>
+      <td>센서를 연결하고 OLED에 숫자와 텍스트를 표시하는 기본 대시보드를 구현함. 간단한 if/else 조건 판단이 포함되어 있으며, CSV 저장을 시도함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">D</span></td>
+      <td>교사의 안내에 따라 센서를 연결하고 예시 코드를 실행하여 OLED에 센서 값을 표시함. 조건 판단이나 CSV 저장은 부분적으로 완성함.</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-rose">E</span></td>
+      <td>교사의 도움으로 센서와 OLED를 연결하고 예시 코드를 실행함. 센서가 환경 데이터를 읽어 화면에 표시한다는 기본 개념을 이해함.</td>
+    </tr>
+  </tbody>
+</table>
