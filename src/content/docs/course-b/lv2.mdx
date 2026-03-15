@@ -354,7 +354,7 @@ print("I2C 장치:", [hex(d) for d in devices])
 
 # ADC 센서 테스트
 light = ADC(Pin(26))  # 빛 센서 (A0)
-sound = ADC(Pin(27))  # 소리 센서 (A2)
+sound = ADC(Pin(27))  # 소리 센서 (A1)
 print(f"빛: {light.read_u16()}, 소리: {sound.read_u16()}")
 ```
 

@@ -169,7 +169,7 @@ while True:
 from machine import ADC, Pin
 import time
 
-sound = ADC(Pin(27))  # A2 포트
+sound = ADC(Pin(27))  # A1 포트
 
 while True:
     raw = sound.read_u16()
@@ -235,7 +235,7 @@ while True:
   <p><strong>이 시점에 순회하며 확인:</strong></p>
   <ol>
     <li>OLED가 I2C 포트에 연결되어 있는가</li>
-    <li>DHT20 팀은 I2C 포트, ADC 센서 팀은 올바른 아날로그 포트(A0/A2)에 연결했는가</li>
+    <li>DHT20 팀은 I2C 포트, ADC 센서 팀은 올바른 아날로그 포트(A0/A1)에 연결했는가</li>
     <li>센서 데이터가 Shell 창에 정상 출력되고 있는가</li>
   </ol>
 </div>
