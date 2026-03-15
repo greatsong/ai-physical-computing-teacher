@@ -75,6 +75,7 @@ export default defineConfig({
             { label: '평가 루브릭', slug: 'appendix/rubric' },
             { label: '학생 관찰 기록 예시', slug: 'appendix/observation' },
             { label: '트러블슈팅 대응', slug: 'appendix/troubleshooting' },
+            { label: '키트 구매 가이드', slug: 'appendix/shopping' },
           ],
         },
       ],

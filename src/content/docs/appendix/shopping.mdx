@@ -1,0 +1,295 @@
+---
+title: "키트 구매 가이드"
+description: "코스 A/B 모듈별 부품 목록, 디바이스마트 구매 링크, 레벨별 키트 구성"
+---
+
+import { Tabs, TabItem, Badge, Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+<p style="color: var(--sl-color-gray-3); margin-bottom: 0.25rem;">부록</p>
+
+# 키트 구매 가이드
+
+> 가격은 **2026.03.15. 기준** 확인 가능한 정보입니다. 실제 가격은 구매 시점에 따라 변동될 수 있으니 링크에서 직접 확인하세요.
+
+<a href="/ai-physical-computing-teacher/kit-shopping-guide.xlsx" download style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; background: var(--sl-color-accent); color: white; border-radius: 0.5rem; text-decoration: none; font-weight: 600;">📥 엑셀 파일 다운로드 (kit-shopping-guide.xlsx)</a>
+
+---
+
+## 공통 베이스 키트 (모든 코스 필수)
+
+모든 수업의 기본이 되는 장비입니다. 이 키트 없이는 어떤 차시/레벨도 진행할 수 없습니다.
+
+| # | 품목 | 제품번호 | 참고가 | 구매 링크 |
+|:-:|------|---------|------:|----------|
+| 1 | **Raspberry Pi Pico 2 WH** (RP2350, WiFi+BT, 헤더 납땜) | SC1632 | ~12,000원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=15604429) |
+| 2 | **Grove Shield for Pi Pico v1.0** | 103100142 | ~5,500원 | [디바이스마트 Seeed 브랜드](https://www.devicemart.co.kr/goods/brand?code=1111) |
+| 3 | **Grove I2C Hub (6 Port)** | 103020272 | ~2,700원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=12382844) |
+| 4 | **Grove 4핀 케이블** (5개팩) | 110990210 | ~3,500원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1153480) |
+| 5 | **USB-C 데이터 케이블** | — | ~3,000원 | 일반 구매 |
+
+:::tip[I2C Hub가 왜 필요한가요?]
+I2C 센서(DHT20, SCD41, OLED, MPU6050 등)는 주소가 달라 같은 전선을 공유할 수 있지만, Grove 포트는 물리적으로 **커넥터 1개**만 꽂을 수 있습니다. **I2C Hub**를 사용하면 한 포트에서 최대 5개 I2C 장치를 동시에 연결할 수 있습니다. Y-스플리터보다 안정적이고 저렴합니다.
+:::
+
+---
+
+## 부품 인덱스
+
+아래 알파벳 ID로 각 키트의 부품을 참조합니다. 중복 구매를 방지하세요.
+
+| ID | 품목 | 포트 | 참고가 | 디바이스마트 | 대안 (Seeed 직구) |
+|:--:|------|------|------:|------------|-----------------|
+| A | **DHT20 온습도 센서** | I2C (0x38) | ~7,500원 | [바로가기](https://www.devicemart.co.kr/goods/view?no=14600420) | [Seeed ~$4.90](https://wiki.seeedstudio.com/Grove-Temperature-Humidity-Sensor-DH20/) |
+| B | **Grove 빛 센서 v1.1** | A0 (GP26) | ~3,300원 | [바로가기](https://www.devicemart.co.kr/goods/view?no=1346035) | [Seeed ~$2.90](https://www.seeedstudio.com/Grove-Light-Sensor-v1-2-LS06-S-phototransistor.html) |
+| C | **Grove OLED 0.96" (SSD1315)** | I2C (0x3C) | ~11,000원 | [바로가기](https://www.devicemart.co.kr/goods/view?no=12377753) | [Seeed ~$5.50](https://www.seeedstudio.com/Grove-OLED-Display-0-96-SSD1315-p-4294.html) |
+| D | **SCD41 CO2 센서** | I2C (0x62) | ~55,000원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=14917083) | [Seeed ~$49.90](https://www.seeedstudio.com/Grove-CO2-Temperature-Humidity-Sensor-SCD41-p-5025.html) |
+| E | **심박 센서 (Pulse Sensor)** | A0 (GP26) | ~11,000원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=38086) | [Seeed ~$6.90](https://www.seeedstudio.com/Grove-Finger-clip-Heart-Rate-Sensor.html) |
+| F | **Grove 초음파 센서** | D16 (GP16/17) | ~4,900원 | [바로가기](https://www.devicemart.co.kr/goods/view?no=1360219) | [Seeed ~$3.90](https://wiki.seeedstudio.com/Grove-Ultrasonic_Ranger/) |
+| G | **Grove 부저** | D18 (GP18) | ~3,300원 | [Seeed 브랜드 검색](https://www.devicemart.co.kr/goods/brand?code=1111) | [Seeed ~$2.90](https://www.seeedstudio.com/Grove-Buzzer.html) |
+| H | **Grove LED Bar v2.0** | D20 (GP20/21) | ~5,500원 | [Seeed 브랜드 검색](https://www.devicemart.co.kr/goods/brand?code=1111) | [Seeed ~$3.90](https://www.seeedstudio.com/Grove-LED-Bar-v2-0.html) |
+| I | **Grove 소리 센서** | A1 (GP27) | ~6,600원 | [Seeed 브랜드 검색](https://www.devicemart.co.kr/goods/brand?code=1111) | [Seeed ~$4.90](https://www.seeedstudio.com/Grove-Sound-Sensor-Based-on-LM358-amplifier-Arduino-Compatible.html) |
+| J | **MPU6050 6축 가속도/자이로** | I2C (0x68) | ~2,100원 | [바로가기](https://www.devicemart.co.kr/goods/view?no=1247052) | — |
+| K | **Grove 먼지 센서 (PPD42NS)** | A2 (GP28) | ~14,000원 | [바로가기](https://www.devicemart.co.kr/goods/view?no=1066618) | [Seeed ~$11.90](https://www.seeedstudio.com/Grove-Dust-Sensor-PPD42NS.html) |
+
+:::note[비 Grove 센서 연결 방법]
+DHT20(Adafruit), SCD41(Pimoroni), MPU6050(GY-521)은 Grove 커넥터가 아닙니다.
+- **Qwiic/STEMMA QT 센서** → [Grove-Qwiic 변환 케이블](https://www.devicemart.co.kr/goods/view?no=14600579) 사용
+- **일반 핀헤더 센서** → [Grove 4핀 Male 점퍼 케이블](https://www.devicemart.co.kr/goods/view?no=1153480) 사용
+:::
+
+---
+
+## 코스 A: 막별 키트
+
+<Tabs>
+  <TabItem label="1막 키트">
+
+### 1막: 센서와 친해지기 (1~4차시)
+
+**추가 부품 3종** (베이스 키트 + 아래)
+
+| ID | 품목 | 처음 사용 차시 | 이후에도 사용 |
+|:--:|------|:------------:|:-----------:|
+| A | DHT20 온습도 센서 | 1차시 | 3, 4, 5, 6차시 |
+| B | Grove 빛 센서 v1.1 | 2차시 | 4차시 |
+| C | Grove OLED 0.96" | 4차시 | 6~8, 12차시 |
+
+**1막 예상 추가 비용:** ~22,000원
+
+**차시별 센서 사용표:**
+
+| 차시 | 주제 | 센서/부품 |
+|:----:|------|----------|
+| 1 | 센서로 세상 읽기 | A (DHT20) |
+| 2 | 빛을 숫자로 | B (빛 센서) |
+| 3 | 자동 기록 시스템 | A (DHT20 재사용) |
+| 4 | 첫 번째 대시보드 | A + B + C (OLED) + **I2C Hub** |
+
+  </TabItem>
+  <TabItem label="2막 키트">
+
+### 2막: 바이브 코딩으로 확장 (5~10차시)
+
+**추가 부품 5종** (1막 키트에 추가)
+
+| ID | 품목 | 처음 사용 차시 |
+|:--:|------|:------------:|
+| D | SCD41 CO2 센서 | 6차시 |
+| E | 심박 센서 | 7차시 |
+| F | Grove 초음파 센서 | 8차시 |
+| G | Grove 부저 | 8차시 |
+| H | Grove LED Bar v2.0 | 8차시 |
+
+**2막 예상 추가 비용:** ~80,000원 (SCD41이 비용의 절반 이상)
+
+**차시별 센서 사용표:**
+
+| 차시 | 주제 | 센서/부품 |
+|:----:|------|----------|
+| 5 | AI에게 코드 시키기 | A (DHT20 재사용) + AI 챗봇 |
+| 6 | 환경 모니터링 대시보드 | A + D (SCD41) + C (OLED) + **I2C Hub** |
+| 7 | 내 몸의 데이터 | E (심박) + C (OLED) |
+| 8 | 스마트 알림 시스템 | F (초음파) + G (부저) + H (LED Bar) + C (OLED) |
+| 9 | 데이터 정리와 시각화 | **PC만** (Python, pandas, matplotlib) |
+| 10 | AI 데이터 분석 | **PC만** (AI 챗봇) |
+
+:::caution[SCD41 대안]
+SCD41(~55,000원)은 가장 비싼 부품입니다. 예산이 부족하면:
+- **MH-Z19B** NDIR CO2 센서 (~15,000원, UART 방식) 로 대체 가능
+- 6차시를 DHT20만으로 단순화하고, CO2는 데이터 시뮬레이션으로 진행
+:::
+
+  </TabItem>
+  <TabItem label="3막 키트">
+
+### 3막: 대시보드와 ML (11~15차시)
+
+**새로 구매할 부품 없음** — 1~2막 키트의 센서를 조합하여 팀 프로젝트 진행
+
+| 차시 | 주제 | 사용 부품 |
+|:----:|------|----------|
+| 11 | 팀 프로젝트 설계 | (기존 센서 선택) |
+| 12 | 실시간 대시보드 제작 | 팀 선택 센서 + C (OLED) + PC |
+| 13 | 센서 데이터로 ML 입문 | **PC 웹캠/마이크** (노트북 내장) + Teachable Machine |
+| 14 | 발표와 피드백 | 프로젝트 결과물 시연 |
+| 15 | 되돌아보기 | 인터랙티브 성장 차트 (PC 브라우저) |
+
+:::tip[3막은 추가 비용 0원]
+3막의 핵심은 기존 센서를 **창의적으로 조합**하는 것입니다. 팀별로 1~2막에서 사용한 센서를 재배치하여 새로운 프로젝트를 설계합니다. Teachable Machine은 무료 웹 도구이며, PC 노트북의 내장 웹캠/마이크를 사용합니다.
+:::
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 코스 B: 레벨별 키트
+
+<Tabs>
+  <TabItem label="Lv.1 탐험가">
+
+### Lv.1 탐험가: 단일 센서 대시보드 (3시간)
+
+학생이 아래 3개 프로젝트 중 **1개를 선택**합니다. 교실에 3종 모두 구비하면 프로젝트 다양화가 가능합니다.
+
+| 프로젝트 | 센서 (ID) | 포트 |
+|----------|----------|------|
+| 1. 교실 온습도 | A (DHT20) | I2C1 |
+| 2. 소음 모니터 | I (소리 센서) | A1 |
+| 3. 밝기 트래커 | B (빛 센서) | A0 |
+
+**공통 필수:** C (OLED) + I2C Hub
+
+**Lv.1 전체 키트 예상 추가 비용:** ~28,000원 (A + B + I + C)
+
+  </TabItem>
+  <TabItem label="Lv.2 발명가">
+
+### Lv.2 발명가: 복합 센서 스마트 시스템 (3시간)
+
+| 프로젝트 | 센서 조합 (ID) | 포트 |
+|----------|--------------|------|
+| 1. 스마트 환기 | A + D (DHT20+SCD41) + C | I2C1 (Hub) |
+| 2. 스마트 알림 | F + I + G + C (초음파+소리+부저+OLED) | D16, A1, D18, I2C1 |
+| 3. 스마트 교실 | A + B + I + C (DHT20+빛+소리+OLED) | I2C1, A0, A1 |
+
+**Lv.2 전체 키트 예상 추가 비용:** ~90,000원 (A + B + D + F + G + I + C)
+
+:::note[Lv.1 키트에서 추가 구매]
+Lv.1 키트(A, B, I, C)를 이미 보유 시 → D, F, G만 추가 (~63,000원)
+:::
+
+  </TabItem>
+  <TabItem label="Lv.3 연구자">
+
+### Lv.3 연구자: 바이브 코딩 + AI 분석 (3시간)
+
+| 프로젝트 | 센서 조합 (ID) | 포트 |
+|----------|--------------|------|
+| 1. 식물 성장 환경 | A + B + C (DHT20+빛+OLED) | I2C1, A0 |
+| 2. 공기질과 집중력 | D + C (SCD41+OLED) | I2C1 (Hub) |
+| 3. 움직임과 자세 | J + C (MPU6050+OLED) | I2C1 (Hub) |
+
+**추가 필수:** PC (Python 설치 — pandas, matplotlib)
+
+**Lv.3에서 새로 필요한 부품:** J (MPU6050, ~2,100원)
+
+  </TabItem>
+  <TabItem label="Lv.4 마스터">
+
+### Lv.4 마스터: ML + 실제 문제 해결 (3시간+)
+
+| 프로젝트 | 센서 조합 (ID) | 포트 |
+|----------|--------------|------|
+| 1. 학교 공기질 | A + D + K + C (DHT20+SCD41+먼지+OLED) | I2C1 (Hub), A2 |
+| 2. 에너지 효율 | A + B + C (DHT20+빛+OLED) | I2C1, A0 |
+| 3. 안전 모니터링 | J + C (MPU6050+OLED) | I2C1 (Hub) |
+
+**추가 필수:** PC (Python + ML)
+
+**Lv.4에서 새로 필요한 부품:** K (먼지 센서, ~14,000원)
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 구매 전략
+
+### 코스별 예상 비용 요약
+
+| 구매 방식 | 베이스 키트 | 추가 부품 | 합계 예상 |
+|-----------|:---------:|:---------:|:---------:|
+| **코스 A 1막만** | ~27,000원 | A, B, C (~22,000원) | **~49,000원** |
+| **코스 A 전체** (1~3막) | ~27,000원 | A~H (~102,000원) | **~129,000원** |
+| **코스 B Lv.1만** | ~27,000원 | A, B, I, C (~28,000원) | **~55,000원** |
+| **코스 B 전체** (Lv.1~4) | ~27,000원 | A~D, I, J, K (~96,000원) | **~123,000원** |
+| **코스 A + B 올인원** | ~27,000원 | A~K (~120,000원) | **~147,000원** |
+
+### 부품 공유 맵 (중복 구매 방지)
+
+| ID | 부품 | 코스A 1막 | 코스A 2막 | 코스A 3막 | 코스B Lv.1 | Lv.2 | Lv.3 | Lv.4 |
+|:--:|------|:--------:|:--------:|:--------:|:---------:|:----:|:----:|:----:|
+| A | DHT20 | O | O | O | O | O | O | O |
+| B | 빛 센서 | O | — | — | O | O | O | O |
+| C | OLED | O | O | O | O | O | O | O |
+| D | SCD41 CO2 | — | O | — | — | O | O | O |
+| E | 심박 센서 | — | O | — | — | — | — | — |
+| F | 초음파 | — | O | — | — | O | — | — |
+| G | 부저 | — | O | — | — | O | — | — |
+| H | LED Bar | — | O | — | — | — | — | — |
+| I | 소리 센서 | — | — | — | O | O | — | — |
+| J | MPU6050 | — | — | — | — | — | O | O |
+| K | 먼지 센서 | — | — | — | — | — | — | O |
+
+### 구매처 안내
+
+<CardGrid>
+  <Card title="디바이스마트 (1순위)" icon="star">
+    국내 최대 전자부품 전문몰. 대부분의 센서를 구매 가능합니다.
+
+    - [Seeed 브랜드 전체 보기](https://www.devicemart.co.kr/goods/brand?code=1111)
+    - 전화: 070-7019-8887
+    - 구로매장 방문 구매 가능
+  </Card>
+
+  <Card title="Seeed Studio (2순위)" icon="rocket">
+    Grove 센서 제조사 직접 판매. $50 이상 무료 배송.
+
+    - [seeedstudio.com](https://www.seeedstudio.com)
+    - 디바이스마트에서 못 찾는 부품 보충
+    - 배송 10~15일 소요
+  </Card>
+</CardGrid>
+
+:::caution[학교 대량 구매 시]
+- 디바이스마트 **견적 요청** 가능 (전화 또는 이메일)
+- 총 15만원 이상 해외 직구 시 **관부가세** 발생 주의
+- 학교 물품구매 시스템(나라장터 등)으로 구매 시, 디바이스마트의 **세금계산서 발행** 확인
+:::
+
+---
+
+## I2C Hub 연결 예시
+
+### Lv.4 프로젝트 1 (학교 공기질): 센서 4개 동시 연결
+
+```
+Grove Shield I2C1 포트
+        |
+   [I2C Hub 6P]
+    |    |    |    |
+  DHT20  SCD41  OLED  (빈 포트)
+  0x38   0x62   0x3C
+
+   + Grove Shield A2 포트
+        |
+     먼지 센서
+      GP28
+```
+
+I2C Hub의 6개 포트 중 3개를 사용하고, 먼지 센서는 아날로그 A2 포트에 별도 연결합니다. Hub에 여유 포트 3개가 있으므로 센서 추가 확장도 가능합니다.
+
+---
+
+*이 페이지의 가격 정보는 2026.03.15. 기준 디바이스마트 및 Seeed Studio 참고가입니다. 실제 구매 시 링크에서 최신 가격을 확인하세요.*
