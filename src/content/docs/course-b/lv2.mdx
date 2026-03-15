@@ -330,7 +330,7 @@ send_to_sheets({"test": "hello", "value": 42})
 <div class="teacher-script">
   <p>"1차시에서 인터넷 연결과 Sheets 설정을 끝냈죠. 오늘은 센서를 연결하고, 데이터를 읽는 코드를 만들어 봅시다."</p>
   <p>"DHT20 온습도 센서와 OLED를 I2C에 연결하고, 소리 센서 또는 빛 센서를 ADC 포트에 연결합니다."</p>
-  <p>"I2C 포트가 부족하면 Y-스플리터를 사용하세요. DHT20(0x38)과 OLED(0x3C)는 주소가 다르므로 같은 버스에서 공존 가능합니다."</p>
+  <p>"I2C 포트가 부족하면 I2C Hub를 사용하세요. DHT20(0x38)과 OLED(0x3C)는 주소가 다르므로 Hub 하나로 같은 버스에서 공존 가능합니다."</p>
 </div>
 
 <div class="student-voice">
