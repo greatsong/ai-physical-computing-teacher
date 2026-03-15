@@ -76,6 +76,7 @@ export default defineConfig({
             { label: '학생 관찰 기록 예시', slug: 'appendix/observation' },
             { label: '트러블슈팅 대응', slug: 'appendix/troubleshooting' },
             { label: '키트 구매 가이드', slug: 'appendix/shopping' },
+            { label: '부품 종합 카탈로그', slug: 'appendix/parts-catalog' },
           ],
         },
       ],
