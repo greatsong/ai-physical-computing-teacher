@@ -27,7 +27,7 @@ import PartsChatbot from '../../../components/teacher/PartsChatbot';
 | 2 | **Grove Shield for Pi Pico v1.0** (10포트) | 103100142 | ~5,500원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=13960283) |
 | 3 | **Grove I2C Hub (6 Port)** | 103020272 | ~2,200원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=12382844) |
 | 4 | **Grove 4핀 케이블** (5개팩) | 110990210 | ~2,200원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1153480) |
-| 5 | **USB-C 데이터 케이블** | — | 1,800원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=USB-C+데이터+케이블) |
+| 5 | **Micro USB 데이터 케이블** | — | 1,800원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=Micro+USB+데이터+케이블) |
 
 **베이스 키트 소계:** ~21,600원
 
@@ -54,9 +54,9 @@ import PartsChatbot from '../../../components/teacher/PartsChatbot';
 | **SCD41 CO2+온습도 센서** | I2C (0x62) | NDIR 방식, 0~5000ppm | 114,900원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=14917083) | [Seeed ~$49.90](https://www.seeedstudio.com/Grove-CO2-Temperature-Humidity-Sensor-SCD41-p-5025.html) |
 | **BMP280 기압/고도 센서** | I2C (0x76) | 300~1100hPa, 고도 계산 | 2,000원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=BMP280) | [Adafruit ~$9.95](https://www.adafruit.com/product/2651) |
 | **DHT11 온습도 (저가 대안)** | Digital (1-Wire) | &plusmn;2&deg;C / &plusmn;5%RH | 1,300원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=DHT11) | Adafruit ~$5 |
-| **GUVA-S12D 자외선 센서** | ADC (A0) | UV 인덱스 0~11+ | 4,000~6,000원 | [Seeed 직구 권장](https://www.seeedstudio.com/Grove-UV-Sensor.html) | [Seeed ~$3.50](https://www.seeedstudio.com/Grove-UV-Sensor.html) |
+| **GUVA-S12D 자외선 센서** | ADC (A0) | UV 인덱스 0~11+ | ~$10.90 | [Seeed 직구 권장](https://www.seeedstudio.com/Grove-UV-Sensor.html) | [Seeed ~$10.90](https://www.seeedstudio.com/Grove-UV-Sensor.html) |
 | **Grove 먼지 센서 (PPD42NS)** | Digital (A2) | PM1.0/2.5/10, LPO 방식 | 14,000원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1066618) | [Seeed ~$11.90](https://www.seeedstudio.com/Grove-Dust-Sensor-PPD42NS.html) |
-| **HM3301 레이저 미세먼지 센서** | I2C | PM2.5/PM10, 레이저 산란 | 38,800원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=HM3301) | [Seeed ~$15.90](https://www.seeedstudio.com/Grove-Laser-PM2-5-Sensor-HM3301.html) |
+| **HM3301 레이저 미세먼지 센서** | I2C | PM2.5/PM10, 레이저 산란 | 38,800원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=HM3301) | [Seeed ~$32.90](https://www.seeedstudio.com/Grove-Laser-PM2-5-Sensor-HM3301.html) |
 
 **교육적 가치:** 환경 모니터링, 기상 관측, 대기질 과학. 과학탐구실험, 지구과학, 화학 교과 연계.
 
@@ -120,7 +120,7 @@ import PartsChatbot from '../../../components/teacher/PartsChatbot';
 
 | 부품명 | 인터페이스 | 주요 사양 | ~가격 | 구매처 | 글로벌 대안 |
 |--------|-----------|----------|------:|--------|------------|
-| **Grove 복합가스 센서 v2** | I2C | NO2/C2H5OH/VOC/CO 동시 | 15,000~20,000원 | [Seeed 직구 권장](https://www.seeedstudio.com/Grove-Multichannel-Gas-Sensor-v2-p-4569.html) | [Seeed ~$19.90](https://www.seeedstudio.com/Grove-Multichannel-Gas-Sensor-v2-p-4569.html) |
+| **Grove 복합가스 센서 v2** | I2C | NO2/C2H5OH/VOC/CO 동시 | ~$29.99 | [Seeed 직구 권장](https://www.seeedstudio.com/Grove-Multichannel-Gas-Sensor-v2-p-4569.html) | [Seeed ~$29.99](https://www.seeedstudio.com/Grove-Multichannel-Gas-Sensor-v2-p-4569.html) |
 | **MQ-135 공기질 센서** | ADC | NH3/NOx/CO2 등 | 1,500원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=MQ-135) | SparkFun |
 
 :::caution[MQ 시리즈 주의]
@@ -410,7 +410,7 @@ MQ-135 등 MQ 시리즈 센서는 **5V 히터**가 필요합니다. Pico의 3.3V
 | **SPI** | 2버스 (SPI0: GP16~19, SPI1: GP10~13) |
 | **UART** | 2포트 (UART0: GP0/1, UART1: GP4/5) |
 | **PWM** | 모든 GPIO, 최대 16채널 |
-| **USB** | USB-C 1.1, Device/Host |
+| **USB** | Micro USB 1.1, Device/Host |
 | **전원** | 1.8~5.5V (USB 또는 VSYS) |
 | **펌웨어** | MicroPython UF2 (Pico 2 W 전용 빌드 사용) |
 
