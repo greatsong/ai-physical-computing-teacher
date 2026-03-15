@@ -27,8 +27,15 @@ import { Tabs, TabItem, Badge, Card, CardGrid, LinkCard } from '@astrojs/starlig
 | 4 | **Grove 4핀 케이블** (5개팩) | 110990210 | ~3,500원 | [구매처](https://www.devicemart.co.kr/goods/view?no=1153480) |
 | 5 | **USB-C 데이터 케이블** | — | ~3,000원 | 일반 구매 |
 
-:::tip[I2C Hub가 왜 필요한가요?]
-I2C 센서(DHT20, SCD41, OLED, MPU6050 등)는 주소가 달라 같은 전선을 공유할 수 있지만, Grove 포트는 물리적으로 **커넥터 1개**만 꽂을 수 있습니다. **I2C Hub**를 사용하면 한 포트에서 최대 5개 I2C 장치를 동시에 연결할 수 있습니다. 별도의 Y-스플리터 케이블보다 안정적이고 확장성이 좋습니다.
+:::tip[I2C Hub는 언제 필요한가요?]
+Grove Shield에는 I2C 포트가 **2개**(I2C0, I2C1)있습니다. 따라서:
+
+- I2C 장치 **1~2개** → Hub 없이 각 포트에 하나씩 꽂으면 됩니다
+- I2C 장치 **3개 이상** → 포트가 부족하므로 **I2C Hub 필요**
+
+예: 4차시(DHT20 + OLED = 2개)는 Hub 불필요, 6차시(SCD41 + DHT20 + OLED = 3개)는 Hub 필요.
+
+Hub를 I2C 포트 하나에 연결하면 최대 **5개 장치**를 동시에 사용할 수 있습니다.
 :::
 
 ---
@@ -51,10 +58,14 @@ I2C 센서(DHT20, SCD41, OLED, MPU6050 등)는 주소가 달라 같은 전선을
 | J | **MPU6050 6축 가속도/자이로** | I2C (0x68) | ~3,500원 | [구매처](https://www.devicemart.co.kr/goods/view?no=1247052) | — |
 | K | **Grove 먼지 센서 (PPD42NS)** | A2 (GP28) | ~14,000원 | [구매처](https://www.devicemart.co.kr/goods/view?no=1066618) | [Seeed ~$11.90](https://www.seeedstudio.com/Grove-Dust-Sensor-PPD42NS.html) |
 
-:::note[비 Grove 센서 연결 방법]
-DHT20(Adafruit), SCD41(Pimoroni), MPU6050(GY-521)은 Grove 커넥터가 아닙니다.
-- **Qwiic/STEMMA QT 센서** → [Grove-Qwiic 변환 케이블](https://www.devicemart.co.kr/goods/view?no=14600579) 사용
-- **일반 핀헤더 센서** → [Grove 4핀 Male 점퍼 케이블](https://www.devicemart.co.kr/goods/view?no=1153480) 사용
+:::note[Grove 커넥터가 없는 센서도 있어요]
+위 구매처 링크 중 일부(DHT20, SCD41, MPU6050)는 **Grove 커넥터가 달려 있지 않은** 제품입니다. Grove Shield에 바로 꽂을 수 없으므로 두 가지 방법이 있습니다:
+
+**방법 1 (추천):** 처음부터 **Seeed Grove 버전**을 구매하면 변환 케이블 없이 바로 연결됩니다. → 오른쪽 "대안 (Seeed 직구)" 열의 링크 참고
+
+**방법 2:** 디바이스마트 제품을 사용하려면 변환 케이블이 필요합니다.
+- Qwiic/STEMMA QT 커넥터 센서 → [Grove-Qwiic 변환 케이블](https://www.devicemart.co.kr/goods/view?no=14600579)
+- 핀헤더 센서(MPU6050 등) → [Grove 4핀 Male 점퍼 케이블](https://www.devicemart.co.kr/goods/view?no=1153480)
 :::
 
 ---
