@@ -25,7 +25,7 @@ description: "바이브 코딩으로 CO2, 온습도 센서와 OLED를 조합한 
     </div>
     <div class="meta-item">
       <div class="meta-label">센서</div>
-      SCD41 (CO2, I2C) + DHT20 (온습도, I2C) + OLED SSD1306 (I2C)
+      SCD30 (CO2, I2C) + DHT20 (온습도, I2C) + OLED SSD1306 (I2C)
     </div>
     <div class="meta-item">
       <div class="meta-label">난이도</div>
@@ -48,7 +48,7 @@ description: "바이브 코딩으로 CO2, 온습도 센서와 OLED를 조합한 
   <h5>하드웨어 (팀별 1세트)</h5>
   <ul>
     <li>Raspberry Pi Pico 2 WH + Grove Shield</li>
-    <li>SCD41 CO2 센서 (I2C, 주소 0x62)</li>
+    <li>SCD30 CO2 센서 (I2C, 주소 0x61)</li>
     <li>DHT20 온습도 센서 (I2C, 주소 0x38)</li>
     <li>OLED 디스플레이 SSD1306 (I2C, 주소 0x3C)</li>
     <li>Grove 케이블 3개 + I2C Hub</li>
@@ -62,9 +62,9 @@ description: "바이브 코딩으로 CO2, 온습도 센서와 OLED를 조합한 
   </ul>
   <h5>수업 전 확인</h5>
   <ul>
-    <li>SCD41 센서를 미리 한 번 테스트 — 첫 측정까지 약 5초 소요됨을 확인</li>
+    <li>SCD30 센서를 미리 한 번 테스트 — 첫 측정까지 약 2초 소요됨을 확인</li>
     <li>I2C 포트가 2개뿐이므로, I2C Hub를 사용한 3개 장치 연결 방법을 미리 파악</li>
-    <li>I2C 스캔 코드를 교사 PC에 준비: <code>i2c.scan()</code>으로 0x38, 0x3C, 0x62 확인</li>
+    <li>I2C 스캔 코드를 교사 PC에 준비: <code>i2c.scan()</code>으로 0x38, 0x3C, 0x61 확인</li>
     <li>교실 환기가 가능한지 확인 (창문 개폐 여부)</li>
     <li>환기 전후 기록표 인쇄</li>
   </ul>
@@ -111,7 +111,7 @@ description: "바이브 코딩으로 CO2, 온습도 센서와 OLED를 조합한 
 
 <div class="teacher-script">
   <p>"오늘 가장 중요한 포인트는 <strong>연결</strong>입니다. 세 장치 모두 I2C 통신을 사용하는데, Grove Shield에 I2C 포트는 2개뿐이에요."</p>
-  <p>"I2C Hub를 I2C1 포트에 연결하세요. 그리고 SCD41, DHT20, OLED를 Hub의 세 포트에 각각 꽂으면 됩니다. 모두 I2C 장치이고 주소가 다르니까 하나의 Hub로 충분합니다."</p>
+  <p>"I2C Hub를 I2C1 포트에 연결하세요. 그리고 SCD30, DHT20, OLED를 Hub의 세 포트에 각각 꽂으면 됩니다. 모두 I2C 장치이고 주소가 다르니까 하나의 Hub로 충분합니다."</p>
   <p>"연결이 끝나면, 먼저 I2C 스캔 코드를 실행해서 세 장치가 다 보이는지 확인합시다."</p>
 </div>
 
@@ -124,14 +124,14 @@ from machine import I2C, Pin
 i2c = I2C(1, sda=Pin(6), scl=Pin(7))
 devices = i2c.scan()
 print("발견된 I2C 장치:", [hex(d) for d in devices])
-# 예상: ['0x38', '0x3c', '0x62']
+# 예상: ['0x38', '0x3c', '0x61']
 ```
 
   </div>
 </details>
 
 <div class="student-voice">
-  <span class="bubble">"0x38, 0x3c, 0x62 세 개 다 나와요!"</span>
+  <span class="bubble">"0x38, 0x3c, 0x61 세 개 다 나와요!"</span>
   <span class="bubble">"저는 두 개만 나와요..."</span>
   <span class="bubble">"케이블이 하나 빠져 있었어요"</span>
 </div>
@@ -156,9 +156,9 @@ print("발견된 I2C 장치:", [hex(d) for d in devices])
 <div class="patrol-point">
   <p><strong>이 시점에 순회하며 확인:</strong></p>
   <ol>
-    <li>I2C 스캔에서 0x38, 0x3C, 0x62 세 개가 모두 보이는가</li>
+    <li>I2C 스캔에서 0x38, 0x3C, 0x61 세 개가 모두 보이는가</li>
     <li>케이블이 단단히 꽂혀 있는가 (느슨한 연결은 간헐적 오류의 원인)</li>
-    <li>SCD41 센서의 방향이 올바른가 (센서면이 위를 향하도록)</li>
+    <li>SCD30 센서의 방향이 올바른가 (센서면이 위를 향하도록)</li>
   </ol>
 </div>
 
@@ -175,7 +175,7 @@ print("발견된 I2C 장치:", [hex(d) for d in devices])
 <div class="teacher-script">
   <p>"세 장치가 다 보이는 팀은, 이제 AI에게 대시보드 코드를 요청합시다."</p>
   <p>"교재에 있는 프롬프트를 참고하세요. 5차시에서 배운 대로, <strong>하드웨어 정보, 센서 주소, 원하는 기능</strong>을 구체적으로 적어야 합니다."</p>
-  <p>"AI가 코드를 주면, 바로 실행하지 말고 먼저 <strong>세 가지</strong>를 확인하세요. 첫째, I2C 설정이 맞는지. 둘째, SCD41 주소가 0x62인지. 셋째, ssd1306 라이브러리를 쓰고 있는지."</p>
+  <p>"AI가 코드를 주면, 바로 실행하지 말고 먼저 <strong>세 가지</strong>를 확인하세요. 첫째, I2C 설정이 맞는지. 둘째, SCD30 주소가 0x61인지. 셋째, ssd1306 라이브러리를 쓰고 있는지."</p>
 </div>
 
 <details class="student-content">
@@ -183,18 +183,18 @@ print("발견된 I2C 장치:", [hex(d) for d in devices])
   <div class="content">
 
 ```
-Pico 2 WH에 Grove SCD41 CO2 센서와 DHT20 온습도 센서를 I2C1(SDA=GP6, SCL=GP7)에,
+Pico 2 WH에 Grove SCD30 CO2 센서와 DHT20 온습도 센서를 I2C1(SDA=GP6, SCL=GP7)에,
 OLED SSD1306도 같은 I2C에 연결했어.
 
 CO2 농도, 온도, 습도를 OLED 대시보드에 실시간 표시하고,
 CO2가 1000ppm 넘으면 'VENTILATE!' 경고를 표시하는 MicroPython 코드 만들어줘.
 
 조건:
-- SCD41 I2C 주소는 0x62
-- 측정 시작 명령: bytes([0x21, 0xB1])
-- 5초 대기 후 읽기 명령: bytes([0xEC, 0x05])
-- 9바이트 읽기
-- CO2 = (data[0]<<8)|data[1]
+- SCD30 I2C 주소는 0x61
+- 연속 측정 시작 명령: i2c.writeto(0x61, bytes([0x00, 0x10, 0x00, 0x00, 0x81]))
+- 2초 대기 후 데이터 준비 확인: i2c.writeto(0x61, bytes([0x02, 0x02]))
+- 준비 시 읽기: i2c.writeto(0x61, bytes([0x03, 0x00])) 후 18바이트 읽기
+- CO2 = struct.unpack('>f', bytes(data[0:2] + data[3:5]))[0]
 - DHT20 주소 0x38
 - OLED 주소 0x3C, ssd1306 라이브러리 사용
 ```
@@ -218,11 +218,11 @@ CO2가 1000ppm 넘으면 'VENTILATE!' 경고를 표시하는 MicroPython 코드 
     <span class="value">Thonny에서 Tools → Manage Packages → ssd1306 검색 후 설치. 또는 ssd1306.py 파일을 Pico에 직접 업로드</span>
   </div>
   <div class="trouble-card">
-    <div class="symptom">"SCD41에서 값이 0으로 나와요"</div>
+    <div class="symptom">"SCD30에서 값이 0으로 나와요"</div>
     <span class="label">원인</span>
     <span class="value">측정 시작 명령 후 대기 시간이 부족하거나, 센서가 아직 워밍업 중</span>
     <span class="label">대응</span>
-    <span class="value">"SCD41은 첫 측정까지 5초가 필요합니다. time.sleep(5) 확인하고, 처음 1&#126;2회 측정은 0이 나올 수 있어요. 잠시 기다려보세요."</span>
+    <span class="value">"SCD30은 첫 측정까지 2초가 필요합니다. time.sleep(2) 확인하고, 처음 1&#126;2회 측정은 0이 나올 수 있어요. 잠시 기다려보세요."</span>
   </div>
   <div class="trouble-card">
     <div class="symptom">"OLED 화면이 깨져요"</div>
@@ -243,7 +243,7 @@ CO2가 1000ppm 넘으면 'VENTILATE!' 경고를 표시하는 MicroPython 코드 
 </div>
 
 <div class="teaching-tip">
-  <p>AI가 SCD41의 데이터 파싱 코드를 틀리는 경우가 많습니다. 특히 온도/습도 변환 공식이 잘못되거나 CRC 체크 바이트를 처리하지 않는 경우가 있습니다. 학생 교재의 기본 코드 탭에 정확한 코드가 있으므로, 막히는 팀에게는 해당 탭을 참고하도록 안내하세요.</p>
+  <p>AI가 SCD30의 데이터 파싱 코드를 틀리는 경우가 많습니다. 특히 float 변환(IEEE 754)이나 CRC 체크 바이트를 처리하지 않는 경우가 있습니다. 학생 교재의 기본 코드 탭에 정확한 코드가 있으므로, 막히는 팀에게는 해당 탭을 참고하도록 안내하세요.</p>
 </div>
 
 <div class="step-header">
@@ -366,7 +366,7 @@ CO2가 1000ppm 넘으면 'VENTILATE!' 경고를 표시하는 MicroPython 코드 
     </tr>
     <tr>
       <td><span class="badge badge-purple">B</span></td>
-      <td>CO2(SCD41), DHT20, OLED 3개 장치를 I2C로 동시 연결함. 창문 닫고 5분 관찰 후 환기 시 925ppm에서 600ppm으로 감소를 확인함. 20분마다 5분 환기를 제안함. I2C 주소 충돌 오류를 수정함.</td>
+      <td>CO2(SCD30), DHT20, OLED 3개 장치를 I2C로 동시 연결함. 창문 닫고 5분 관찰 후 환기 시 925ppm에서 600ppm으로 감소를 확인함. 20분마다 5분 환기를 제안함. I2C 주소 충돌 오류를 수정함.</td>
     </tr>
     <tr>
       <td><span class="badge badge-amber">C</span></td>

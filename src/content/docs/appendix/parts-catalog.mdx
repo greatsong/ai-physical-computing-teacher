@@ -44,23 +44,24 @@ import PartsChatbot from '../../../components/teacher/PartsChatbot';
 ## 전체 부품 카탈로그
 
 <Tabs>
-  <TabItem label="센서 (26종)">
+  <TabItem label="센서 (32종)">
 
 ### 환경 센서
 
 | 부품명 | 인터페이스 | 주요 사양 | ~가격 | 구매처 | 글로벌 대안 |
 |--------|-----------|----------|------:|--------|------------|
 | **DHT20 온습도 센서** | I2C (0x38) | &plusmn;0.3&deg;C / &plusmn;2%RH | 7,900원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=14600420) | [Seeed ~$4.90](https://www.seeedstudio.com/Grove-Temperature-Humidity-Sensor-V2-0-DHT20-p-4967.html) |
-| **SCD41 CO2+온습도 센서** | I2C (0x62) | NDIR 방식, 0~5000ppm | 114,900원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=14917083) | [Seeed ~$49.90](https://www.seeedstudio.com/Grove-CO2-Temperature-Humidity-Sensor-SCD41-p-5025.html) |
-| **BMP280 기압/고도 센서** | I2C (0x76) | 300~1100hPa, 고도 계산 | 2,000원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=BMP280) | [Adafruit ~$9.95](https://www.adafruit.com/product/2651) |
+| **SCD30 CO2+온습도 센서** | I2C (0x61) | NDIR 방식, 400~10000ppm | 65,000원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=10918824) | [SparkFun](https://www.devicemart.co.kr/goods/view?no=10824519) |
+| **AHT20+BMP280 온습도/기압 센서** | I2C (0x38+0x76) | 온습도+기압+고도 콤보 | 3,500원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=13207035) | [Adafruit ~$9.95](https://www.adafruit.com/product/2651) |
 | **DHT11 온습도 (저가 대안)** | Digital (1-Wire) | &plusmn;2&deg;C / &plusmn;5%RH | 1,300원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=DHT11) | Adafruit ~$5 |
+| **DS18B20 방수 온도 센서** | Digital (1-Wire) | -55~+125&deg;C, 방수 프로브 | 3,500원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1382898) | [DFRobot Kit](https://www.devicemart.co.kr/goods/view?no=1321187) |
 | **GUVA-S12D 자외선 센서** | ADC (A0) | UV 인덱스 0~11+ | ~$10.90 | [Seeed 직구 권장](https://www.seeedstudio.com/Grove-UV-Sensor.html) | [Seeed ~$10.90](https://www.seeedstudio.com/Grove-UV-Sensor.html) |
-| **Grove 먼지 센서 (PPD42NS)** | Digital (A2) | PM1.0/2.5/10, LPO 방식 | 14,000원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1066618) | [Seeed ~$11.90](https://www.seeedstudio.com/Grove-Dust-Sensor-PPD42NS.html) |
+| **GP2Y10 먼지 센서 모듈** | ADC | PM2.5, 적외선 LED 방식 | 7,000원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1330859) | [GP2Y1010AU0F](https://www.devicemart.co.kr/goods/view?no=1111977) |
 | **HM3301 레이저 미세먼지 센서** | I2C | PM2.5/PM10, 레이저 산란 | 38,800원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=HM3301) | [Seeed ~$32.90](https://www.seeedstudio.com/Grove-Laser-PM2-5-Sensor-HM3301.html) |
 
 **교육적 가치:** 환경 모니터링, 기상 관측, 대기질 과학. 과학탐구실험, 지구과학, 화학 교과 연계.
 
-**MicroPython 참고:** DHT20/SCD41/BMP280은 I2C 프로토콜로 `i2c.readfrom_mem()` 사용. DHT11은 `dht` 내장 모듈 지원.
+**MicroPython 참고:** DHT20/SCD30/AHT20+BMP280은 I2C 프로토콜로 `i2c.readfrom_mem()` 사용. DHT11은 `dht` 내장 모듈 지원.
 
 ---
 
@@ -98,6 +99,7 @@ import PartsChatbot from '../../../components/teacher/PartsChatbot';
 | 부품명 | 인터페이스 | 주요 사양 | ~가격 | 구매처 | 글로벌 대안 |
 |--------|-----------|----------|------:|--------|------------|
 | **심박 센서 (Pulse Sensor)** | ADC (A0, GP26) | 광학식 PPG | 21,000원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=38086) | [Seeed ~$6.90](https://www.seeedstudio.com/Grove-Finger-clip-Heart-Rate-Sensor.html) |
+| **MAX30102 SpO2+심박 센서** | I2C (0x57) | SpO2+심박 동시 측정, PPG | 1,700원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=13137639) | [Gravity 버전](https://www.devicemart.co.kr/goods/view?no=15080520) |
 | **GSR 피부전도 센서** | ADC | 피부 전기저항 측정 | 11,000원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=Grove+GSR) | [Seeed ~$7.90](https://www.seeedstudio.com/Grove-GSR-sensor-p-1614.html) |
 | **MLX90614 비접촉 체온 센서** | I2C (0x5A) | 적외선 온도계 | 17,900원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=MLX90614) | [Adafruit ~$14.95](https://www.adafruit.com/product/1748) |
 
@@ -109,7 +111,7 @@ import PartsChatbot from '../../../components/teacher/PartsChatbot';
 
 | 부품명 | 인터페이스 | 주요 사양 | ~가격 | 구매처 | 글로벌 대안 |
 |--------|-----------|----------|------:|--------|------------|
-| **Grove 소리 센서** (LM358) | ADC (A1, GP27) | 아날로그, 증폭 내장 | 4,900원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1066604) | [Seeed ~$4.90](https://www.seeedstudio.com/Grove-Sound-Sensor-Based-on-LM358-amplifier-Arduino-Compatible.html) |
+| **Grove 아날로그 마이크** (MEMS) | ADC (A1, GP27) | SiSonic MEMS, 저노이즈 | 8,800원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=Grove+Analog+Microphone) | [Seeed ~$3.90](https://www.seeedstudio.com/Grove-Analog-Microphone-p-4593.html) |
 | **Grove 진동 센서** (SW-420) | Digital (GPIO) | 디지털 출력 | 800원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=진동+센서+SW-420) | [Seeed ~$2.90](https://www.seeedstudio.com/Grove-Vibration-Sensor-SW-420.html) |
 
 **교육적 가치:** 소음 레벨 측정, 진동 감지/지진 시뮬레이션. 아날로그 신호 필터링 학습.
@@ -135,8 +137,23 @@ MQ-135 등 MQ 시리즈 센서는 **5V 히터**가 필요합니다. Pico의 3.3V
 |--------|-----------|----------|------:|--------|------------|
 | **Grove 토양수분 센서** | ADC (A0) | 저항식, 아날로그 | 3,800원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=Grove+Moisture) | [Seeed ~$2.90](https://www.seeedstudio.com/Grove-Moisture-Sensor.html) |
 | **Grove TDS 수질 센서** | ADC | Total Dissolved Solids (ppm) | 17,000원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=Grove+TDS) | [Seeed ~$9.90](https://www.seeedstudio.com/Grove-TDS-Sensor-p-4400.html) |
+| **PH 센서 모듈** | ADC | pH 0~14, 수용액 산도 | 12,800원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=12546560) | [Crowtail](https://www.devicemart.co.kr/goods/view?no=1383102) |
 
-**교육적 가치:** 스마트팜/자동 관수 시스템, 수질 모니터링. 생명과학+기술가정 융합.
+**교육적 가치:** 스마트팜/자동 관수, 수질 모니터링, pH 측정(산·염기). 생명과학+화학+기술가정 융합.
+
+---
+
+### 힘/전류/압력 센서
+
+| 부품명 | 인터페이스 | 주요 사양 | ~가격 | 구매처 | 글로벌 대안 |
+|--------|-----------|----------|------:|--------|------------|
+| **로드셀 + HX711 앰프** | Digital (2핀) | 0~1000g, 24비트 ADC | 5,500원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=13920240) | [SparkFun ~$9.95](https://www.sparkfun.com/products/13879) |
+| **Grove 전류 센서 (ACS70331)** | ADC | DC 0~2.5A, GMR 방식 | 12,000원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=10918677) | [Seeed ~$9.90](https://www.seeedstudio.com/Grove-2-5A-DC-Current-Sensor-ACS70331-p-2929.html) |
+| **공압 센서 (XGZP6847A)** | I2C/ADC | 0~1MPa, 기체/액체 압력 | 5,000원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=XGZP6847) | — |
+
+**교육적 가치:** 무게/힘 측정(뉴턴의 법칙), 전류 측정(옴의 법칙), 기체 압력(보일의 법칙). 물리학 핵심 실험 직접 연계.
+
+**MicroPython 참고:** HX711은 `hx711` 라이브러리 사용. 전류 센서는 `ADC` 읽기 후 감도(800mV/A) 기반 변환. 공압 센서는 I2C `readfrom_mem()` 사용.
 
   </TabItem>
 
@@ -146,14 +163,14 @@ MQ-135 등 MQ 시리즈 센서는 **5V 히터**가 필요합니다. Pico의 3.3V
 
 | 부품명 | 인터페이스 | 주요 사양 | ~가격 | 구매처 | 글로벌 대안 |
 |--------|-----------|----------|------:|--------|------------|
-| **Grove OLED 0.96" (SSD1315)** | I2C (0x3C) | 128x64 픽셀, 단색 | 8,200원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=12377753) | [Seeed ~$5.50](https://www.seeedstudio.com/Grove-OLED-Display-0-96-SSD1315-p-4294.html) |
+| **0.96" OLED (SSD1306)** | I2C (0x3C) | 128x64 픽셀, 단색 | 3,000원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1311755) | [Grove 버전](https://www.devicemart.co.kr/goods/view?no=14608982) |
 | **I2C LCD 1602** (16x2 문자) | I2C (0x27) | PCF8574 백팩, 백라이트 | 2,500원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=I2C+LCD+1602) | Adafruit ~$9.95 |
 | **1.3" OLED (SH1106)** | I2C (0x3C) | 128x64, 0.96"보다 큰 화면 | 11,400원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=OLED+1.3+SH1106) | Adafruit |
 | **MAX7219 8x8 LED 매트릭스** | SPI | 체이닝 가능, 도트 매트릭스 | 2,200원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=MAX7219+LED) | SparkFun |
 | **TM1637 4자리 7세그먼트** | Digital (CLK+DIO) | 시계/카운터 표시 | 1,200원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=TM1637) | SparkFun |
 | **e-Paper 2.13"** | SPI | 전원 없이 표시 유지 | 31,600원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=e-paper+pico) | [Pimoroni](https://shop.pimoroni.com/products/pico-inky-pack), Waveshare |
 
-**MicroPython 참고:** OLED은 `ssd1306` 내장 모듈. LCD는 `lcd_i2c` 라이브러리. MAX7219/TM1637은 각 전용 드라이버 필요.
+**MicroPython 참고:** SSD1306 OLED은 `ssd1306` 내장 모듈. LCD는 `lcd_i2c` 라이브러리. MAX7219/TM1637은 각 전용 드라이버 필요.
 
 ---
 
@@ -163,12 +180,12 @@ MQ-135 등 MQ 시리즈 센서는 **5V 히터**가 필요합니다. Pico의 3.3V
 |--------|-----------|----------|------:|--------|------------|
 | **Grove LED** | Digital (GPIO) | 3.3V/5V, 내장 저항 | ~1,500원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=Grove+LED) | [Seeed ~$1.90](https://www.seeedstudio.com/Grove-Red-LED.html) |
 | **Grove LED Bar v2.0** (MY9221) | Digital (D20) | 10단계 바그래프 | 5,700원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1271913) | [Seeed ~$3.90](https://www.seeedstudio.com/Grove-LED-Bar-v2-0.html) |
-| **WS2812B NeoPixel 스트립** (8 LED) | Digital (1-Wire) | 개별 RGB 제어, 5V | 900원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=WS2812+네오픽셀) | [Adafruit NeoPixel](https://www.adafruit.com/category/168) |
+| **Grove RGB LED Stick** (WS2813, 10 LED) | Digital (1-Wire) | 개별 RGB 제어, 5V | 5,500원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=10848824) | [Adafruit NeoPixel](https://www.adafruit.com/category/168) |
 | **5mm LED 키트** (각색 20개) | GPIO + 저항 | 빨/초/노/파/백 | ~2,000원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=5mm+LED+키트) | SparkFun |
 
-**교육적 가치:** 디지털 출력 기초, RGB 색상 혼합, 데이터 시각화. NeoPixel은 미디어 아트 프로젝트에 탁월.
+**교육적 가치:** 디지털 출력 기초, RGB 색상 혼합, 데이터 시각화. WS2813은 미디어 아트 프로젝트에 탁월.
 
-**MicroPython 참고:** NeoPixel은 `neopixel` 내장 모듈 지원.
+**MicroPython 참고:** WS2813/WS2812은 `neopixel` 내장 모듈 지원 (호환).
 
 ---
 
@@ -207,8 +224,8 @@ MQ-135 등 MQ 시리즈 센서는 **5V 히터**가 필요합니다. Pico의 3.3V
 | **Grove 버튼** | Digital (GPIO) | 풀다운 내장 | 1,500원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=Grove+Button) | [Seeed ~$1.90](https://www.seeedstudio.com/Grove-Button.html) |
 | **Grove 터치 센서** | Digital (GPIO) | 정전식 터치 | 3,900원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=Grove+Touch) | [Seeed ~$2.90](https://www.seeedstudio.com/Grove-Touch-Sensor.html) |
 | **Grove 로터리 앵글 센서** | ADC (A0) | 300&deg; 회전, 아날로그 | 3,400원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=Grove+Rotary) | [Seeed ~$2.90](https://www.seeedstudio.com/Grove-Rotary-Angle-Sensor.html) |
-| **Grove 조이스틱** | ADC (2축) | X/Y 아날로그 + 버튼 | 5,900원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=Grove+Thumb+Joystick) | [Seeed ~$2.90](https://www.seeedstudio.com/Grove-Thumb-Joystick.html) |
-| **10K 가변저항** (보드용) | ADC (GP26~28) | 전압 분배, 3핀 | ~500원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=가변저항+10K) | SparkFun |
+| **PS2 조이스틱 모듈** | ADC (2축) | X/Y 아날로그 + 버튼 | 1,500원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1287087) | [ELB 버전](https://www.devicemart.co.kr/goods/view?no=1384038) |
+| **75mm 슬라이드 포텐셔미터** | ADC (GP26~28) | 10K&ohm;, 슬라이드 방식 | 1,200원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=슬라이드+포텐셔미터) | SparkFun |
 
 **교육적 가치:** 디지털/아날로그 입력 비교, ADC 변환 (0~65535), 사용자 인터페이스 설계, 디바운싱/인터럽트.
 
@@ -220,7 +237,7 @@ MQ-135 등 MQ 시리즈 센서는 **5V 히터**가 필요합니다. Pico의 3.3V
 |--------|-----------|----------|------:|--------|------------|
 | **WiFi (내장)** | 내장 | 802.11n 2.4GHz | 0원 | — | — |
 | **Bluetooth 5.2 (내장)** | 내장 | BLE 지원 | 0원 | — | — |
-| **Grove GPS (Air530)** | UART (GP0/1) | GPS/BeiDou/Glonass | 13,200원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=Grove+GPS) | [Seeed ~$15.90](https://www.seeedstudio.com/Grove-GPS-Air530-p-4584.html) |
+| **NEO-6M GPS 모듈** | UART (GP0/1) | GPS, Micro USB, SMA 안테나 | 5,500원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1321968) | [NEO-M8N 업그레이드](https://www.devicemart.co.kr/goods/view?no=14870402) |
 | **RFID RC522** | SPI | 13.56MHz, Mifare, 3.3V 호환 | 3,100원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=RC522+RFID) | SparkFun ~$15.50 |
 | **Grove 적외선 수신 센서** | Digital (GPIO) | 38kHz, VS1838B | 4,000원 | [디바이스마트 검색](https://www.devicemart.co.kr/goods/search?search_text=Grove+IR+Receiver) | [Seeed ~$2.90](https://www.seeedstudio.com/Grove-Infrared-Receiver.html) |
 
@@ -298,12 +315,12 @@ MQ-135 등 MQ 시리즈 센서는 **5V 히터**가 필요합니다. Pico의 3.3V
 | **입문 키트** | ~45,000원 | 베이스 + DHT20 + 빛센서 + OLED | 온습도/조도 측정, I2C 통신, 대시보드, 데이터 기록 |
 | **기본 키트** | ~75,000원 | 입문 + 초음파 + 부저 + LED Bar + 소리센서 | + 거리 측정, 알림 시스템, 소음 모니터링 |
 | **표준 키트** | ~120,000원 | 기본 + MPU6050 + PIR + 서보모터 + 버튼 | + 동작 감지, 모터 제어, 보안 시스템, 로보틱스 |
-| **고급 키트** | ~200,000원 | 표준 + SCD41(Seeed직구) + 먼지센서 + 심박 | + CO2/미세먼지, 생체 데이터, 환경+건강 프로젝트 |
-| **풀 키트** | ~300,000원 | 고급 + BMP280 + TCS34725 + GPS + NeoPixel + 릴레이 | 전 교과 융합 가능, 자유 프로젝트 완전 지원 |
+| **고급 키트** | ~200,000원 | 표준 + SCD30(Seeed직구) + 먼지센서 + 심박 | + CO2/미세먼지, 생체 데이터, 환경+건강 프로젝트 |
+| **풀 키트** | ~300,000원 | 고급 + AHT20+BMP280 + TCS34725 + GPS + NeoPixel + 릴레이 | 전 교과 융합 가능, 자유 프로젝트 완전 지원 |
 
 :::tip[구매 전략]
 1. **입문 키트**로 시작하여 학생 반응을 본 후 점진적으로 확장
-2. **SCD41**은 디바이스마트 대비 Seeed 직구 시 ~43,000원 절감
+2. **SCD30**은 디바이스마트 대비 Seeed 직구 시 ~43,000원 절감
 3. 학교 **세금계산서**가 필요하면 디바이스마트 우선
 4. 팀별로 다른 센서를 배분하면 적은 예산으로 다양한 프로젝트 가능
 :::
@@ -316,9 +333,9 @@ MQ-135 등 MQ 시리즈 센서는 **5V 히터**가 필요합니다. Pico의 3.3V
 |------|--------------|-------------|
 | **정보** | 전 부품 | 프로그래밍, 피지컬 컴퓨팅, 데이터 수집/분석/시각화 |
 | **과학탐구실험** | 온습도, 기압, 빛, CO2, 미세먼지, 소리 | 센서 기반 정량적 데이터 수집, 실험 자동화, 가설 검증 |
-| **물리학** | 초음파, 가속도, 자이로, 부저, 서보모터 | 속도/가속도 측정, 음파 속도 실험, 진동/파동 |
-| **화학** | 가스센서, CO2, 수질(TDS), 온습도 | 물질의 성질, 기체 분석, 화학 반응 모니터링 |
-| **생명과학** | 심박, 토양수분, 온습도, GSR, 체온 | 생체 데이터 수집, 식물 성장 환경 모니터링, 스트레스 연구 |
+| **물리학** | 초음파, 가속도, 자이로, 부저, 서보모터, 로드셀, 전류센서, 공압센서 | 속도/가속도 측정, 음파 속도 실험, 뉴턴 법칙, 옴의 법칙, 보일 법칙 |
+| **화학** | 가스센서, CO2, 수질(TDS), PH센서, 온습도 | 물질의 성질, 산·염기 판별, 기체 분석, 화학 반응 모니터링 |
+| **생명과학** | 심박, MAX30102(SpO2), 토양수분, 온습도, GSR, 체온, 방수온도센서 | 생체 데이터 수집, 산소포화도, 식물 성장 환경 모니터링, 스트레스 연구 |
 | **지구과학** | 기압, UV, GPS, 미세먼지, 온습도 | 기상 관측 자동화, 대기 환경 분석, 위치 기반 데이터 |
 | **기술가정** | 릴레이, 모터, 서보, PIR, 토양수분 | 스마트홈, 자동 관수 시스템, IoT 자동화 |
 | **미술** | NeoPixel, OLED, LED 매트릭스, 색상센서 | 인터랙티브 아트, 라이트 설치, 미디어 아트 |
@@ -329,7 +346,7 @@ MQ-135 등 MQ 시리즈 센서는 **5V 히터**가 필요합니다. Pico의 3.3V
   <Card title="스마트 교실 환경 모니터" icon="sun">
     **연계 교과:** 정보 + 과학탐구실험 + 지구과학
 
-    DHT20 + SCD41 + 빛센서 + OLED로 교실 환경(온도, 습도, CO2, 조도)을 실시간 측정하고, WiFi로 클라우드에 데이터를 전송하여 장기 패턴을 분석합니다.
+    DHT20 + SCD30 + 빛센서 + OLED로 교실 환경(온도, 습도, CO2, 조도)을 실시간 측정하고, WiFi로 클라우드에 데이터를 전송하여 장기 패턴을 분석합니다.
   </Card>
 
   <Card title="식물 성장 자동화 시스템" icon="star">
@@ -366,7 +383,7 @@ MQ-135 등 MQ 시리즈 센서는 **5V 히터**가 필요합니다. Pico의 3.3V
   </Card>
 
   <Card title="Seeed Studio (2순위)" icon="rocket">
-    Grove 센서 제조사 직접 판매. **SCD41 등 고가 부품은 직구 추천!**
+    Grove 센서 제조사 직접 판매. **SCD30 등 고가 부품은 직구 추천!**
 
     - [seeedstudio.com](https://www.seeedstudio.com)
     - Air Mail: 15~25일 ($50 이상 무료)
@@ -425,7 +442,7 @@ MQ-135 등 MQ 시리즈 센서는 **5V 히터**가 필요합니다. Pico의 3.3V
 - "과학탐구실험 교과 연계 프로젝트 추천"
 - "초음파 센서 MicroPython 코드 예시"
 - "스마트팜 프로젝트에 필요한 부품 목록"
-- "SCD41 대안 센서 비교 분석"
+- "SCD30 CO2 센서 활용 수업 아이디어"
 
 <PartsChatbot client:only="react" />
 

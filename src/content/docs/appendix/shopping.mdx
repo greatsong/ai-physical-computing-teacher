@@ -33,7 +33,7 @@ Grove Shield에는 I2C 포트가 **2개**(I2C0, I2C1)있습니다. 따라서:
 - I2C 장치 **1~2개** → Hub 없이 각 포트에 하나씩 꽂으면 됩니다
 - I2C 장치 **3개 이상** → 포트가 부족하므로 **I2C Hub 필요**
 
-예: 4차시(DHT20 + OLED = 2개)는 Hub 불필요, 6차시(SCD41 + DHT20 + OLED = 3개)는 Hub 필요.
+예: 4차시(DHT20 + OLED = 2개)는 Hub 불필요, 6차시(SCD30 + DHT20 + OLED = 3개)는 Hub 필요.
 
 Hub를 I2C 포트 하나에 연결하면 최대 **5개 장치**를 동시에 사용할 수 있습니다.
 :::
@@ -48,18 +48,18 @@ Hub를 I2C 포트 하나에 연결하면 최대 **5개 장치**를 동시에 사
 |:--:|------|------|------:|------------|-----------------|
 | A | **DHT20 온습도 센서** | I2C (0x38) | ~7,900원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=14600420) | [Seeed ~$4.90](https://wiki.seeedstudio.com/Grove-Temperature-Humidity-Sensor-DH20/) |
 | B | **Grove 빛 센서 v1.1** | A0 (GP26) | ~5,200원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1346035) | [Seeed ~$2.90](https://www.seeedstudio.com/Grove-Light-Sensor-v1-2-LS06-S-phototransistor.html) |
-| C | **Grove OLED 0.96" (SSD1315)** | I2C (0x3C) | ~8,200원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=12377753) | [Seeed ~$5.50](https://www.seeedstudio.com/Grove-OLED-Display-0-96-SSD1315-p-4294.html) |
-| D | **SCD41 CO2 센서** | I2C (0x62) | ~114,900원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=14917083) | [Seeed ~$49.90](https://www.seeedstudio.com/Grove-CO2-Temperature-Humidity-Sensor-SCD41-p-5025.html) |
+| C | **Grove OLED 0.96" (SSD1306)** | I2C (0x3C) | ~3,000원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1311755) | [Seeed ~$5.50](https://www.seeedstudio.com/Grove-OLED-Display-0-96-SSD1315-p-4294.html) |
+| D | **SCD30 CO2 센서** | I2C (0x61) | ~65,000원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=10918824) | [Seeed 검색](https://www.seeedstudio.com/catalogsearch/result/?q=SCD30) |
 | E | **심박 센서 (Pulse Sensor)** | A0 (GP26) | ~21,000원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=38086) | [Seeed ~$6.90](https://www.seeedstudio.com/Grove-Finger-clip-Heart-Rate-Sensor.html) |
 | F | **Grove 초음파 센서** | D16 (GP16/17) | ~4,900원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1360219) | [Seeed ~$3.90](https://wiki.seeedstudio.com/Grove-Ultrasonic_Ranger/) |
 | G | **Grove 부저** | D18 (GP18) | ~2,100원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1066479) | [Seeed ~$2.90](https://www.seeedstudio.com/Grove-Buzzer.html) |
 | H | **Grove LED Bar v2.0** | D20 (GP20/21) | ~5,700원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1271913) | [Seeed ~$3.90](https://www.seeedstudio.com/Grove-LED-Bar-v2-0.html) |
-| I | **Grove 소리 센서** | A1 (GP27) | ~4,900원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1066604) | [Seeed ~$4.90](https://www.seeedstudio.com/Grove-Sound-Sensor-Based-on-LM358-amplifier-Arduino-Compatible.html) |
+| I | **Grove 아날로그 마이크 (MEMS)** | A1 (GP27) | ~8,800원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1066604) | [Seeed ~$4.90](https://www.seeedstudio.com/Grove-Sound-Sensor-Based-on-LM358-amplifier-Arduino-Compatible.html) |
 | J | **MPU6050 6축 가속도/자이로** | I2C (0x68) | ~3,500원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1247052) | — |
-| K | **Grove 먼지 센서 (PPD42NS)** | A2 (GP28) | ~14,000원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1066618) | [Seeed ~$11.90](https://www.seeedstudio.com/Grove-Dust-Sensor-PPD42NS.html) |
+| K | **Grove 먼지 센서 (GP2Y10)** | A2 (GP28) | ~7,000원 | [디바이스마트](https://www.devicemart.co.kr/goods/view?no=1330859) | [Seeed 검색](https://www.seeedstudio.com/catalogsearch/result/?q=dust+sensor) |
 
 :::note[Grove 커넥터가 없는 센서도 있어요]
-위 구매처 링크 중 일부(DHT20, SCD41, MPU6050)는 **Grove 커넥터가 달려 있지 않은** 제품입니다. Grove Shield에 바로 꽂을 수 없으므로 두 가지 방법이 있습니다.
+위 구매처 링크 중 일부(DHT20, SCD30, MPU6050)는 **Grove 커넥터가 달려 있지 않은** 제품입니다. Grove Shield에 바로 꽂을 수 없으므로 두 가지 방법이 있습니다.
 
 **방법 1:** 변환 케이블을 함께 구매
 - Qwiic/STEMMA QT 커넥터 센서 → [Grove-Qwiic 변환 케이블](https://www.devicemart.co.kr/goods/view?no=14600579)
@@ -85,7 +85,7 @@ Hub를 I2C 포트 하나에 연결하면 최대 **5개 장치**를 동시에 사
 | B | Grove 빛 센서 v1.1 | 2차시 | 4차시 |
 | C | Grove OLED 0.96" | 4차시 | 6~8, 12차시 |
 
-**1막 예상 추가 비용:** ~21,300원
+**1막 예상 추가 비용:** ~16,100원
 
 **차시별 센서 사용표:**
 
@@ -105,29 +105,29 @@ Hub를 I2C 포트 하나에 연결하면 최대 **5개 장치**를 동시에 사
 
 | ID | 품목 | 처음 사용 차시 |
 |:--:|------|:------------:|
-| D | SCD41 CO2 센서 | 6차시 |
+| D | SCD30 CO2 센서 | 6차시 |
 | E | 심박 센서 | 7차시 |
 | F | Grove 초음파 센서 | 8차시 |
 | G | Grove 부저 | 8차시 |
 | H | Grove LED Bar v2.0 | 8차시 |
 
-**2막 예상 추가 비용:** ~148,600원 (SCD41이 비용의 대부분)
+**2막 예상 추가 비용:** ~98,700원 (SCD30이 비용의 대부분)
 
 **차시별 센서 사용표:**
 
 | 차시 | 주제 | 센서/부품 |
 |:----:|------|----------|
 | 5 | AI에게 코드 시키기 | A (DHT20 재사용) + AI 챗봇 |
-| 6 | 환경 모니터링 대시보드 | A + D (SCD41) + C (OLED) + **I2C Hub** |
+| 6 | 환경 모니터링 대시보드 | A + D (SCD30) + C (OLED) + **I2C Hub** |
 | 7 | 내 몸의 데이터 | E (심박) + C (OLED) |
 | 8 | 스마트 알림 시스템 | F (초음파) + G (부저) + H (LED Bar) + C (OLED) |
 | 9 | 데이터 정리와 시각화 | **PC만** (Python, pandas, matplotlib) |
 | 10 | AI 데이터 분석 | **PC만** (AI 챗봇) |
 
-:::caution[SCD41 가격 주의]
-디바이스마트의 SCD41은 **Pimoroni 보드** 기준 ~114,900원으로 매우 비쌉니다. 비용 절감 방법:
+:::caution[SCD30 가격 참고]
+디바이스마트의 SCD30은 ~65,000원입니다. 비용 절감 방법:
 
-1. **Seeed Studio 직구 추천:** [Grove SCD41](https://www.seeedstudio.com/Grove-CO2-Temperature-Humidity-Sensor-SCD41-p-5025.html) ~$49.90 (≈72,000원, Grove 커넥터 포함)
+1. **Seeed Studio 직구:** [SCD30 검색](https://www.seeedstudio.com/catalogsearch/result/?q=SCD30)에서 가격 비교
    - 배송: Air Mail 15~25일 (무료, $50 이상) / DHL 3~5일 ($15~30)
 2. **MH-Z19B** NDIR CO2 센서 (~15,000원, UART 방식)로 대체 가능
 3. 6차시를 DHT20만으로 단순화하고, CO2는 데이터 시뮬레이션으로 진행
@@ -169,12 +169,12 @@ Hub를 I2C 포트 하나에 연결하면 최대 **5개 장치**를 동시에 사
 | 프로젝트 | 센서 (ID) | 포트 |
 |----------|----------|------|
 | 1. 교실 온습도 | A (DHT20) | I2C1 |
-| 2. 소음 모니터 | I (소리 센서) | A1 |
+| 2. 소음 모니터 | I (아날로그 마이크) | A1 |
 | 3. 밝기 트래커 | B (빛 센서) | A0 |
 
 **공통 필수:** C (OLED) + I2C Hub
 
-**Lv.1 전체 키트 예상 추가 비용:** ~26,200원 (A + B + I + C)
+**Lv.1 전체 키트 예상 추가 비용:** ~24,900원 (A + B + I + C)
 
   </TabItem>
   <TabItem label="Lv.2 발명가">
@@ -183,14 +183,14 @@ Hub를 I2C 포트 하나에 연결하면 최대 **5개 장치**를 동시에 사
 
 | 프로젝트 | 센서 조합 (ID) | 포트 |
 |----------|--------------|------|
-| 1. 스마트 환기 | A + D (DHT20+SCD41) + C | I2C1 (Hub) |
-| 2. 스마트 알림 | F + I + G + C (초음파+소리+부저+OLED) | D16, A1, D18, I2C1 |
-| 3. 스마트 교실 | A + B + I + C (DHT20+빛+소리+OLED) | I2C1, A0, A1 |
+| 1. 스마트 환기 | A + D (DHT20+SCD30) + C | I2C1 (Hub) |
+| 2. 스마트 알림 | F + I + G + C (초음파+마이크+부저+OLED) | D16, A1, D18, I2C1 |
+| 3. 스마트 교실 | A + B + I + C (DHT20+빛+마이크+OLED) | I2C1, A0, A1 |
 
-**Lv.2 전체 키트 예상 추가 비용:** ~148,100원 (A + B + D + F + G + I + C)
+**Lv.2 전체 키트 예상 추가 비용:** ~96,900원 (A + B + D + F + G + I + C)
 
 :::note[Lv.1 키트에서 추가 구매]
-Lv.1 키트(A, B, I, C)를 이미 보유 시 → D, F, G만 추가 (~121,900원)
+Lv.1 키트(A, B, I, C)를 이미 보유 시 → D, F, G만 추가 (~72,000원)
 :::
 
   </TabItem>
@@ -201,7 +201,7 @@ Lv.1 키트(A, B, I, C)를 이미 보유 시 → D, F, G만 추가 (~121,900원)
 | 프로젝트 | 센서 조합 (ID) | 포트 |
 |----------|--------------|------|
 | 1. 식물 성장 환경 | A + B + C (DHT20+빛+OLED) | I2C1, A0 |
-| 2. 공기질과 집중력 | D + C (SCD41+OLED) | I2C1 (Hub) |
+| 2. 공기질과 집중력 | D + C (SCD30+OLED) | I2C1 (Hub) |
 | 3. 움직임과 자세 | J + C (MPU6050+OLED) | I2C1 (Hub) |
 
 **추가 필수:** PC (Python 설치 — pandas, matplotlib)
@@ -219,13 +219,13 @@ Lv.2 키트에서 J만 추가 (~3,500원)
 
 | 프로젝트 | 센서 조합 (ID) | 포트 |
 |----------|--------------|------|
-| 1. 학교 공기질 | A + D + K + C (DHT20+SCD41+먼지+OLED) | I2C1 (Hub), A2 |
+| 1. 학교 공기질 | A + D + K + C (DHT20+SCD30+먼지+OLED) | I2C1 (Hub), A2 |
 | 2. 에너지 효율 | A + B + C (DHT20+빛+OLED) | I2C1, A0 |
 | 3. 안전 모니터링 | J + C (MPU6050+OLED) | I2C1 (Hub) |
 
 **추가 필수:** PC (Python + ML)
 
-**Lv.4에서 새로 필요한 부품:** K (먼지 센서, ~14,000원)
+**Lv.4에서 새로 필요한 부품:** K (먼지 센서, ~7,000원)
 
   </TabItem>
 </Tabs>
@@ -238,15 +238,14 @@ Lv.2 키트에서 J만 추가 (~3,500원)
 
 | 구매 방식 | 베이스 키트 | 추가 부품 | 합계 예상 |
 |-----------|:---------:|:---------:|:---------:|
-| **코스 A 1막만** | ~23,000원 | A, B, C (~21,300원) | **~44,300원** |
-| **코스 A 전체** (1~3막) | ~23,000원 | A~H (~169,900원) | **~192,900원** |
-| **코스 B Lv.1만** | ~23,000원 | A, B, I, C (~26,200원) | **~49,200원** |
-| **코스 B 전체** (Lv.1~4) | ~23,000원 | A~D, I, J, K (~158,600원) | **~181,600원** |
-| **코스 A + B 올인원** | ~23,000원 | A~K (~192,300원) | **~215,300원** |
+| **코스 A 1막만** | ~23,000원 | A, B, C (~16,100원) | **~39,100원** |
+| **코스 A 전체** (1~3막) | ~23,000원 | A~H (~114,800원) | **~137,800원** |
+| **코스 B Lv.1만** | ~23,000원 | A, B, I, C (~24,900원) | **~47,900원** |
+| **코스 B 전체** (Lv.1~4) | ~23,000원 | A~D, I, J, K (~100,400원) | **~123,400원** |
+| **코스 A + B 올인원** | ~23,000원 | A~K (~134,100원) | **~157,100원** |
 
-:::tip[SCD41 Seeed 직구 시 비용 절감]
-위 금액은 디바이스마트 기준입니다. **SCD41을 Seeed Studio에서 직구**하면 (~72,000원, 약 43,000원 절감):
-- 코스 A 전체: **~150,000원** / 코스 B 전체: **~139,000원** / 올인원: **~172,000원**
+:::tip[Seeed 직구 시 추가 절감 가능]
+위 금액은 디바이스마트 기준입니다. Seeed Studio에서 Grove 버전을 직구하면 일부 센서를 더 저렴하게 구매할 수 있습니다. 특히 **SCD30은 Seeed에서 가격을 비교**해 보세요.
 :::
 
 ### 부품 공유 맵 (중복 구매 방지)
@@ -256,12 +255,12 @@ Lv.2 키트에서 J만 추가 (~3,500원)
 | A | DHT20 | O | O | O | O | O | O | O |
 | B | 빛 센서 | O | — | — | O | O | O | O |
 | C | OLED | O | O | O | O | O | O | O |
-| D | SCD41 CO2 | — | O | — | — | O | O | O |
+| D | SCD30 CO2 | — | O | — | — | O | O | O |
 | E | 심박 센서 | — | O | — | — | — | — | — |
 | F | 초음파 | — | O | — | — | O | — | — |
 | G | 부저 | — | O | — | — | O | — | — |
 | H | LED Bar | — | O | — | — | — | — | — |
-| I | 소리 센서 | — | — | — | O | O | — | — |
+| I | 아날로그 마이크 | — | — | — | O | O | — | — |
 | J | MPU6050 | — | — | — | — | — | O | O |
 | K | 먼지 센서 | — | — | — | — | — | — | O |
 
@@ -277,7 +276,7 @@ Lv.2 키트에서 J만 추가 (~3,500원)
   </Card>
 
   <Card title="Seeed Studio (2순위)" icon="rocket">
-    Grove 센서 제조사 직접 판매. **SCD41은 Seeed 직구 추천!**
+    Grove 센서 제조사 직접 판매. **SCD30 등 Seeed 직구 가격 비교 추천!**
 
     - [seeedstudio.com](https://www.seeedstudio.com)
     - Air Mail: 15~25일 ($50 이상 무료)
@@ -302,8 +301,8 @@ Grove Shield I2C1 포트
         |
    [I2C Hub 6P]
     |    |    |    |
-  DHT20  SCD41  OLED  (빈 포트)
-  0x38   0x62   0x3C
+  DHT20  SCD30  OLED  (빈 포트)
+  0x38   0x61   0x3C
 
    + Grove Shield A2 포트
         |
