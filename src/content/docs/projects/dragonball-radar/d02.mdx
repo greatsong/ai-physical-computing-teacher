@@ -154,26 +154,24 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 </div>
 
 <div class="flow-diagram">
-  <h5>매핑(Mapping)이란?</h5>
-  <div class="flow-row">
-    <div class="flow-box" style="background: #1a1a3e; border: 1px solid #2a2a5e;">
-      <strong>입력 범위 (RSSI)</strong><br/>
-      -30 (가까움)<br/>
-      ↕ 매핑 함수 f(x)<br/>
-      -90 (멀리)
-    </div>
-    <div class="flow-arrow">→</div>
-    <div class="flow-box" style="background: #1a1a3e; border: 1px solid #2a2a5e;">
-      <strong>출력 범위 (LED 딜레이)</strong><br/>
-      0.05초 (미친 듯이 빠르게!)<br/>
-      ↕<br/>
-      1.0초 (느긋하게)
-    </div>
+  <div class="flow-step" style="min-width: 140px;">
+    <div class="flow-icon">📡</div>
+    <div class="flow-label">입력 범위 (RSSI)</div>
+    <div class="flow-desc">-30 (가까움)<br/>↕ 매핑 함수 f(x)<br/>-90 (멀리)</div>
   </div>
-  <p style="margin-top: 12px; color: #aaa; font-size: 0.9em;">한 범위의 숫자를 다른 범위로 변환하는 것!</p>
-  <p style="color: #888; font-size: 0.85em; margin-top: 8px;">
-    실생활 예시: 시험 원점수(0-100) → 등급(1-9) / 온도(0-40도) → 에어컨 세기(1-5) / 볼륨 노브(0-10) → 스피커 출력(0-100W)
-  </p>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step" style="min-width: 140px;">
+    <div class="flow-icon">💡</div>
+    <div class="flow-label">출력 범위 (LED 딜레이)</div>
+    <div class="flow-desc">0.05초 (빠르게!)<br/>↕<br/>1.0초 (느긋하게)</div>
+  </div>
+</div>
+
+<div class="key-terms">
+  <dl>
+    <dt>매핑(Mapping)</dt>
+    <dd>한 범위의 숫자를 다른 범위로 변환하는 것! 실생활 예: 시험 원점수(0-100)→등급(1-9), 온도(0-40도)→에어컨 세기(1-5), 볼륨 노브(0-10)→스피커 출력(0-100W)</dd>
+  </dl>
 </div>
 
 <div class="teacher-script">
@@ -370,29 +368,20 @@ while True:
   <p>"맞아요! 그게 바로 '노이즈' 문제예요. 1차시에서도 잠깐 얘기했죠?"</p>
 </div>
 
-<div class="flow-diagram">
-  <h5>실제 RSSI 값의 흔들림 (같은 위치에서!)</h5>
-  <table style="width: 100%; border-collapse: collapse; font-size: 0.9em; margin-bottom: 12px;">
-    <thead>
-      <tr style="border-bottom: 1px solid #444;">
-        <th style="text-align: left; padding: 6px; color: #888;">시간</th>
-        <th style="text-align: left; padding: 6px; color: #888;">RSSI</th>
-        <th style="text-align: left; padding: 6px; color: #888;">LED 딜레이</th>
-        <th style="text-align: left; padding: 6px; color: #888;">변화</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td style="padding: 4px 6px;">0초</td><td style="padding: 4px 6px;">-52</td><td style="padding: 4px 6px;">0.412초</td><td style="padding: 4px 6px; color: #ffd43b;">왔다갔다!</td></tr>
-      <tr><td style="padding: 4px 6px;">2초</td><td style="padding: 4px 6px;">-48</td><td style="padding: 4px 6px;">0.349초</td><td style="padding: 4px 6px; color: #ffd43b;">가만히 있는데!</td></tr>
-      <tr><td style="padding: 4px 6px;">4초</td><td style="padding: 4px 6px;">-55</td><td style="padding: 4px 6px;">0.459초</td><td style="padding: 4px 6px;"></td></tr>
-      <tr><td style="padding: 4px 6px;">6초</td><td style="padding: 4px 6px;">-50</td><td style="padding: 4px 6px;">0.381초</td><td style="padding: 4px 6px;"></td></tr>
-      <tr><td style="padding: 4px 6px;">8초</td><td style="padding: 4px 6px;">-61</td><td style="padding: 4px 6px;">0.554초</td><td style="padding: 4px 6px; color: #ff6b6b;">갑자기 확!</td></tr>
-      <tr><td style="padding: 4px 6px;">10초</td><td style="padding: 4px 6px;">-49</td><td style="padding: 4px 6px;">0.365초</td><td style="padding: 4px 6px;"></td></tr>
-    </tbody>
-  </table>
-  <p style="color: #aaa; font-size: 0.9em;">평균하면? → 약 -52.5 dBm (이게 실제 거리)</p>
-  <p style="color: #51cf66; font-size: 0.9em; margin-top: 4px;"><strong>해결책: 여러 번 측정해서 평균을 내자!</strong></p>
-</div>
+### 실제 RSSI 값의 흔들림 (같은 위치에서!)
+
+| 시간 | RSSI | LED 딜레이 | 변화 |
+|------|------|-----------|------|
+| 0초 | -52 | 0.412초 | 왔다갔다! |
+| 2초 | -48 | 0.349초 | 가만히 있는데! |
+| 4초 | -55 | 0.459초 | |
+| 6초 | -50 | 0.381초 | |
+| 8초 | -61 | 0.554초 | 갑자기 확! |
+| 10초 | -49 | 0.365초 | |
+
+<Aside type="tip" title="해결책">
+평균하면? → 약 **-52.5 dBm** (이게 실제 거리). **여러 번 측정해서 평균을 내자!**
+</Aside>
 
 <div class="teacher-script">
   <p>"무선 신호는 벽 반사, 사람 이동, 전자기 간섭 등으로 항상 흔들려요. 이건 피코의 문제가 아니라 전파의 특성이에요. 스마트폰 Wi-Fi 아이콘이 가끔 막대 하나가 왔다갔다하는 것도 같은 이유예요."</p>
@@ -411,25 +400,25 @@ while True:
   <p>"비유하면, 주식 차트에서 당일 주가만 보면 너무 출렁거리잖아요? 그래서 '5일 이동 평균선'이라고 최근 5일 평균을 선으로 그리면 전체적인 추세가 보이거든요. 같은 원리예요!"</p>
 </div>
 
-<div class="flow-diagram">
-  <h5>이동 평균 (Moving Average)</h5>
-  <p style="margin-bottom: 10px; color: #aaa;">최근 5개 값을 기억해서 평균!</p>
-  <div style="font-family: monospace; font-size: 0.85em; line-height: 1.6; color: #ccc;">
-    <p>원본 데이터: <span style="color: #ff6b6b;">-52, -48, -55, -50, -61</span>, -49, -53</p>
-    <p style="margin-left: 16px;">→ 이 5개의 평균 = <strong style="color: #51cf66;">-53.2</strong></p>
-    <p>원본 데이터: -52, <span style="color: #ff6b6b;">-48, -55, -50, -61, -49</span>, -53</p>
-    <p style="margin-left: 16px;">→ 이 5개의 평균 = <strong style="color: #51cf66;">-52.6</strong></p>
-    <p>원본 데이터: -52, -48, <span style="color: #ff6b6b;">-55, -50, -61, -49, -53</span></p>
-    <p style="margin-left: 16px;">→ 이 5개의 평균 = <strong style="color: #51cf66;">-53.6</strong></p>
+<div class="outcome-preview">
+  <h4>이동 평균 (Moving Average)</h4>
+  <p>최근 5개 값을 기억해서 평균!</p>
+  <div style="font-family: var(--sl-font-mono); font-size: 0.85em; line-height: 1.8;">
+    <p>원본 데이터: <span style="color: var(--teacher-rose); font-weight: 600;">-52, -48, -55, -50, -61</span>, -49, -53</p>
+    <p style="margin-left: 16px;">→ 이 5개의 평균 = <strong style="color: var(--teacher-emerald);">-53.2</strong></p>
+    <p>원본 데이터: -52, <span style="color: var(--teacher-rose); font-weight: 600;">-48, -55, -50, -61, -49</span>, -53</p>
+    <p style="margin-left: 16px;">→ 이 5개의 평균 = <strong style="color: var(--teacher-emerald);">-52.6</strong></p>
+    <p>원본 데이터: -52, -48, <span style="color: var(--teacher-rose); font-weight: 600;">-55, -50, -61, -49, -53</span></p>
+    <p style="margin-left: 16px;">→ 이 5개의 평균 = <strong style="color: var(--teacher-emerald);">-53.6</strong></p>
   </div>
-  <div style="margin-top: 16px; display: flex; gap: 16px; flex-wrap: wrap;">
-    <div style="flex: 1; min-width: 140px; padding: 8px; background: #2a1a1a; border-radius: 8px; text-align: center;">
-      <div style="color: #ff6b6b; font-weight: bold;">원본</div>
-      <div style="color: #aaa; font-size: 0.85em;">울퉁불퉁!</div>
+  <div class="outcome-items" style="margin-top: 1rem;">
+    <div class="outcome-item" style="border-color: rgba(244, 63, 94, 0.3);">
+      <div style="color: var(--teacher-rose); font-weight: bold;">원본</div>
+      <div style="font-size: 0.8rem;">울퉁불퉁!</div>
     </div>
-    <div style="flex: 1; min-width: 140px; padding: 8px; background: #1a2a1a; border-radius: 8px; text-align: center;">
-      <div style="color: #51cf66; font-weight: bold;">이동평균</div>
-      <div style="color: #aaa; font-size: 0.85em;">부드러움!</div>
+    <div class="outcome-item" style="border-color: rgba(16, 185, 129, 0.3);">
+      <div style="color: var(--teacher-emerald); font-weight: bold;">이동평균</div>
+      <div style="font-size: 0.8rem;">부드러움!</div>
     </div>
   </div>
 </div>
@@ -448,24 +437,36 @@ while True:
   <p>"프로그래밍으로 구현하는 방법은 간단해요. 리스트에 값을 계속 넣되, 5개까지만 유지하면서 평균을 내는 거예요."</p>
 </div>
 
-<div class="flow-diagram">
-  <h5>이동 평균 구현 원리</h5>
-  <div style="font-family: monospace; font-size: 0.85em; line-height: 1.8; color: #ccc;">
-    <p>리스트 = [] (빈 바구니), 창 크기 = 5</p>
-    <p>값 -52 들어옴 → <code>[-52]</code> &nbsp;&nbsp; 평균: <strong>-52.0</strong></p>
-    <p>값 -48 들어옴 → <code>[-52, -48]</code> &nbsp;&nbsp; 평균: <strong>-50.0</strong></p>
-    <p>값 -55 들어옴 → <code>[-52, -48, -55]</code> &nbsp;&nbsp; 평균: <strong>-51.7</strong></p>
-    <p>값 -50 들어옴 → <code>[-52, -48, -55, -50]</code> &nbsp;&nbsp; 평균: <strong>-51.3</strong></p>
-    <p>값 -61 들어옴 → <code>[-52, -48, -55, -50, -61]</code> &nbsp;&nbsp; 평균: <strong>-53.2</strong> ← 5개 꽉 참!</p>
-    <p>값 -49 들어옴 → <code>[-48, -55, -50, -61, -49]</code> &nbsp;&nbsp; 평균: <strong>-52.6</strong> ← 가장 오래된 -52 빠짐!</p>
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">1</div>
+    <div class="map-content">
+      <div class="map-title">이동 평균 구현 원리</div>
+      <div class="map-desc">리스트 = [] (빈 바구니), 창 크기 = 5</div>
+    </div>
   </div>
-  <div style="margin-top: 12px; padding: 10px; background: #1a2a3e; border-radius: 8px; font-family: monospace; font-size: 0.85em; color: #00d4ff;">
-    <p>buffer.append(new_value) &nbsp;&nbsp;&nbsp; # 새 값 추가</p>
-    <p>if len(buffer) &gt; WINDOW: &nbsp;&nbsp; # 창 크기 초과하면</p>
-    <p>&nbsp;&nbsp;&nbsp;&nbsp;buffer.pop(0) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # 가장 오래된 값 제거</p>
-    <p>avg = sum(buffer) / len(buffer) &nbsp; # 평균 계산</p>
+  <div class="map-row">
+    <div class="map-num n2">2</div>
+    <div class="map-content">
+      <div class="map-title">값이 들어올 때마다</div>
+      <div class="map-desc">
+        <code>[-52]</code> → 평균: <strong>-52.0</strong><br/>
+        <code>[-52, -48]</code> → 평균: <strong>-50.0</strong><br/>
+        <code>[-52, -48, -55]</code> → 평균: <strong>-51.7</strong><br/>
+        <code>[-52, -48, -55, -50]</code> → 평균: <strong>-51.3</strong><br/>
+        <code>[-52, -48, -55, -50, -61]</code> → 평균: <strong>-53.2</strong> ← 5개 꽉 참!<br/>
+        <code>[-48, -55, -50, -61, -49]</code> → 평균: <strong>-52.6</strong> ← 가장 오래된 -52 빠짐!
+      </div>
+    </div>
   </div>
 </div>
+
+```python
+buffer.append(new_value)           # 새 값 추가
+if len(buffer) > WINDOW:           # 창 크기 초과하면
+    buffer.pop(0)                  # 가장 오래된 값 제거
+avg = sum(buffer) / len(buffer)    # 평균 계산
+```
 
 ---
 
@@ -711,7 +712,7 @@ while True:
   </div>
   <div class="mission-body">
     <div class="mission-desc">LED 깜빡임만으로 드래곤볼을 찾아라!</div>
-    <ol style="margin-top: 8px; padding-left: 20px; color: #ccc; font-size: 0.9em;">
+    <ol style="margin-top: 8px; padding-left: 20px; font-size: 0.9em;">
       <li>짝꿍이 드래곤볼을 복도에 숨긴다 (보조배터리 연결)</li>
       <li>레이더 피코만 들고 나가서 LED 깜빡임만으로 찾는다</li>
       <li><strong>Thonny 화면 보기 금지!</strong> 오직 LED만!</li>
