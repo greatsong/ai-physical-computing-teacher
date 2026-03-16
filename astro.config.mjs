@@ -73,6 +73,7 @@ export default defineConfig({
           label: '바이브 코딩 프로젝트',
           items: [
             { label: '프로젝트 소개', slug: 'projects' },
+            { label: '네트워크 이해하기', slug: 'projects/network-guide' },
             {
               label: 'Wi-Fi 품질 모니터 (6차시)',
               items: [

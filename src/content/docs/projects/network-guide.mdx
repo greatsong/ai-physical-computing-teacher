@@ -1,0 +1,840 @@
+---
+title: "네트워크 이해하기"
+description: "입문자를 위한 시각적 네트워크 교육 — 아파트 비유부터 실시간 대시보드까지"
+prev: false
+next: false
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+<div class="teacher-script">
+  <p>"여러분, 지금 이 순간에도 이 교실에는 <strong>수백만 개의 데이터</strong>가 공기 중을 날아다니고 있어요. 눈에 안 보일 뿐이죠. 오늘은 그 보이지 않는 세계를 <strong>눈에 보이게</strong> 만들어 볼 거예요."</p>
+</div>
+
+> 이 페이지는 **4개 프로젝트 모두의 기반**입니다. 네트워크가 뭔지 몰라도 괜찮아요. 지금부터 하나씩 쌓아갑니다.
+
+---
+
+## 1. 이미 알고 있는 것에 이름 붙이기
+
+<div class="outcome-preview">
+  <p><strong>네트워크를 처음 배우는 사람은 "모르는 것을 배우는 게" 아니에요.</strong><br/>
+  여러분이 매일 하는 행동에 <strong>정확한 이름을 붙이는 것</strong>입니다.</p>
+</div>
+
+여러분은 이미 네트워크를 쓰고 있습니다:
+
+- 📱 학교 Wi-Fi에 폰을 연결해서 유튜브 본 적 있죠?
+- 🖨️ 무선 프린터로 과제를 출력한 적 있죠?
+- 📺 선생님이 노트북 화면을 전자칠판에 미러링하는 거 봤죠?
+
+이 모든 것이 **네트워크** 위에서 일어나는 일입니다. 이제 이름을 붙여봅시다.
+
+### 아파트에 비유하면
+
+<div class="analogy-grid">
+  <div class="analogy-card real-world">
+    <div class="analogy-header">🏢 아파트 단지</div>
+    <div class="analogy-row">
+      <span class="a-emoji">🏗️</span>
+      <div><span class="a-text">관리사무소</span><span class="a-sub">건물의 중심. 택배도 여기 거침</span></div>
+    </div>
+    <div class="analogy-row">
+      <span class="a-emoji">🏠</span>
+      <div><span class="a-text">101호, 102호...</span><span class="a-sub">각 가정의 고유 번호</span></div>
+    </div>
+    <div class="analogy-row">
+      <span class="a-emoji">🏘️</span>
+      <div><span class="a-text">같은 단지</span><span class="a-sub">단지 안에서는 자유롭게 방문</span></div>
+    </div>
+    <div class="analogy-row">
+      <span class="a-emoji">🔤</span>
+      <div><span class="a-text">"래미안 1차"</span><span class="a-sub">아파트 단지 이름</span></div>
+    </div>
+    <div class="analogy-row">
+      <span class="a-emoji">📮</span>
+      <div><span class="a-text">우체국</span><span class="a-sub">다른 단지로 편지 보내기</span></div>
+    </div>
+  </div>
+
+  <div class="analogy-equals">=</div>
+
+  <div class="analogy-card network-world">
+    <div class="analogy-header">🌐 네트워크</div>
+    <div class="analogy-row">
+      <span class="a-emoji">📡</span>
+      <div><span class="a-text">공유기 (AP)</span><span class="a-sub">모든 기기를 연결하는 중심</span></div>
+    </div>
+    <div class="analogy-row">
+      <span class="a-emoji">🔢</span>
+      <div><span class="a-text">IP 주소</span><span class="a-sub">192.168.1.10, 192.168.1.20...</span></div>
+    </div>
+    <div class="analogy-row">
+      <span class="a-emoji">🔗</span>
+      <div><span class="a-text">LAN</span><span class="a-sub">같은 공유기에 연결된 기기 모임</span></div>
+    </div>
+    <div class="analogy-row">
+      <span class="a-emoji">📶</span>
+      <div><span class="a-text">SSID</span><span class="a-sub">"School_WiFi" — Wi-Fi 이름</span></div>
+    </div>
+    <div class="analogy-row">
+      <span class="a-emoji">🌍</span>
+      <div><span class="a-text">인터넷</span><span class="a-sub">다른 네트워크로 데이터 보내기</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">학생:</span> "그러면 Wi-Fi랑 LAN이랑 같은 건가요?"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "아파트 비유로 설명하면 — LAN은 <strong>아파트 단지 자체</strong>고, Wi-Fi는 <strong>단지에 들어가는 방법</strong> 중 하나예요. 랜선(유선)으로 들어가도 같은 단지, Wi-Fi(무선)로 들어가도 같은 단지!"</div>
+</div>
+
+<div class="net-check">
+  <div class="check-q">Q. 내 스마트폰과 전자칠판이 같은 Wi-Fi에 연결되어 있으면?</div>
+  <div class="check-a">같은 LAN(아파트 단지)에 있는 거예요! 서로 직접 데이터를 주고받을 수 있습니다.</div>
+  <div class="check-q">Q. 학교 Wi-Fi와 우리 집 Wi-Fi에 각각 연결된 기기끼리는?</div>
+  <div class="check-a">다른 아파트 단지에 사는 것과 같아요. 직접 방문은 안 되고, 우체국(인터넷)을 거쳐야 합니다.</div>
+</div>
+
+---
+
+## 2. 우리 교실의 네트워크
+
+<div class="teacher-script">
+  <p>"교실을 위에서 내려다본다고 상상해보세요. <strong>보이는 것</strong>과 <strong>보이지 않는 것</strong>이 있어요."</p>
+</div>
+
+### 눈에 보이는 것 — 기기들
+
+<div class="net-topo">
+  <div class="net-topo-title">
+    <span class="title-icon">🏫</span>
+    우리 교실을 위에서 보면
+  </div>
+
+  <div class="net-zone zone-purple">
+    <div class="net-zone-label">학교 LAN — 같은 공유기에 연결된 기기들</div>
+
+    <div class="net-devices" style="margin-bottom: 0.75rem;">
+      <div class="net-device dev-highlight">
+        <div class="dev-icon">📡</div>
+        <div class="dev-name">학교 공유기</div>
+        <div class="dev-detail">SSID: School_WiFi<br/>IP: 192.168.1.1<br/><strong>아파트 관리사무소</strong></div>
+        <span class="dev-badge badge-ap">AP</span>
+      </div>
+    </div>
+
+    <div class="net-signal">
+      <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+      <span class="signal-label">👆 이건 눈에 안 보여요! 2.4GHz / 5GHz Wi-Fi 전파</span>
+      <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="net-devices">
+      <div class="net-device">
+        <div class="dev-icon">📺</div>
+        <div class="dev-name">전자칠판</div>
+        <div class="dev-detail">192.168.1.10<br/>101호</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+      <div class="net-device">
+        <div class="dev-icon">💻</div>
+        <div class="dev-name">선생님 노트북</div>
+        <div class="dev-detail">192.168.1.20<br/>102호</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+      <div class="net-device">
+        <div class="dev-icon">📱</div>
+        <div class="dev-name">학생 폰</div>
+        <div class="dev-detail">192.168.1.30<br/>103호</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+      <div class="net-device">
+        <div class="dev-icon">🖨️</div>
+        <div class="dev-name">무선 프린터</div>
+        <div class="dev-detail">192.168.1.50<br/>105호</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+### 핵심 규칙: 같은 LAN = 서로 직접 대화 가능
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+  <div class="net-topo" style="margin: 0;">
+    <div class="net-topo-title"><span class="title-icon">✅</span> 가능!</div>
+    <div class="net-zone zone-emerald" style="margin: 0;">
+      <div class="net-zone-label">같은 LAN</div>
+      <div class="net-devices">
+        <div class="net-device dev-emerald">
+          <div class="dev-icon">💻</div>
+          <div class="dev-name">내 노트북</div>
+        </div>
+        <div class="net-device dev-emerald">
+          <div class="dev-icon">🖨️</div>
+          <div class="dev-name">프린터</div>
+        </div>
+      </div>
+    </div>
+    <div class="compare-summary">같은 단지 → 직접 방문!</div>
+  </div>
+  <div class="net-topo" style="margin: 0;">
+    <div class="net-topo-title"><span class="title-icon">🚫</span> 불가!</div>
+    <div style="display: flex; gap: 0.5rem;">
+      <div class="net-zone zone-purple" style="flex: 1; margin: 0;">
+        <div class="net-zone-label">LAN A</div>
+        <div class="net-devices">
+          <div class="net-device">
+            <div class="dev-icon">💻</div>
+          </div>
+        </div>
+      </div>
+      <div class="net-zone zone-rose" style="flex: 1; margin: 0;">
+        <div class="net-zone-label">LAN B</div>
+        <div class="net-devices">
+          <div class="net-device dev-rose">
+            <div class="dev-icon">💻</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="compare-summary">다른 단지 → 우체국(인터넷) 필요</div>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>왜 이게 중요하죠?</strong> 우리 프로젝트에서 Pico가 만든 웹 페이지를 <strong>같은 Wi-Fi에 연결된 기기</strong>라면 누구나 볼 수 있어요. 노트북, 스마트폰, 전자칠판 모두요! 바로 이 "같은 LAN" 규칙 덕분입니다.</p>
+</div>
+
+---
+
+## 3. 데이터의 여행 따라가기
+
+<div class="teacher-script">
+  <p>"네트워크 구조를 알았으니, 이제 진짜 재미있는 부분이에요. <strong>데이터 하나가 어디서 출발해서 어디에 도착하는지</strong> 따라가 봅시다."</p>
+</div>
+
+### 온도 26.5°C의 여행
+
+센서 연구소 프로젝트를 예로 들어볼게요. 교실 온도 26.5°C라는 숫자가 어떻게 여러분의 스마트폰 화면에 나타나는지 따라가봅시다.
+
+<div class="packet-tracker">
+  <div class="tracker-title">🔵 데이터 패킷의 여행 (빛나는 점을 따라가 보세요!)</div>
+
+  <div class="packet-track-rail">
+    <div class="packet-dot"></div>
+  </div>
+
+  <div class="packet-stops">
+    <div class="packet-stop">
+      <div class="ps-icon">🌡️</div>
+      <div class="ps-name">센서</div>
+      <div class="ps-detail">전기 신호로<br/>온도를 감지</div>
+      <div class="ps-data">0.82V</div>
+    </div>
+    <div class="packet-stop">
+      <div class="ps-icon">📡</div>
+      <div class="ps-name">Pico</div>
+      <div class="ps-detail">전압 → 숫자 변환<br/>Python 처리</div>
+      <div class="ps-data">26.5</div>
+    </div>
+    <div class="packet-stop">
+      <div class="ps-icon">📶</div>
+      <div class="ps-name">Wi-Fi</div>
+      <div class="ps-detail">공기 중으로<br/>데이터 전파 전송</div>
+      <div class="ps-data">{`{"temp":26.5}`}</div>
+    </div>
+    <div class="packet-stop">
+      <div class="ps-icon">📱</div>
+      <div class="ps-name">화면</div>
+      <div class="ps-detail">브라우저가<br/>숫자 → 그래프</div>
+      <div class="ps-data">📊 26.5°C</div>
+    </div>
+  </div>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">학생:</span> "이게 매번 일어나는 거예요?"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "네! 5초마다 이 여행이 반복돼요. 그래서 '실시간'처럼 보이는 거예요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">학생:</span> "근데 브라우저가 어떻게 Pico한테 데이터를 달라고 해요?"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "좋은 질문! 그게 바로 다음에 배울 <strong>요청과 응답</strong>이에요."</div>
+</div>
+
+### 요청과 응답 — 카페 주문처럼!
+
+Pico는 **웹 서버**입니다. 웹 서버란 "누군가 요청하면 응답해주는 프로그램"이에요.
+카페에서 주문하는 것과 똑같습니다!
+
+<div class="http-chat">
+  <div class="chat-divider">— 처음 접속할 때 (1번만) —</div>
+  <div class="http-msg req">
+    <div class="msg-who">🖥️ 브라우저 (손님)</div>
+    <code>GET /</code> "메뉴판 주세요!"
+  </div>
+  <div class="http-msg res">
+    <div class="msg-who">📡 Pico (사장님)</div>
+    여기 <strong>HTML 페이지</strong> 드릴게요!<br/>
+    (화면 틀 + CSS + JavaScript 전부 포함)
+  </div>
+  <div class="chat-divider">— 그 다음부터 N초마다 자동 반복 —</div>
+  <div class="http-msg req">
+    <div class="msg-who">🖥️ JS (자동 주문)</div>
+    <code>GET /data</code> "최신 데이터 주세요!"
+  </div>
+  <div class="http-msg res">
+    <div class="msg-who">📡 Pico</div>
+    <code>{`{"temp":26.5, "humidity":45}`}</code><br/>
+    JSON 데이터만 딱!
+  </div>
+  <div class="http-msg req">
+    <div class="msg-who">🖥️ JS (5초 후 또)</div>
+    <code>GET /data</code> "또 주세요!"
+  </div>
+  <div class="http-msg res">
+    <div class="msg-who">📡 Pico</div>
+    <code>{`{"temp":26.7, "humidity":44}`}</code><br/>
+    업데이트된 데이터!
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>"실시간"의 비밀:</strong> 처음에 HTML을 1번 받고, 그 다음부터는 <strong>JSON 데이터만</strong> 반복 요청합니다. 매번 전체 페이지를 새로 받지 않아요! 네이버 실시간 검색어가 새로고침 없이 바뀌는 것도 같은 원리예요.</p>
+</div>
+
+<div class="net-check">
+  <div class="check-q">Q. 브라우저가 Pico에게 데이터를 요청하려면 무엇이 필요한가요?</div>
+  <div class="check-a">Pico의 <strong>IP 주소</strong>가 필요합니다! 아파트 호수를 알아야 방문할 수 있는 것처럼, IP를 알아야 데이터를 요청할 수 있어요.</div>
+  <div class="check-q">Q. 왜 HTML은 처음 1번만 보내고, 그 다음은 JSON만 보내나요?</div>
+  <div class="check-a">화면 틀(HTML)은 안 바뀌니까요! 바뀌는 건 <strong>숫자(데이터)</strong>뿐이에요. 매번 전체 페이지를 보내면 낭비잖아요.</div>
+</div>
+
+---
+
+## 4. Pico의 두 얼굴
+
+<div class="teacher-script">
+  <p>"여기서 Pico의 특별한 능력이 나옵니다. Pico는 네트워크에서 <strong>두 가지 역할</strong>을 할 수 있어요!"</p>
+</div>
+
+### STA 모드 vs AP 모드
+
+<div class="compare-cards">
+  <div class="compare-card new">
+    <div class="compare-title">☕ STA 모드 = 카페 손님</div>
+    <div class="compare-item">✅ 기존 Wi-Fi에 접속 (학교 Wi-Fi)</div>
+    <div class="compare-item">✅ 공유기가 IP를 줌 (192.168.1.xxx)</div>
+    <div class="compare-item">✅ 같은 LAN의 모든 기기와 통신</div>
+    <div class="compare-item">✅ 인터넷 접속 가능 (API 호출)</div>
+    <div style="color: var(--teacher-purple); margin-top: 8px; font-weight: 600;">
+      → Wi-Fi 모니터, 공공데이터, 센서연구소
+    </div>
+  </div>
+  <div class="compare-arrow">vs</div>
+  <div class="compare-card new">
+    <div class="compare-title">🏪 AP 모드 = 카페 사장님</div>
+    <div class="compare-item">✅ 자기만의 Wi-Fi를 만듦</div>
+    <div class="compare-item">✅ 자기가 IP를 나눠줌 (192.168.4.xxx)</div>
+    <div class="compare-item">✅ 접속한 기기와만 통신</div>
+    <div class="compare-item">❌ 인터넷 불가 (독립 네트워크)</div>
+    <div style="color: var(--teacher-rose); margin-top: 8px; font-weight: 600;">
+      → 드래곤볼 레이더
+    </div>
+  </div>
+</div>
+
+### STA 모드 — 학교 Wi-Fi에 합류
+
+<div class="net-topo">
+  <div class="net-topo-title">
+    <span class="title-icon">📡</span>
+    Pico가 학교 Wi-Fi에 접속하면
+  </div>
+
+  <div class="net-zone zone-purple">
+    <div class="net-zone-label">학교 LAN — Pico도 한 가족!</div>
+
+    <div class="net-devices" style="margin-bottom: 0.5rem;">
+      <div class="net-device dev-highlight">
+        <div class="dev-icon">📡</div>
+        <div class="dev-name">학교 공유기</div>
+        <div class="dev-detail">SSID: School_WiFi</div>
+        <span class="dev-badge badge-ap">AP</span>
+      </div>
+    </div>
+
+    <div class="net-signal">
+      <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+      <span class="signal-label">2.4GHz Wi-Fi (Pico는 5GHz 불가!)</span>
+      <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="net-devices">
+      <div class="net-device dev-highlight" style="border-color: var(--teacher-rose);">
+        <div class="dev-icon">🔧</div>
+        <div class="dev-name">Pico 2 WH</div>
+        <div class="dev-detail">STA로 접속<br/>IP: 192.168.1.100<br/><strong>웹 서버 운영!</strong></div>
+        <span class="dev-badge badge-sta">STA + 서버</span>
+      </div>
+      <div class="net-device">
+        <div class="dev-icon">💻</div>
+        <div class="dev-name">노트북</div>
+        <div class="dev-detail">192.168.1.20<br/>브라우저 접속</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+      <div class="net-device">
+        <div class="dev-icon">📱</div>
+        <div class="dev-name">스마트폰</div>
+        <div class="dev-detail">192.168.1.30<br/>브라우저 접속</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+      <div class="net-device">
+        <div class="dev-icon">📺</div>
+        <div class="dev-name">전자칠판</div>
+        <div class="dev-detail">192.168.1.10<br/>전체화면 표시</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="compare-summary">브라우저에 192.168.1.100 입력 → Pico의 대시보드가 뜬다!</div>
+</div>
+
+### AP 모드 — Pico가 직접 Wi-Fi를 만듦
+
+<div class="net-topo">
+  <div class="net-topo-title">
+    <span class="title-icon">🐉</span>
+    드래곤볼 레이더 — Pico가 공유기 역할!
+  </div>
+
+  <div class="net-zone zone-rose">
+    <div class="net-zone-label">Pico가 만든 독립 네트워크 (학교 Wi-Fi와 별개!)</div>
+
+    <div class="net-devices" style="margin-bottom: 0.5rem;">
+      <div class="net-device dev-rose">
+        <div class="dev-icon">🔧</div>
+        <div class="dev-name">Pico (AP 모드)</div>
+        <div class="dev-detail">SSID: "DragonRadar"<br/>IP: 192.168.4.1<br/>자기가 공유기!</div>
+        <span class="dev-badge badge-ap">AP</span>
+      </div>
+    </div>
+
+    <div class="net-signal">
+      <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+      <span class="signal-label">Pico가 만든 Wi-Fi (인터넷 없는 독립 네트워크)</span>
+      <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="net-devices">
+      <div class="net-device dev-rose">
+        <div class="dev-icon">📱</div>
+        <div class="dev-name">내 폰</div>
+        <div class="dev-detail">"DragonRadar" 접속<br/>192.168.4.2</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+      <div class="net-device dev-rose">
+        <div class="dev-icon">📱</div>
+        <div class="dev-name">짝꿍 폰</div>
+        <div class="dev-detail">"DragonRadar" 접속<br/>192.168.4.3</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="compare-summary">학교 Wi-Fi 없어도 동작! Pico가 직접 Wi-Fi를 만드니까!</div>
+</div>
+
+<div class="net-check">
+  <div class="check-q">Q. STA 모드와 AP 모드의 가장 큰 차이는?</div>
+  <div class="check-a"><strong>STA</strong>는 남이 만든 Wi-Fi에 접속(카페 손님), <strong>AP</strong>는 자기가 Wi-Fi를 만듦(카페 사장님). STA는 인터넷 가능, AP는 독립 네트워크.</div>
+  <div class="check-q">Q. 드래곤볼 레이더 프로젝트는 왜 AP 모드를 쓸까요?</div>
+  <div class="check-a">운동장이나 복도처럼 학교 Wi-Fi가 안 닿는 곳에서도 동작해야 하니까요! Pico가 직접 Wi-Fi를 만들면 어디서든 사용 가능.</div>
+</div>
+
+---
+
+## 5. 4개 프로젝트, 4가지 데이터 경로
+
+<div class="teacher-script">
+  <p>"같은 네트워크 위에서 동작하지만, 각 프로젝트마다 <strong>데이터의 출발점</strong>이 달라요. 이걸 이해하면 프로젝트의 핵심을 한방에 파악할 수 있습니다!"</p>
+</div>
+
+### 한눈에 보는 4가지 아키텍처
+
+<div class="arch-grid">
+  <div class="arch-card arch-wifi">
+    <div class="arch-emoji">📶</div>
+    <div class="arch-title">Wi-Fi 품질 모니터</div>
+    <div class="arch-sub">Pico 자체가 데이터 원천. 센서 불필요!</div>
+    <div class="arch-path">
+      <span class="arch-node">📶 전파</span>
+      <span class="arch-arr">→</span>
+      <span class="arch-node">📡 Pico 측정</span>
+      <span class="arch-arr">→</span>
+      <span class="arch-node">💻 브라우저</span>
+    </div>
+    <div class="arch-key">💡 Pico가 느끼는 전파 세기 자체가 데이터</div>
+  </div>
+
+  <div class="arch-card arch-api">
+    <div class="arch-emoji">🍱</div>
+    <div class="arch-title">공공데이터 전광판</div>
+    <div class="arch-sub">인터넷 API에서 데이터 수집. 손님이자 사장님!</div>
+    <div class="arch-path">
+      <span class="arch-node">🌐 공공API</span>
+      <span class="arch-arr">→</span>
+      <span class="arch-node">📡 Pico 캐시</span>
+      <span class="arch-arr">→</span>
+      <span class="arch-node">📱 전광판</span>
+    </div>
+    <div class="arch-key">💡 Pico가 인터넷에서 받아 교실에 서빙</div>
+  </div>
+
+  <div class="arch-card arch-sensor">
+    <div class="arch-emoji">🌡️</div>
+    <div class="arch-title">센서 실험실</div>
+    <div class="arch-sub">물리 센서가 데이터 원천. 전선으로 연결!</div>
+    <div class="arch-path">
+      <span class="arch-node">🌡️ 센서</span>
+      <span class="arch-arr">→</span>
+      <span class="arch-node">🔌 Pico 처리</span>
+      <span class="arch-arr">→</span>
+      <span class="arch-node">📊 그래프</span>
+    </div>
+    <div class="arch-key">💡 물리 세계 → 전선 → Wi-Fi → 화면</div>
+  </div>
+
+  <div class="arch-card arch-dragon">
+    <div class="arch-emoji">🐉</div>
+    <div class="arch-title">드래곤볼 레이더</div>
+    <div class="arch-sub">Pico끼리 무선 통신. 인터넷 불필요!</div>
+    <div class="arch-path">
+      <span class="arch-node">🟠 드래곤볼(AP)</span>
+      <span class="arch-arr">→</span>
+      <span class="arch-node">🔍 레이더(STA)</span>
+      <span class="arch-arr">→</span>
+      <span class="arch-node">💡 LED/웹</span>
+    </div>
+    <div class="arch-key">💡 신호 세기로 거리를 추정하는 보물찾기</div>
+  </div>
+</div>
+
+### 프로젝트별 데이터 흐름 상세
+
+<details open>
+<summary><strong>📶 Wi-Fi 품질 모니터</strong> — 가장 간단한 구조</summary>
+
+<div class="data-flow">
+  <div class="flow-phase">
+    <div class="phase-icon">📶</div>
+    <div class="phase-title">Wi-Fi 전파</div>
+    <div class="phase-desc">공유기가 쏘는<br/>전파 (RSSI)</div>
+    <div class="phase-time">항상 존재</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">📡</div>
+    <div class="phase-title">Pico 측정</div>
+    <div class="phase-desc">신호 세기 측정<br/>주변 AP 스캔</div>
+    <div class="phase-time">3초마다</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">📦</div>
+    <div class="phase-title">JSON 변환</div>
+    <div class="phase-desc">RSSI → 퍼센트<br/>품질 등급 판정</div>
+    <div class="phase-time">순간</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">💻</div>
+    <div class="phase-title">브라우저</div>
+    <div class="phase-desc">게이지, 차트<br/>히트맵 표시</div>
+    <div class="phase-time">3초마다</div>
+  </div>
+</div>
+
+</details>
+
+<details>
+<summary><strong>🍱 공공데이터 전광판</strong> — 인터넷 ↔ 교실 중계</summary>
+
+<div class="data-flow">
+  <div class="flow-phase">
+    <div class="phase-icon">🏧</div>
+    <div class="phase-title">공공 API</div>
+    <div class="phase-desc">나이스, 기상청<br/>에어코리아, 버스</div>
+    <div class="phase-time">인터넷</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">📡</div>
+    <div class="phase-title">Pico 수집</div>
+    <div class="phase-desc">HTTP 요청<br/>JSON/XML 파싱</div>
+    <div class="phase-time">10분마다</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">💾</div>
+    <div class="phase-title">캐시 저장</div>
+    <div class="phase-desc">메모리에 보관<br/>API 부담 줄이기</div>
+    <div class="phase-time">순간</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">📱</div>
+    <div class="phase-title">전광판</div>
+    <div class="phase-desc">급식, 날씨<br/>미세먼지, 버스</div>
+    <div class="phase-time">30초마다</div>
+  </div>
+</div>
+
+<Aside type="tip" title="Pico의 이중 역할">
+공공 데이터 프로젝트에서 Pico는 **클라이언트**(인터넷 API에 데이터 요청)이면서 동시에 **서버**(교실 기기에 데이터 제공)입니다. 카페에서 원두를 사오는 손님이면서, 커피를 파는 사장님이기도 한 거죠!
+</Aside>
+
+</details>
+
+<details>
+<summary><strong>🌡️ 센서 실험실</strong> — 물리 세계 → 디지털 세계</summary>
+
+<div class="data-flow">
+  <div class="flow-phase">
+    <div class="phase-icon">🌡️</div>
+    <div class="phase-title">물리 센서</div>
+    <div class="phase-desc">온도, 습도, 빛<br/>소리, CO₂, 기압</div>
+    <div class="phase-time">전선 연결</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">🔌</div>
+    <div class="phase-title">Pico 읽기</div>
+    <div class="phase-desc">I2C / ADC<br/>전기신호 → 숫자</div>
+    <div class="phase-time">10초마다</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">📊</div>
+    <div class="phase-title">기록 저장</div>
+    <div class="phase-desc">시계열 데이터<br/>최대 200개</div>
+    <div class="phase-time">순간</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">💻</div>
+    <div class="phase-title">실시간 그래프</div>
+    <div class="phase-desc">라인 차트<br/>게이지 표시</div>
+    <div class="phase-time">5초마다</div>
+  </div>
+</div>
+
+</details>
+
+<details>
+<summary><strong>🐉 드래곤볼 레이더</strong> — Pico ↔ Pico 무선 통신</summary>
+
+<div class="data-flow">
+  <div class="flow-phase">
+    <div class="phase-icon">🟠</div>
+    <div class="phase-title">드래곤볼</div>
+    <div class="phase-desc">AP 모드<br/>비콘 신호 송출</div>
+    <div class="phase-time">항상</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">📻</div>
+    <div class="phase-title">공기 중</div>
+    <div class="phase-desc">2.4GHz 전파<br/>거리 따라 감쇠</div>
+    <div class="phase-time">빛의 속도</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">🔍</div>
+    <div class="phase-title">레이더 스캔</div>
+    <div class="phase-desc">STA 모드로<br/>RSSI 측정</div>
+    <div class="phase-time">2초마다</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">💡</div>
+    <div class="phase-title">출력</div>
+    <div class="phase-desc">LED 깜빡임<br/>웹 대시보드</div>
+    <div class="phase-time">즉시</div>
+  </div>
+</div>
+
+<Aside type="tip" title="학교 Wi-Fi 불필요!">
+드래곤볼 레이더는 **Pico끼리만 통신**하는 독립 네트워크입니다. 운동장, 복도, 체육관 어디서든 동작해요!
+</Aside>
+
+</details>
+
+### 4개 프로젝트 비교표
+
+| 항목 | Wi-Fi 모니터 | 공공데이터 | 센서 실험실 | 드래곤볼 |
+|------|:---:|:---:|:---:|:---:|
+| **데이터 원천** | Pico 자체 | 인터넷 API | 물리 센서 | 다른 Pico |
+| **Wi-Fi 모드** | STA | STA | STA | AP + STA |
+| **인터넷 필요** | ❌ | ✅ | ❌ | ❌ |
+| **센서 필요** | ❌ | ❌ | ✅ | ❌ |
+| **난이도** | ⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
+
+---
+
+## 6. 전체 네트워크 지도
+
+<div class="teacher-script">
+  <p>"자, 마지막으로 4개 프로젝트를 <strong>하나의 지도</strong>에 올려봅시다. 큰 그림이 보일 거예요!"</p>
+</div>
+
+<div class="net-topo">
+  <div class="net-topo-title">
+    <span class="title-icon">🗺️</span>
+    바이브 코딩 프로젝트 — 전체 네트워크 지도
+  </div>
+
+  {/* 인터넷 영역 */}
+  <div class="net-zone zone-blue">
+    <div class="net-zone-label">☁️ 인터넷 (공공데이터 프로젝트만 사용)</div>
+    <div class="net-devices">
+      <div class="net-device dev-blue">
+        <div class="dev-icon">🍱</div>
+        <div class="dev-name">나이스</div>
+        <div class="dev-detail">급식 정보</div>
+      </div>
+      <div class="net-device dev-blue">
+        <div class="dev-icon">🌤️</div>
+        <div class="dev-name">기상청</div>
+        <div class="dev-detail">날씨/강수</div>
+      </div>
+      <div class="net-device dev-blue">
+        <div class="dev-icon">😷</div>
+        <div class="dev-name">에어코리아</div>
+        <div class="dev-detail">미세먼지</div>
+      </div>
+      <div class="net-device dev-blue">
+        <div class="dev-icon">🚌</div>
+        <div class="dev-name">버스 API</div>
+        <div class="dev-detail">도착 정보</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="net-signal">
+    <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    <span class="signal-label">인터넷 (공공데이터 전광판만 사용)</span>
+    <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+  </div>
+
+  {/* 학교 LAN */}
+  <div class="net-zone zone-purple">
+    <div class="net-zone-label">🏫 학교 LAN — Wi-Fi 모니터 / 공공데이터 / 센서 실험실</div>
+
+    <div class="net-devices" style="margin-bottom: 0.5rem;">
+      <div class="net-device dev-highlight">
+        <div class="dev-icon">📡</div>
+        <div class="dev-name">학교 공유기</div>
+        <div class="dev-detail">School_WiFi</div>
+        <span class="dev-badge badge-ap">AP</span>
+      </div>
+    </div>
+
+    <div class="net-signal">
+      <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+      <span class="signal-label">2.4GHz Wi-Fi</span>
+      <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="net-devices">
+      <div class="net-device dev-highlight" style="border-color: var(--teacher-rose);">
+        <div class="dev-icon">🔧</div>
+        <div class="dev-name">Pico (STA)</div>
+        <div class="dev-detail">웹 서버 운영<br/>192.168.1.100</div>
+        <span class="dev-badge badge-sta">STA + 서버</span>
+      </div>
+      <div class="net-device">
+        <div class="dev-icon">🌡️</div>
+        <div class="dev-name">물리 센서</div>
+        <div class="dev-detail">전선으로 Pico에<br/>직접 연결</div>
+      </div>
+      <div class="net-device dev-emerald">
+        <div class="dev-icon">💻</div>
+        <div class="dev-name">노트북</div>
+        <div class="dev-detail">브라우저 접속</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+      <div class="net-device dev-emerald">
+        <div class="dev-icon">📱</div>
+        <div class="dev-name">스마트폰</div>
+        <div class="dev-detail">브라우저 접속</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+      <div class="net-device dev-emerald">
+        <div class="dev-icon">📺</div>
+        <div class="dev-name">전자칠판</div>
+        <div class="dev-detail">전체화면 표시</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+    </div>
+  </div>
+
+  {/* 드래곤볼 독립 네트워크 */}
+  <div class="net-zone zone-rose" style="margin-top: 1rem;">
+    <div class="net-zone-label">🐉 독립 네트워크 — 드래곤볼 레이더 (학교 Wi-Fi 불필요!)</div>
+
+    <div class="net-devices">
+      <div class="net-device dev-rose">
+        <div class="dev-icon">🟠</div>
+        <div class="dev-name">DB1~DB7</div>
+        <div class="dev-detail">AP 모드<br/>비콘 송출</div>
+        <span class="dev-badge badge-ap">AP</span>
+      </div>
+
+      <div class="net-device dev-highlight" style="border-color: var(--teacher-rose);">
+        <div class="dev-icon">🔍</div>
+        <div class="dev-name">레이더 Pico</div>
+        <div class="dev-detail">STA 스캔 + AP 서빙<br/>192.168.4.1</div>
+        <span class="dev-badge badge-dual">STA + AP</span>
+      </div>
+
+      <div class="net-device dev-rose">
+        <div class="dev-icon">📱</div>
+        <div class="dev-name">스마트폰</div>
+        <div class="dev-detail">"DragonRadar"<br/>Wi-Fi 접속</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+---
+
+## 핵심 용어 정리
+
+<div class="key-terms">
+  <dl>
+    <dt>LAN</dt>
+    <dd>Local Area Network. <strong>같은 공유기에 연결된 기기들의 모임</strong>. 아파트 비유의 "같은 단지".</dd>
+    <dt>AP (Access Point)</dt>
+    <dd>Wi-Fi 신호를 쏘는 쪽. 공유기, 또는 AP 모드의 Pico. <strong>"카페 사장님"</strong> 역할.</dd>
+    <dt>STA (Station)</dt>
+    <dd>Wi-Fi 신호를 받는 쪽. 노트북, 스마트폰, STA 모드의 Pico. <strong>"카페 손님"</strong> 역할.</dd>
+    <dt>IP 주소</dt>
+    <dd>네트워크 안에서 각 기기의 고유 주소. 아파트의 호수. <strong>192.168.1.xxx</strong> 형태.</dd>
+    <dt>SSID</dt>
+    <dd>Wi-Fi 이름. "School_WiFi", "DragonRadar" 등. 스마트폰에서 보이는 Wi-Fi 목록.</dd>
+    <dt>웹 서버</dt>
+    <dd>누군가 IP로 접속하면 웹 페이지(HTML)를 보내주는 프로그램. Pico가 이 역할을 합니다!</dd>
+    <dt>JSON</dt>
+    <dd>기계가 읽기 쉬운 데이터 형식. <code>{`{"temp":26.5}`}</code> 같은 모양. 실시간 업데이트에 사용.</dd>
+    <dt>fetch()</dt>
+    <dd>브라우저가 서버에 "데이터 주세요!"하고 요청하는 JavaScript 함수. 실시간의 핵심 도구.</dd>
+  </dl>
+</div>
+
+---
+
+## 다음 단계
+
+<div class="net-check">
+  <div class="check-q">Q. 이 페이지에서 가장 중요한 개념 3가지는?</div>
+  <div class="check-a"><strong>① 같은 LAN = 서로 직접 통신 가능</strong> ② 데이터는 센서→Pico→Wi-Fi→브라우저 순서로 여행 ③ 실시간은 JSON 데이터를 반복 요청하는 것</div>
+</div>
+
+<Aside type="note" title="프로젝트를 시작하세요!">
+네트워크 기초를 이해했으면, 원하는 프로젝트를 골라 시작하세요!
+
+- **처음이라면** → [Wi-Fi 모니터 1차시](/ai-physical-computing-teacher/projects/wifi-monitor/w01/) (센서 없이 시작)
+- **공공 데이터** → [공공데이터 전광판 1차시](/ai-physical-computing-teacher/projects/public-data/p01/)
+- **센서를 만지고 싶다면** → [센서 실험실 1차시](/ai-physical-computing-teacher/projects/sensor-lab/s01/)
+- **보물찾기!** → [드래곤볼 레이더 1차시](/ai-physical-computing-teacher/projects/dragonball-radar/d01/)
+</Aside>
