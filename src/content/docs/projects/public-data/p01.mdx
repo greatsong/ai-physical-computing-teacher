@@ -193,6 +193,129 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
   <p>"API 키는 자판기 사용 카드 같은 거예요. 이게 있어야 데이터를 줘요. 선생님이 미리 발급받았으니까 여러분은 코드에 넣기만 하면 돼요."</p>
 </div>
 
+### 전체 네트워크 구성 — Pico는 손님이면서 동시에 가게 주인!
+
+<div class="teacher-script">
+  <p>"이 프로젝트에서 Pico는 재밌는 역할을 해요. 인터넷에서 데이터를 가져오는 <strong>손님(클라이언트)</strong>이면서, 동시에 여러분 스마트폰에 화면을 보여주는 <strong>가게 주인(서버)</strong>이에요!"</p>
+</div>
+
+<div class="net-topo">
+  <div class="net-topo-title">
+    <span class="title-icon">🗺️</span>
+    공공 데이터 전광판 — 네트워크 구성도
+  </div>
+
+  {/* 인터넷 API 영역 */}
+  <div class="net-zone zone-blue">
+    <div class="net-zone-label">인터넷 — 공공 데이터 API 서버들</div>
+    <div class="net-devices">
+      <div class="net-device dev-blue">
+        <div class="dev-icon">🍱</div>
+        <div class="dev-name">나이스</div>
+        <div class="dev-detail">급식 정보<br/>HTTPS</div>
+      </div>
+      <div class="net-device dev-blue">
+        <div class="dev-icon">🌤️</div>
+        <div class="dev-name">기상청</div>
+        <div class="dev-detail">날씨/강수<br/>HTTPS</div>
+      </div>
+      <div class="net-device dev-blue">
+        <div class="dev-icon">😷</div>
+        <div class="dev-name">에어코리아</div>
+        <div class="dev-detail">미세먼지<br/>HTTP</div>
+      </div>
+      <div class="net-device dev-blue">
+        <div class="dev-icon">🚌</div>
+        <div class="dev-name">서울버스</div>
+        <div class="dev-detail">버스 도착<br/>HTTP (XML)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="net-signal">
+    <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    <span class="signal-label">학교 공유기 → 인터넷 → API 서버</span>
+    <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+  </div>
+
+  {/* 학교 LAN */}
+  <div class="net-zone zone-purple">
+    <div class="net-zone-label">학교 LAN — 같은 공유기에 연결</div>
+
+    <div class="net-devices" style="margin-bottom: 0.5rem;">
+      <div class="net-device dev-highlight">
+        <div class="dev-icon">🌐</div>
+        <div class="dev-name">학교 공유기</div>
+        <div class="dev-detail">인터넷 연결<br/>Wi-Fi AP</div>
+      </div>
+    </div>
+
+    <div class="net-signal">
+      <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+      <span class="signal-label">2.4GHz Wi-Fi</span>
+      <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="net-devices">
+      <div class="net-device dev-highlight" style="border-color: var(--teacher-rose);">
+        <div class="dev-icon">📡</div>
+        <div class="dev-name">Pico 2 WH</div>
+        <div class="dev-detail">클라이언트 + 서버<br/>API에서 데이터 수집<br/>브라우저에 화면 제공</div>
+        <span class="dev-badge badge-dual">클라이언트 + 서버</span>
+      </div>
+      <div class="net-device dev-emerald">
+        <div class="dev-icon">📱</div>
+        <div class="dev-name">스마트폰</div>
+        <div class="dev-detail">전광판 화면<br/>브라우저 접속</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+      <div class="net-device dev-emerald">
+        <div class="dev-icon">📺</div>
+        <div class="dev-name">전자칠판</div>
+        <div class="dev-detail">전광판 전체화면<br/>교실 게시용</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="data-flow">
+  <div class="flow-phase">
+    <div class="phase-icon">🏧</div>
+    <div class="phase-title">API 호출</div>
+    <div class="phase-desc">Pico가 인터넷에<br/>데이터 요청</div>
+    <div class="phase-time">10분/30초마다</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">📥</div>
+    <div class="phase-title">JSON 수신</div>
+    <div class="phase-desc">급식, 날씨, 먼지<br/>버스 데이터 도착</div>
+    <div class="phase-time">0.5-2초</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">💾</div>
+    <div class="phase-title">Pico 캐시</div>
+    <div class="phase-desc">메모리에 저장<br/>API 부담 줄이기</div>
+    <div class="phase-time">순간</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">🌐</div>
+    <div class="phase-title">웹 서버</div>
+    <div class="phase-desc">GET / → HTML<br/>GET /data → JSON</div>
+    <div class="phase-time">요청 시</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">📱</div>
+    <div class="phase-title">전광판 표시</div>
+    <div class="phase-desc">브라우저가<br/>실시간 갱신</div>
+    <div class="phase-time">30초마다</div>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>핵심:</strong> Pico는 인터넷의 API에서 데이터를 가져오고(클라이언트 역할), 동시에 같은 Wi-Fi의 스마트폰에 전광판을 보여줍니다(서버 역할). 한 마디로 <strong>중계소</strong>예요!</p>
+</div>
+
 ---
 
 ## 기본 코드 실행 (07-20분)

@@ -1,14 +1,14 @@
 ---
-title: "3차시: 버스 언제 와? — 서울시 버스 도착정보"
-description: "서울시 버스 도착 API를 추가하고 4종 API를 완전 통합한 전광판 완성"
+title: "3차시: 버스 도착정보"
+description: "서울시 버스 도착 API + 4종 API 완전 통합 전광판"
 ---
 
 import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 
 {/* 프로젝트 진행 바 */}
 <div class="project-progress">
-  <div class="prog-item prog-1">1. 급식 전광판</div>
-  <div class="prog-item prog-2">2. 날씨+미세먼지</div>
+  <div class="prog-item prog-1 done">1. 급식 전광판</div>
+  <div class="prog-item prog-2 done">2. 날씨+미세먼지</div>
   <div class="prog-item prog-3 current">3. 버스 도착</div>
   <div class="prog-item prog-4">4. 디자인 완성</div>
   <div class="prog-item prog-5">5. 나만의 API</div>
@@ -19,27 +19,27 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 <div class="outcome-preview">
   <div class="outcome-badge">이 차시가 끝나면</div>
   <h4>4종 API 완전 통합 전광판이 완성됩니다</h4>
-  <p>관악11번 버스 실시간 도착정보를 추가하고, <strong>급식 + 날씨 + 미세먼지 + 버스</strong> 4종 API를 하나의 전광판에 통합합니다. 데이터별 갱신 주기를 다르게 설정하는 <strong>실시간 데이터 vs 예보 데이터</strong>의 차이를 배웁니다.</p>
+  <p>서울시 버스 도착 API로 <strong>관악11번 버스</strong> 실시간 도착정보를 추가합니다. 급식 + 날씨 + 미세먼지 + 버스까지 <strong>4종 API 완전 통합</strong> 전광판이 완성됩니다. 데이터별 갱신 주기를 다르게 설정하는 <strong>실시간 vs 예보</strong> 데이터의 차이를 배웁니다.</p>
   <div class="outcome-items">
     <div class="outcome-item">
       <div class="item-icon">🚌</div>
       <div class="item-label">버스 도착</div>
-      관악11번 실시간 도착 시간
+      관악11 실시간 도착정보
     </div>
     <div class="outcome-item">
-      <div class="item-icon">📺</div>
-      <div class="item-label">4종 통합</div>
-      급식+날씨+미세먼지+버스
+      <div class="item-icon">🔗</div>
+      <div class="item-label">4종 API 통합</div>
+      급식 + 날씨 + 미세먼지 + 버스
     </div>
     <div class="outcome-item">
-      <div class="item-icon">⚡</div>
-      <div class="item-label">30초 갱신</div>
-      버스 데이터 자동 업데이트
+      <div class="item-icon">📄</div>
+      <div class="item-label">XML 파싱</div>
+      JSON이 아닌 XML 응답 처리
     </div>
     <div class="outcome-item">
-      <div class="item-icon">🎯</div>
-      <div class="item-label">정보 우선순위</div>
-      급한 정보를 위에 배치
+      <div class="item-icon">🤖</div>
+      <div class="item-label">바이브 코딩</div>
+      카운트다운, 자동갱신, 레이아웃
     </div>
   </div>
 </div>
@@ -61,11 +61,11 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
     </div>
     <div class="meta-item">
       <div class="meta-label">선수학습</div>
-      2차시 — 다중 API 통합, 캐싱 전략
+      2차시 날씨+미세먼지 전광판 완료 (다중 API 통합, HTTP/HTTPS, 캐싱 경험)
     </div>
     <div class="meta-item">
       <div class="meta-label">학습목표</div>
-      실시간 버스 API를 추가하고, 4종 API를 하나의 전광판에 통합하기
+      버스 도착 API를 추가하여 4종 API 완전 통합 전광판을 완성하고, XML 파싱과 갱신 주기 전략 이해하기
     </div>
     <div class="meta-item">
       <div class="meta-label">핵심 역량</div>
@@ -86,14 +86,15 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
   <ul>
     <li>Thonny IDE 설치 완료</li>
     <li>MicroPython 펌웨어 설치 완료</li>
-    <li>AI 접근 환경 — Claude, ChatGPT 등</li>
+    <li>AI 접근 환경 — Claude, ChatGPT 등 (학생 PC 또는 스마트폰)</li>
   </ul>
   <h5>수업 전 확인 (교사)</h5>
   <ul>
-    <li>**서울시 버스 API 키** 발급 완료 (공유자원포털 또는 data.go.kr)</li>
-    <li>당곡중.고등학교 정류장 arsId(20522) 확인</li>
+    <li>**서울시 버스도착정보 API 키** 발급 완료 (https://www.data.go.kr)</li>
+    <li>정류장 ID 확인: `arsId=20522` (당곡중.고등학교)</li>
+    <li>관악11번 버스가 정류장에 실제로 다니는지 확인</li>
     <li>**버스 운행 시간 내에 수업**하는지 확인 (보통 06:00~23:00)</li>
-    <li>5개 API 순차 호출 시 총 로딩 시간 테스트 (30초 내외 예상)</li>
+    <li>코드에 API 키 넣어서 사전 테스트 완료</li>
   </ul>
 </div>
 
@@ -112,54 +113,56 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 
 <div class="step-header">
   <span class="step-num">1</span>
-  <span class="step-title">오늘의 목표 — 전광판 완성!</span>
+  <span class="step-title">2차시 복습 + 마지막 퍼즐</span>
   <span class="step-time">00-05분</span>
 </div>
 
 <div class="teacher-script">
-  <p>"2차시까지 급식, 날씨, 미세먼지를 만들었죠? 오늘은 마지막 퍼즐 — **버스 도착정보**를 추가해요."</p>
-  <p>"하교할 때 '관악11번 언제 와?' 이걸 전광판이 알려주는 거예요. 그리고 오늘 코드가 4종 API를 전부 합친 **완성판**이에요."</p>
+  <p>"지금까지 전광판에 뭐가 들어갔죠?"</p>
+</div>
+
+<div class="student-response">
+  "급식이요!" / "날씨, 미세먼지요!"
+</div>
+
+<div class="teacher-script">
+  <p>"맞아요. 급식, 날씨, 강수확률, 미세먼지. 그런데 아직 하나가 빠졌어요."</p>
+  <p>"오늘은 <strong>마지막 퍼즐 — 버스 도착정보</strong>를 추가합니다."</p>
+  <p>"관악11번 버스가 몇 분 후에 오는지, 실시간으로 전광판에 보여줄 거예요. 이게 추가되면 4종 API 완전 통합 전광판이 완성됩니다."</p>
 </div>
 
 <div class="flow-diagram">
   <div class="flow-step">
-    <div class="flow-num">🚌</div>
-    <div class="flow-icon"></div>
-    <div class="flow-label">관악11 버스</div>
-    <div class="flow-desc">30초 자동갱신 — NEW!</div>
-  </div>
-  <div class="flow-arrow">↓</div>
-  <div class="flow-step">
-    <div class="flow-num">🌡️</div>
-    <div class="flow-icon"></div>
-    <div class="flow-label">지금 날씨</div>
-    <div class="flow-desc">기온 / 습도</div>
-  </div>
-  <div class="flow-arrow">↓</div>
-  <div class="flow-step">
-    <div class="flow-num">🌂</div>
-    <div class="flow-icon"></div>
-    <div class="flow-label">강수확률</div>
-    <div class="flow-desc">하교 / 내일</div>
-  </div>
-  <div class="flow-arrow">↓</div>
-  <div class="flow-step">
-    <div class="flow-num">😷</div>
-    <div class="flow-icon"></div>
-    <div class="flow-label">미세먼지</div>
-    <div class="flow-desc">PM2.5 등급</div>
-  </div>
-  <div class="flow-arrow">↓</div>
-  <div class="flow-step">
-    <div class="flow-num">🍽️</div>
-    <div class="flow-icon"></div>
+    <div class="flow-num">1</div>
+    <div class="flow-icon">🍚</div>
     <div class="flow-label">급식</div>
-    <div class="flow-desc">오늘 메뉴</div>
+    <div class="flow-desc">1차시 완료</div>
+  </div>
+  <div class="flow-arrow">+</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">🌤️</div>
+    <div class="flow-label">날씨</div>
+    <div class="flow-desc">2차시 완료</div>
+  </div>
+  <div class="flow-arrow">+</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">😷</div>
+    <div class="flow-label">미세먼지</div>
+    <div class="flow-desc">2차시 완료</div>
+  </div>
+  <div class="flow-arrow">+</div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-icon">🚌</div>
+    <div class="flow-label">버스 도착</div>
+    <div class="flow-desc">오늘!</div>
   </div>
 </div>
 
 <div class="teacher-script">
-  <p>"버스가 맨 위에 있는 이유가 뭘까요? 하교할 때 가장 급한 정보니까요! 정보의 우선순위를 생각해서 배치한 거예요."</p>
+  <p>"오늘 새로운 점이 하나 있어요. 지금까지 API 응답은 전부 <strong>JSON</strong>이었는데, 버스 API는 <strong>XML</strong>로 응답해요. 형식만 다를 뿐 원리는 같습니다."</p>
 </div>
 
 ---
@@ -168,21 +171,19 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 
 <div class="step-header">
   <span class="step-num">2</span>
-  <span class="step-title">코드 교체 → 실행</span>
-  <span class="step-time">05-10분</span>
+  <span class="step-title">api_config.py 업데이트</span>
+  <span class="step-time">05-08분</span>
 </div>
 
 <div class="teacher-script">
-  <p>"<code>api_config.py</code>에 버스 관련 설정을 추가하고, <code>main.py</code>를 교체하세요."</p>
-  <p>"이번에는 API 5개를 호출하니까 로딩이 좀 걸려요. Shell에서 각 API 결과를 하나씩 확인할 수 있어요."</p>
+  <p>"api_config.py에 버스 API 키와 정류장 ID를 추가하세요. 칠판에 적어놓을게요."</p>
+  <p>"<code>arsId=20522</code>는 당곡중.고등학교 정류장 번호예요."</p>
 </div>
 
-### api_config.py (최종 업데이트)
-
-<div class="code-file-label">api_config.py — Pico에 저장 (최종)</div>
+<div class="code-file-label">api_config.py — 업데이트 (버스 정보 추가)</div>
 
 ```python
-# api_config.py (3차시 — 버스 API 추가)
+# api_config.py (3차시 — 버스 도착정보 추가)
 NEIS_KEY = "나이스_API_키"
 WEATHER_KEY = "기상청_API_키"
 AIR_KEY = "에어코리아_API_키"
@@ -192,21 +193,36 @@ SCHOOL_CODE = "7011536"
 ATPT_CODE = "B10"
 SCHOOL_NAME = "당곡고등학교"
 
+# 기상청 격자 좌표
 WEATHER_NX = 59
 WEATHER_NY = 125
+
+# 미세먼지 측정소
 AIR_STATION = "관악구"
 
 # 버스 정류장 정보
-BUS_STATION_ID = "20522"          # 당곡중.고등학교 (봉천역 방면)
+BUS_STATION_ID = "20522"       # 당곡중.고등학교 정류장
 BUS_STATION_NAME = "당곡중.고등학교"
-BUS_ROUTE_NAME = "관악11"
+BUS_ROUTE_NAME = "관악11"      # 추적할 버스 노선
 ```
 
-### main.py (3차시 기본 코드)
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">3차시 main.py 교체 → 실행</span>
+  <span class="step-time">08-17분</span>
+</div>
 
-<Aside type="tip" title="2차시 코드에 버스 API를 추가한 전체 통합 버전">
-코드가 길어졌으므로 복사 버튼을 활용하세요. 2차시와의 차이점은 주로 버스 관련 함수와 HTML 부분입니다.
+<div class="teacher-script">
+  <p>"main.py를 교체합니다. 2차시 기능은 전부 그대로 있고, 버스 도착정보가 추가된 버전이에요."</p>
+  <p>"이번에 새로운 건 <strong>XML 파싱</strong>이에요. JSON처럼 라이브러리로 파싱하는 게 아니라, 문자열을 직접 잘라서 데이터를 꺼내요."</p>
+</div>
+
+<Aside type="tip" title="복사 & 붙여넣기">
+코드 블록 오른쪽 위의 복사 버튼을 클릭하면 전체 코드가 복사됩니다. Thonny에 붙여넣고 Pico에 저장하세요.
 </Aside>
+
+<details>
+<summary><strong>main.py 전체 코드 보기 (클릭하여 펼치기)</strong></summary>
 
 <div class="code-file-label">main.py — Pico에 저장 (3차시)</div>
 
@@ -242,7 +258,7 @@ while not wlan.isconnected():
     if wait > 15:
         raise SystemExit("연결 실패")
 my_ip = wlan.ifconfig()[0]
-print(f"연결 완료! IP: {my_ip}")
+print(f"연결 완료! IP: &#123;my_ip&#125;")
 
 # ── NTP ─────────────────────────────────────
 try:
@@ -256,11 +272,11 @@ def kst():
 
 def today_str():
     t = kst()
-    return f"{t[0]}{t[1]:02d}{t[2]:02d}"
+    return f"&#123;t[0]&#125;&#123;t[1]:02d&#125;&#123;t[2]:02d&#125;"
 
 def tomorrow_str():
     t = time.localtime(time.time() + 9 * 3600 + 86400)
-    return f"{t[0]}{t[1]:02d}{t[2]:02d}"
+    return f"&#123;t[0]&#125;&#123;t[1]:02d&#125;&#123;t[2]:02d&#125;"
 
 # ── HTTP/HTTPS 요청 ─────────────────────────
 def fetch_https(url):
@@ -275,7 +291,7 @@ def fetch_https(url):
     ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
     ctx.verify_mode = ssl.CERT_NONE
     ss = ctx.wrap_socket(s, server_hostname=host)
-    ss.write(f"GET {path} HTTP/1.0\r\nHost: {host}\r\nConnection: close\r\n\r\n".encode())
+    ss.write(f"GET &#123;path&#125; HTTP/1.0\r\nHost: &#123;host&#125;\r\nConnection: close\r\n\r\n".encode())
     data = b""
     while True:
         try:
@@ -299,7 +315,7 @@ def fetch_http(url):
     s = _s.socket()
     s.settimeout(10)
     s.connect(addr)
-    s.send(f"GET {path} HTTP/1.0\r\nHost: {host}\r\nConnection: close\r\n\r\n".encode())
+    s.send(f"GET &#123;path&#125; HTTP/1.0\r\nHost: &#123;host&#125;\r\nConnection: close\r\n\r\n".encode())
     data = b""
     while True:
         try:
@@ -311,46 +327,46 @@ def fetch_http(url):
     text = data.decode('utf-8', 'ignore')
     return text.split("\r\n\r\n", 1)[1] if "\r\n\r\n" in text else text
 
-# ── 급식 (간소화) ───────────────────────────
+# ── 급식 ────────────────────────────────────
 def get_meal():
     url = (f"https://open.neis.go.kr/hub/mealServiceDietInfo"
-           f"?KEY={NEIS_KEY}&Type=json&pIndex=1&pSize=5"
-           f"&ATPT_OFCDC_SC_CODE={ATPT_CODE}"
-           f"&SD_SCHUL_CODE={SCHOOL_CODE}&MLSV_YMD={today_str()}")
+           f"?KEY=&#123;NEIS_KEY&#125;&Type=json&pIndex=1&pSize=5"
+           f"&ATPT_OFCDC_SC_CODE=&#123;ATPT_CODE&#125;"
+           f"&SD_SCHUL_CODE=&#123;SCHOOL_CODE&#125;&MLSV_YMD=&#123;today_str()&#125;")
     try:
         gc.collect()
         data = json.loads(fetch_https(url))
-        meals = data.get("mealServiceDietInfo", [{}])
+        meals = data.get("mealServiceDietInfo", [&#123;&#125;])
         if len(meals) < 2: return []
         for row in meals[1].get("row", []):
             if row.get("MMEAL_SC_CODE") == "2":
                 return [x.strip() for x in row.get("DDISH_NM", "").split("<br/>") if x.strip()]
         return []
     except Exception as e:
-        print(f"급식 에러: {e}"); return []
+        print(f"급식 에러: &#123;e&#125;"); return []
 
 # ── 날씨 ────────────────────────────────────
 def get_base_time_ultra():
     t = kst()
     h = t[3] - (1 if t[4] < 40 else 0)
     if h < 0: h = 23
-    return f"{h:02d}00"
+    return f"&#123;h:02d&#125;00"
 
 def get_base_time_fcst():
     h = kst()[3]
-    for b in [23,20,17,14,11,8,5,2]:
-        if h >= b + 1: return f"{b:02d}00"
+    for b in [23, 20, 17, 14, 11, 8, 5, 2]:
+        if h >= b + 1: return f"&#123;b:02d&#125;00"
     return "2300"
 
 def get_weather():
     url = (f"https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst"
-           f"?serviceKey={WEATHER_KEY}&dataType=JSON&numOfRows=10"
-           f"&base_date={today_str()}&base_time={get_base_time_ultra()}"
-           f"&nx={WEATHER_NX}&ny={WEATHER_NY}")
+           f"?serviceKey=&#123;WEATHER_KEY&#125;&dataType=JSON&numOfRows=10"
+           f"&base_date=&#123;today_str()&#125;&base_time=&#123;get_base_time_ultra()&#125;"
+           f"&nx=&#123;WEATHER_NX&#125;&ny=&#123;WEATHER_NY&#125;")
     try:
         gc.collect()
         items = json.loads(fetch_https(url))["response"]["body"]["items"]["item"]
-        r = {}
+        r = &#123;&#125;
         for i in items:
             c, v = i["category"], i["obsrValue"]
             if c == "T1H": r["temp"] = v
@@ -358,17 +374,17 @@ def get_weather():
             elif c == "PTY": r["pty"] = v
         return r
     except Exception as e:
-        print(f"날씨 에러: {e}"); return {}
+        print(f"날씨 에러: &#123;e&#125;"); return &#123;&#125;
 
 def get_rain():
     url = (f"https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst"
-           f"?serviceKey={WEATHER_KEY}&dataType=JSON&numOfRows=300"
-           f"&base_date={today_str()}&base_time={get_base_time_fcst()}"
-           f"&nx={WEATHER_NX}&ny={WEATHER_NY}")
+           f"?serviceKey=&#123;WEATHER_KEY&#125;&dataType=JSON&numOfRows=300"
+           f"&base_date=&#123;today_str()&#125;&base_time=&#123;get_base_time_fcst()&#125;"
+           f"&nx=&#123;WEATHER_NX&#125;&ny=&#123;WEATHER_NY&#125;")
     try:
         gc.collect()
         items = json.loads(fetch_https(url))["response"]["body"]["items"]["item"]
-        r = {"t16": "--", "t08": "--", "t16t": "--"}
+        r = &#123;"t16": "--", "t08": "--", "t16t": "--"&#125;
         tmr = tomorrow_str()
         for i in items:
             if i["category"] != "POP": continue
@@ -378,45 +394,44 @@ def get_rain():
             elif fd == tmr and ft == "1600": r["t16t"] = i["fcstValue"]
         return r
     except Exception as e:
-        print(f"예보 에러: {e}"); return {"t16":"--","t08":"--","t16t":"--"}
+        print(f"예보 에러: &#123;e&#125;"); return &#123;"t16": "--", "t08": "--", "t16t": "--"&#125;
 
 # ── 미세먼지 ────────────────────────────────
 def get_air():
     url = (f"http://apis.data.go.kr/B552584/ArpltnInforInqireSvc"
            f"/getMsrstnAcctoRltmMesureDnsty"
-           f"?serviceKey={AIR_KEY}&returnType=json&numOfRows=1"
-           f"&stationName={AIR_STATION}&dataTerm=DAILY&ver=1.0")
+           f"?serviceKey=&#123;AIR_KEY&#125;&returnType=json&numOfRows=1"
+           f"&stationName=&#123;AIR_STATION&#125;&dataTerm=DAILY&ver=1.0")
     try:
         gc.collect()
         item = json.loads(fetch_http(url))["response"]["body"]["items"][0]
         pm25 = item.get("pm25Value", "--")
         try:
             v = int(pm25)
-            if v <= 15: return {"pm25": pm25, "g": "좋음", "gc": "#51cf66", "ge": "😊"}
-            elif v <= 35: return {"pm25": pm25, "g": "보통", "gc": "#94d82d", "ge": "🙂"}
-            elif v <= 75: return {"pm25": pm25, "g": "나쁨", "gc": "#ff922b", "ge": "😷"}
-            else: return {"pm25": pm25, "g": "매우나쁨", "gc": "#ff6b6b", "ge": "🤢"}
+            if v <= 15: return &#123;"pm25": pm25, "g": "좋음", "gc": "#51cf66", "ge": "😊"&#125;
+            elif v <= 35: return &#123;"pm25": pm25, "g": "보통", "gc": "#94d82d", "ge": "🙂"&#125;
+            elif v <= 75: return &#123;"pm25": pm25, "g": "나쁨", "gc": "#ff922b", "ge": "😷"&#125;
+            else: return &#123;"pm25": pm25, "g": "매우나쁨", "gc": "#ff6b6b", "ge": "🤢"&#125;
         except:
-            return {"pm25": pm25, "g": "--", "gc": "#888", "ge": "❓"}
+            return &#123;"pm25": pm25, "g": "--", "gc": "#888", "ge": "❓"&#125;
     except Exception as e:
-        print(f"대기질 에러: {e}"); return {"pm25":"--","g":"--","gc":"#888","ge":"❓"}
+        print(f"대기질 에러: &#123;e&#125;"); return &#123;"pm25": "--", "g": "--", "gc": "#888", "ge": "❓"&#125;
 
-# ── 버스 도착정보 (NEW!) ────────────────────
+# ── 버스 도착정보 (XML 파싱) ─────────────────
 def get_bus():
-    """관악11번 버스 도착 정보"""
+    """관악11번 버스 도착 정보 (XML 응답)"""
     url = (f"http://ws.bus.go.kr/api/rest/stationinfo/getStationByUid"
-           f"?ServiceKey={BUS_KEY}&arsId={BUS_STATION_ID}")
+           f"?ServiceKey=&#123;BUS_KEY&#125;&arsId=&#123;BUS_STATION_ID&#125;")
     try:
         gc.collect()
         xml = fetch_http(url)
 
-        # 간단한 XML 파싱 (관악11 노선만 추출)
-        buses = []
-
+        # 간단한 XML 파싱: itemList 블록 분리 → 관악11 필터링
         parts = xml.split("<itemList>")
         for part in parts[1:]:
             block = part.split("</itemList>")[0]
 
+            # 노선명 추출
             rt = ""
             if "<rtNm>" in block:
                 rt = block.split("<rtNm>")[1].split("</rtNm>")[0]
@@ -424,12 +439,14 @@ def get_bus():
             if BUS_ROUTE_NAME not in rt:
                 continue
 
+            # 도착 메시지 추출
             msg1 = msg2 = ""
             if "<arrmsg1>" in block:
                 msg1 = block.split("<arrmsg1>")[1].split("</arrmsg1>")[0]
             if "<arrmsg2>" in block:
                 msg2 = block.split("<arrmsg2>")[1].split("</arrmsg2>")[0]
 
+            # 도착 예정 시간(초) 추출
             t1 = t2 = 0
             if "<traTime1>" in block:
                 try: t1 = int(block.split("<traTime1>")[1].split("</traTime1>")[0])
@@ -438,52 +455,49 @@ def get_bus():
                 try: t2 = int(block.split("<traTime2>")[1].split("</traTime2>")[0])
                 except: pass
 
-            buses.append({
-                "route": rt,
-                "msg1": msg1,
-                "msg2": msg2,
-                "sec1": t1,
-                "sec2": t2,
-            })
+            return &#123;
+                "route": rt, "msg1": msg1, "msg2": msg2,
+                "sec1": t1, "sec2": t2,
+            &#125;
 
-        if buses:
-            return buses[0]
-        return {"route": BUS_ROUTE_NAME, "msg1": "도착 정보 없음", "msg2": "", "sec1": 0, "sec2": 0}
-
+        return &#123;"route": BUS_ROUTE_NAME, "msg1": "도착 정보 없음",
+                "msg2": "", "sec1": 0, "sec2": 0&#125;
     except Exception as e:
-        print(f"버스 에러: {e}")
-        return {"route": BUS_ROUTE_NAME, "msg1": "정보 조회 실패", "msg2": "", "sec1": 0, "sec2": 0}
+        print(f"버스 에러: &#123;e&#125;")
+        return &#123;"route": BUS_ROUTE_NAME, "msg1": "정보 조회 실패",
+                "msg2": "", "sec1": 0, "sec2": 0&#125;
 
 # ── 전체 데이터 로드 ────────────────────────
-print("=== 데이터 로딩 ===")
-meal_data = get_meal(); print(f"  급식: {len(meal_data)}개"); gc.collect()
-weather_data = get_weather(); print(f"  날씨: {weather_data.get('temp','?')}°C"); gc.collect()
-rain_data = get_rain(); print(f"  강수: 하교 {rain_data.get('t16','?')}%"); gc.collect()
-air_data = get_air(); print(f"  PM2.5: {air_data.get('pm25','?')}"); gc.collect()
-bus_data = get_bus(); print(f"  버스: {bus_data.get('msg1','')}"); gc.collect()
+print("=== 데이터 로딩 시작 ===")
+meal_data = get_meal(); print(f"  1) 급식: &#123;len(meal_data)&#125;개 메뉴"); gc.collect()
+weather_data = get_weather(); print(f"  2) 날씨: &#123;weather_data.get('temp', '?')&#125;°C"); gc.collect()
+rain_data = get_rain(); print(f"  3) 강수: 하교 &#123;rain_data.get('t16', '?')&#125;%"); gc.collect()
+air_data = get_air(); print(f"  4) PM2.5: &#123;air_data.get('pm25', '?')&#125;"); gc.collect()
+bus_data = get_bus(); print(f"  5) 버스: &#123;bus_data.get('msg1', '?')&#125;"); gc.collect()
+print("=== 데이터 로딩 완료 ===")
 
-# ── HTML ────────────────────────────────────
+# ── HTML 페이지 ─────────────────────────────
 def make_page():
     t = kst()
-    date_str = f"{t[1]}월 {t[2]}일"
-    wd = ["월","화","수","목","금","토","일"][t[6]]
-    time_str = f"{t[3]:02d}:{t[4]:02d}"
+    date_str = f"&#123;t[1]&#125;월 &#123;t[2]&#125;일"
+    wd = ["월", "화", "수", "목", "금", "토", "일"][t[6]]
+    time_str = f"&#123;t[3]:02d&#125;:&#123;t[4]:02d&#125;"
 
     # 강수형태
-    pty_map = {"0":"","1":"🌧️비","2":"🌨️비/눈","3":"❄️눈","5":"🌦️빗방울"}
-    pty = pty_map.get(weather_data.get("pty","0"), "")
+    pty_map = &#123;"0": "", "1": "🌧️비", "2": "🌨️비/눈", "3": "❄️눈", "5": "🌦️빗방울"&#125;
+    pty = pty_map.get(weather_data.get("pty", "0"), "")
 
     # 기온 이모지
     try:
         tv = float(weather_data.get("temp", 20))
-        te = "🥵" if tv>=30 else "😊" if tv>=20 else "🧥" if tv>=10 else "🥶" if tv>=0 else "🧊"
+        te = "🥵" if tv >= 30 else "😊" if tv >= 20 else "🧥" if tv >= 10 else "🥶" if tv >= 0 else "🧊"
     except: te = "🌡️"
 
     # 강수확률 아이콘
     def ri(v):
         try:
             n = int(v)
-            return "☔" if n>=60 else "🌂" if n>=30 else "☀️"
+            return "☔" if n >= 60 else "🌂" if n >= 30 else "☀️"
         except: return "❓"
 
     # 급식 HTML
@@ -493,11 +507,11 @@ def make_page():
             c = ""
             for ch in item:
                 if not (ch.isdigit() or ch == '.'): c += ch
-            mh += f'<div class="mi">{c.strip()}</div>'
+            mh += f'<div class="mi">&#123;c.strip()&#125;</div>'
     else:
         mh = '<div class="mi" style="color:#555;">급식 정보 없음</div>'
 
-    # 버스 도착 메시지 정리
+    # 버스 데이터
     bus_msg1 = bus_data.get("msg1", "정보 없음")
     bus_msg2 = bus_data.get("msg2", "")
     bus_sec = bus_data.get("sec1", 0)
@@ -505,51 +519,71 @@ def make_page():
     # 도착 시간에 따른 색상
     if bus_sec > 0 and bus_sec <= 180:
         bus_color = "#ff6b6b"
-        bus_urgency = "곧 도착!"
     elif bus_sec > 0 and bus_sec <= 420:
         bus_color = "#ffd43b"
-        bus_urgency = "준비하세요"
     else:
         bus_color = "#51cf66"
-        bus_urgency = ""
 
     return """<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>""" + SCHOOL_NAME + """</title>
+    <title>""" + SCHOOL_NAME + """ 전광판</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:-apple-system,'Segoe UI',sans-serif;background:#0a0a1a;color:#ddd;padding:12px;min-height:100vh;}
-        .hd{text-align:center;padding:6px 0 10px;}
-        .hd h1{color:#ffd43b;font-size:1.15em;}
-        .hd .sub{color:#555;font-size:0.75em;margin-top:2px;}
-        .sc{background:#141428;border-radius:11px;padding:12px;margin:7px auto;max-width:500px;border:1px solid #252550;}
-        .st{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
-        .st .i{font-size:1.1em;} .st .t{color:#ffd43b;font-size:0.85em;font-weight:bold;}
-        .wm{display:flex;align-items:center;justify-content:center;gap:12px;padding:4px 0;}
-        .wm .tb{font-size:2.2em;font-weight:bold;color:#fff;}
-        .wm .tu{font-size:0.9em;color:#888;}
-        .wd{display:flex;justify-content:center;gap:16px;color:#777;font-size:0.75em;margin-top:2px;}
-        .wp{text-align:center;color:#74c0fc;font-size:0.85em;margin-top:4px;}
-        .rg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px;}
-        .rc{text-align:center;background:#1a1a3a;border-radius:8px;padding:8px 4px;}
-        .rc .rl{color:#777;font-size:0.65em;margin-bottom:2px;}
-        .rc .ri{font-size:1.2em;}
-        .rc .rv{font-size:0.95em;font-weight:bold;color:#74c0fc;margin-top:1px;}
-        .ar{display:flex;align-items:center;justify-content:center;gap:12px;padding:4px 0;}
-        .ar .ae{font-size:1.6em;} .ar .ag{font-size:1.1em;font-weight:bold;}
-        .ad{color:#666;font-size:0.7em;text-align:center;margin-top:2px;}
-        .bus-main{text-align:center;padding:6px 0;}
-        .bus-route{color:#94d82d;font-size:0.85em;font-weight:bold;margin-bottom:4px;}
-        .bus-msg{font-size:1.3em;font-weight:bold;margin:4px 0;}
-        .bus-msg2{color:#777;font-size:0.8em;}
-        .bus-station{color:#555;font-size:0.7em;margin-top:4px;}
-        .bus-urgency{font-size:0.75em;font-weight:bold;margin-top:4px;}
-        .mi{padding:5px 10px;border-bottom:1px solid #1e1e3e;font-size:0.8em;line-height:1.3;}
-        .mi:last-child{border-bottom:none;}
-        .ft{text-align:center;margin-top:12px;color:#2a2a4a;font-size:0.6em;}
+        * &#123; margin: 0; padding: 0; box-sizing: border-box; &#125;
+        body &#123;
+            font-family: -apple-system, 'Segoe UI', sans-serif;
+            background: #0a0a1a; color: #ddd;
+            padding: 12px; min-height: 100vh;
+        &#125;
+        .hd &#123; text-align: center; padding: 6px 0 10px; &#125;
+        .hd h1 &#123; color: #ffd43b; font-size: 1.15em; &#125;
+        .hd .sub &#123; color: #555; font-size: 0.75em; margin-top: 2px; &#125;
+        .sc &#123;
+            background: #141428; border-radius: 11px; padding: 12px;
+            margin: 7px auto; max-width: 500px; border: 1px solid #252550;
+        &#125;
+        .st &#123; display: flex; align-items: center; gap: 6px; margin-bottom: 8px; &#125;
+        .st .i &#123; font-size: 1.1em; &#125;
+        .st .t &#123; color: #ffd43b; font-size: 0.85em; font-weight: bold; &#125;
+        .st .badge &#123;
+            background: #2a2a50; color: #888; font-size: 0.65em;
+            padding: 2px 8px; border-radius: 10px; margin-left: auto;
+        &#125;
+        .bus-main &#123; text-align: center; padding: 6px 0; &#125;
+        .bus-station &#123; color: #888; font-size: 0.75em; margin-bottom: 4px; &#125;
+        .bus-msg &#123; font-size: 1.3em; font-weight: bold; margin: 4px 0; &#125;
+        .bus-msg2 &#123; color: #777; font-size: 0.8em; &#125;
+        .wm &#123;
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; padding: 4px 0;
+        &#125;
+        .wm .tb &#123; font-size: 2.2em; font-weight: bold; color: #fff; &#125;
+        .wm .tu &#123; font-size: 0.9em; color: #888; &#125;
+        .wd &#123;
+            display: flex; justify-content: center; gap: 16px;
+            color: #777; font-size: 0.75em; margin-top: 2px;
+        &#125;
+        .wp &#123; text-align: center; color: #74c0fc; font-size: 0.85em; margin-top: 4px; &#125;
+        .rg &#123; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; &#125;
+        .rc &#123; text-align: center; background: #1a1a3a; border-radius: 8px; padding: 8px 4px; &#125;
+        .rc .rl &#123; color: #777; font-size: 0.65em; margin-bottom: 2px; &#125;
+        .rc .rio &#123; font-size: 1.2em; &#125;
+        .rc .rv &#123; font-size: 0.95em; font-weight: bold; color: #74c0fc; margin-top: 1px; &#125;
+        .ar &#123;
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; padding: 4px 0;
+        &#125;
+        .ar .ae &#123; font-size: 1.6em; &#125;
+        .ar .ag &#123; font-size: 1.1em; font-weight: bold; &#125;
+        .ad &#123; color: #666; font-size: 0.7em; text-align: center; margin-top: 2px; &#125;
+        .mi &#123;
+            padding: 5px 10px; border-bottom: 1px solid #1e1e3e;
+            font-size: 0.8em; line-height: 1.3;
+        &#125;
+        .mi:last-child &#123; border-bottom: none; &#125;
+        .ft &#123; text-align: center; margin-top: 12px; color: #2a2a4a; font-size: 0.6em; &#125;
     </style>
 </head>
 <body>
@@ -557,55 +591,63 @@ def make_page():
         <h1>📺 """ + SCHOOL_NAME + """ 전광판</h1>
         <div class="sub">""" + date_str + " (" + wd + ") " + time_str + """</div>
     </div>
+
     <div class="sc">
-        <div class="st"><span class="i">🚌</span><span class="t">""" + BUS_ROUTE_NAME + """ 버스</span></div>
+        <div class="st">
+            <span class="i">🚌</span>
+            <span class="t">""" + BUS_ROUTE_NAME + """</span>
+            <span class="badge">""" + BUS_STATION_NAME + """</span>
+        </div>
         <div class="bus-main">
-            <div class="bus-route">🚏 """ + BUS_STATION_NAME + """</div>
-            <div class="bus-msg" style="color:""" + bus_color + """;">""" + bus_msg1 + """</div>""" + (f'<div class="bus-msg2">{bus_msg2}</div>' if bus_msg2 else "") + (f'<div class="bus-urgency" style="color:{bus_color};">{bus_urgency}</div>' if bus_urgency else "") + """
+            <div class="bus-msg" style="color:""" + bus_color + """;">""" + bus_msg1 + """</div>""" + (f'<div class="bus-msg2">&#123;bus_msg2&#125;</div>' if bus_msg2 else "") + """
         </div>
     </div>
+
     <div class="sc">
         <div class="st"><span class="i">""" + te + """</span><span class="t">지금 날씨</span></div>
         <div class="wm">
             <span style="font-size:1.8em;">""" + te + """</span>
-            <span><span class="tb">""" + str(weather_data.get("temp","--")) + """</span><span class="tu">°C</span></span>
+            <span><span class="tb">""" + str(weather_data.get("temp", "--")) + """</span><span class="tu">°C</span></span>
         </div>
-        <div class="wd">
-            <span>💧""" + str(weather_data.get("hum","--")) + """%</span>
-        </div>""" + (f'<div class="wp">{pty}</div>' if pty else "") + """
+        <div class="wd"><span>💧 """ + str(weather_data.get("hum", "--")) + """%</span></div>""" + (f'<div class="wp">&#123;pty&#125;</div>' if pty else "") + """
     </div>
+
     <div class="sc">
         <div class="st"><span class="i">🌂</span><span class="t">우산 챙길까?</span></div>
         <div class="rg">
-            <div class="rc"><div class="rl">오늘 하교</div><div class="ri">""" + ri(rain_data.get("t16","--")) + """</div><div class="rv">""" + str(rain_data.get("t16","--")) + """%</div></div>
-            <div class="rc"><div class="rl">내일 아침</div><div class="ri">""" + ri(rain_data.get("t08","--")) + """</div><div class="rv">""" + str(rain_data.get("t08","--")) + """%</div></div>
-            <div class="rc"><div class="rl">내일 하교</div><div class="ri">""" + ri(rain_data.get("t16t","--")) + """</div><div class="rv">""" + str(rain_data.get("t16t","--")) + """%</div></div>
+            <div class="rc"><div class="rl">오늘 하교</div><div class="rio">""" + ri(rain_data.get("t16", "--")) + """</div><div class="rv">""" + str(rain_data.get("t16", "--")) + """%</div></div>
+            <div class="rc"><div class="rl">내일 아침</div><div class="rio">""" + ri(rain_data.get("t08", "--")) + """</div><div class="rv">""" + str(rain_data.get("t08", "--")) + """%</div></div>
+            <div class="rc"><div class="rl">내일 하교</div><div class="rio">""" + ri(rain_data.get("t16t", "--")) + """</div><div class="rv">""" + str(rain_data.get("t16t", "--")) + """%</div></div>
         </div>
     </div>
+
     <div class="sc">
         <div class="st"><span class="i">😷</span><span class="t">미세먼지</span></div>
         <div class="ar">
-            <span class="ae">""" + str(air_data.get("ge","❓")) + """</span>
-            <span class="ag" style="color:""" + str(air_data.get("gc","#888")) + """;">""" + str(air_data.get("g","--")) + """</span>
+            <span class="ae">""" + str(air_data.get("ge", "❓")) + """</span>
+            <span class="ag" style="color:""" + str(air_data.get("gc", "#888")) + """;">""" + str(air_data.get("g", "--")) + """</span>
         </div>
-        <div class="ad">PM2.5 """ + str(air_data.get("pm25","--")) + """㎍/㎥</div>
+        <div class="ad">PM2.5 """ + str(air_data.get("pm25", "--")) + """㎍/㎥</div>
     </div>
+
     <div class="sc">
         <div class="st"><span class="i">🍽️</span><span class="t">오늘의 급식</span></div>
         """ + mh + """
     </div>
-    <div class="ft">Powered by Pico 2 WH · 기상청 · 에어코리아 · 나이스 · 서울시버스</div>
+
+    <div class="ft">Powered by Pico 2 WH · 나이스 · 기상청 · 에어코리아 · 서울시버스</div>
+
     <script>
-        async function refreshBus() {
-            try {
+        async function refreshBus() &#123;
+            try &#123;
                 const r = await fetch('/bus');
                 const d = await r.json();
                 const el = document.querySelector('.bus-msg');
                 if (el && d.msg1) el.textContent = d.msg1;
                 const el2 = document.querySelector('.bus-msg2');
                 if (el2) el2.textContent = d.msg2 || '';
-            } catch(e) {}
-        }
+            &#125; catch(e) &#123;&#125;
+        &#125;
         setInterval(refreshBus, 30000);
     </script>
 </body>
@@ -617,7 +659,7 @@ server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.bind(('0.0.0.0', 80))
 server.listen(3)
 
-print(f"\n{'='*45}\n  통합 전광판 시작!\n  http://{my_ip}\n{'='*45}")
+print(f"\n&#123;'=' * 45&#125;\n  통합 전광판 시작!\n  http://&#123;my_ip&#125;\n&#123;'=' * 45&#125;")
 
 last_weather = time.ticks_ms()
 last_bus = time.ticks_ms()
@@ -652,18 +694,25 @@ while True:
         request = client.recv(1024).decode()
 
         if 'GET /bus' in request:
-            body = json.dumps({"msg1": bus_data.get("msg1",""), "msg2": bus_data.get("msg2",""), "sec1": bus_data.get("sec1",0)})
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
+            body = json.dumps(&#123;"msg1": bus_data.get("msg1", ""),
+                              "msg2": bus_data.get("msg2", ""),
+                              "sec1": bus_data.get("sec1", 0)&#125;)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
             client.send(h.encode()); client.send(body.encode())
 
         elif 'GET /data' in request:
-            body = json.dumps({
-                "temp": weather_data.get("temp","--"), "hum": weather_data.get("hum","--"),
-                "t16": rain_data.get("t16","--"), "t08": rain_data.get("t08","--"), "t16t": rain_data.get("t16t","--"),
-                "pm25": air_data.get("pm25","--"), "g": air_data.get("g","--"),
-                "bus1": bus_data.get("msg1",""), "bus2": bus_data.get("msg2",""),
-            })
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
+            body = json.dumps(&#123;
+                "temp": weather_data.get("temp", "--"),
+                "hum": weather_data.get("hum", "--"),
+                "t16": rain_data.get("t16", "--"),
+                "t08": rain_data.get("t08", "--"),
+                "t16t": rain_data.get("t16t", "--"),
+                "pm25": air_data.get("pm25", "--"),
+                "g": air_data.get("g", "--"),
+                "bus1": bus_data.get("msg1", ""),
+                "bus2": bus_data.get("msg2", ""),
+            &#125;)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
             client.send(h.encode()); client.send(body.encode())
 
         elif 'favicon' in request:
@@ -672,74 +721,88 @@ while True:
         else:
             gc.collect()
             page = make_page()
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: {len(page.encode())}\r\nConnection: close\r\n\r\n"
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: &#123;len(page.encode())&#125;\r\nConnection: close\r\n\r\n"
             client.send(h.encode()); client.send(page.encode())
-            print(f"페이지: {addr[0]}")
+            print(f"페이지: &#123;addr[0]&#125;")
 
         client.close(); gc.collect()
     except Exception as e:
-        if "ETIMEDOUT" not in str(e): print(f"에러: {e}")
+        if "ETIMEDOUT" not in str(e): print(f"에러: &#123;e&#125;")
         try: client.close()
         except: pass
 ```
 
-<div class="step-header">
-  <span class="step-num">3</span>
-  <span class="step-title">관악11번 도착 정보 확인</span>
-  <span class="step-time">10-17분</span>
-</div>
-
-<div class="class-scene">
-  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "관악11번이 '4분30초 후 도착'이래요! 진짜 실시간이에요?"</div>
-  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "네, 서울시 버스 API가 GPS로 추적한 실시간 데이터예요."</div>
-  <div class="scene-line"><span class="speaker speaker-student">수아:</span> "30초마다 바뀌네요! 아까 4분이었는데 지금 3분 30초!"</div>
-  <div class="scene-line"><span class="speaker speaker-student">민수:</span> "배차 15분이면 운행 안 하는 시간도 있죠?"</div>
-  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "맞아요. 첫차 전이나 막차 후에는 '운행 종료'라고 나올 거예요."</div>
-</div>
+</details>
 
 <div class="step-header">
   <span class="step-num">4</span>
-  <span class="step-title">실시간 API vs 예보 API 차이</span>
+  <span class="step-title">스마트폰 접속 + 버스 도착정보 확인</span>
   <span class="step-time">17-20분</span>
 </div>
 
 <div class="teacher-script">
-  <p>"데이터마다 갱신 주기가 다른 이유를 알아볼까요?"</p>
+  <p>"이번에는 API 5개를 호출하니까 로딩이 좀 걸려요. Shell에서 1~5번 순서로 진행 상황을 확인하세요."</p>
+  <p>"스마트폰으로 접속하면 맨 위에 버스 도착정보가 추가된 걸 볼 수 있어요."</p>
 </div>
 
-<div class="compare-cards">
-  <div class="compare-card">
-    <h5>실시간 데이터</h5>
-    <p>🚌 버스 → <strong>30초</strong></p>
-    <p>30초 사이에 버스 위치가 바뀜</p>
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">수아:</span> "관악11번이 3분 후에 온대요! 진짜예요?"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "진짜예요. 서울시 버스 API에서 실시간으로 가져온 거예요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "두 번째 버스는 8분 뒤래요. 첫차 놓치면 저거 타야겠네요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">민수:</span> "이제 급식, 날씨, 미세먼지, 버스까지 다 나와요! 진짜 전광판이다!"</div>
+</div>
+
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">①</div>
+    <div class="map-content">
+      <div class="map-title">get_bus() — 버스 도착 API <span class="map-tag">새로 추가</span></div>
+      <div class="map-desc">XML 응답을 문자열 split으로 파싱, 관악11 필터링</div>
+    </div>
   </div>
-  <div class="compare-card">
-    <h5>예보/측정 데이터</h5>
-    <p>🌡️ 날씨 → 10분</p>
-    <p>🌂 강수확률 → 10분</p>
-    <p>😷 미세먼지 → 10분</p>
-    <p>🍽️ 급식 → 시작 시 1번</p>
+  <div class="map-row">
+    <div class="map-num n2">②</div>
+    <div class="map-content">
+      <div class="map-title">XML 파싱 (문자열 split) <span class="map-tag">새로 추가</span></div>
+      <div class="map-desc">MicroPython에 XML 라이브러리 없음 → 태그 이름으로 직접 추출</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n3">③</div>
+    <div class="map-content">
+      <div class="map-title">갱신 주기 분리 <span class="map-tag">새로 추가</span></div>
+      <div class="map-desc">버스 30초, 날씨 10분, 급식 시작시 1번</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n4">④</div>
+    <div class="map-content">
+      <div class="map-title">make_page() — 버스 섹션 + JS 자동갱신</div>
+      <div class="map-desc">도착 메시지 표시 + 30초마다 fetch('/bus')로 갱신</div>
+    </div>
   </div>
 </div>
 
 <div class="teacher-script">
-  <p>"버스만 30초인 이유는, 실제로 30초 사이에 버스 위치가 바뀌니까요. 날씨는 10분마다도 충분해요. 급식은 하루 안 바뀌니까 시작할 때 한 번만!"</p>
+  <p>"새로운 개념이 두 가지 있어요."</p>
+  <p>"첫째, <strong>XML 파싱</strong>이에요. JSON은 <code>json.loads()</code>로 바로 파싱했는데, XML은 MicroPython에 파서가 없어서 문자열을 직접 잘라야 해요."</p>
+  <p>"둘째, <strong>갱신 주기 분리</strong>예요. 버스는 30초마다, 날씨는 10분마다, 급식은 시작할 때 한 번만. 데이터 성격에 따라 갱신 주기가 다릅니다."</p>
 </div>
 
 <div class="trouble-cards">
   <div class="trouble-card">
-    <div class="symptom">버스 "도착 정보 없음"</div>
+    <div class="symptom">버스 '도착 정보 없음'으로 나와요</div>
     <span class="label">원인</span>
-    <span class="value">운행 시간 외 (보통 06:00~23:00)</span>
+    <span class="value">운행 시간 외 (심야/새벽) 또는 arsId 불일치</span>
     <span class="label">대응</span>
-    <span class="value">운행 시간에 테스트하거나, Shell 에러 메시지 확인</span>
+    <span class="value">운행 시간에 테스트, api_config.py의 BUS_STATION_ID가 '20522'인지 확인</span>
   </div>
   <div class="trouble-card">
-    <div class="symptom">버스 API XML 파싱 실패</div>
+    <div class="symptom">버스 API 연결 실패</div>
     <span class="label">원인</span>
-    <span class="value">응답 형식이 예상과 다름</span>
+    <span class="value">버스 API도 HTTP만 지원</span>
     <span class="label">대응</span>
-    <span class="value">AI에게 "이 XML 파싱을 개선해줘"라고 요청</span>
+    <span class="value">URL이 http://ws.bus.go.kr로 시작하는지, fetch_http() 사용하는지 확인</span>
   </div>
   <div class="trouble-card">
     <div class="symptom">ENOMEM 에러 빈번</div>
@@ -756,12 +819,13 @@ while True:
 
 <div class="step-header">
   <span class="step-num">5</span>
-  <span class="step-title">전광판 완성도 높이기</span>
+  <span class="step-title">AI와 함께 통합 전광판 완성하기</span>
   <span class="step-time">20-45분</span>
 </div>
 
 <div class="teacher-script">
-  <p>"이제 4종 데이터가 모두 모였어요. 바이브 코딩으로 전광판을 더 멋지게 만들어봅시다!"</p>
+  <p>"4종 API가 전부 합쳐졌으니, 이제 전광판을 진짜로 쓸모있게 만들어볼 시간이에요."</p>
+  <p>"오늘 팁 — 버스 도착 시간은 <strong>초 단위</strong>로 바뀌어요. 실시간 카운트다운을 만들면 정말 전광판 같아질 거예요."</p>
 </div>
 
 ### 미션 카드
@@ -773,10 +837,10 @@ while True:
   </div>
   <div class="mission-body">
     <div class="mission-desc">
-      "3분12초후[1번째 전]" 대신 큰 숫자 카운트다운으로 표시하세요!
+      '3분12초후[1번째 전]' 대신 큰 숫자 카운트다운으로 표시하세요! JavaScript로 1초마다 시간을 깎으면 됩니다.
     </div>
     <div class="prompt-box prompt-full">
-      <p>"버스 도착 시간(sec1)을 '분:초' 형식의 큰 카운트다운 숫자로 표시해줘. JavaScript에서 1초마다 줄어드는 애니메이션도 추가하고, 3분 이내면 빨간색 깜빡임으로."</p>
+      <p>"버스 도착정보에서 '몇분후' 텍스트 대신, 서버에서 받은 sec1(초 단위)을 '분:초' 형식의 큰 카운트다운 숫자로 표시해줘. JavaScript setInterval로 1초마다 줄어들고, 0이 되면 '곧 도착'으로 바뀌게."</p>
       <p>[전체 코드 붙여넣기]</p>
     </div>
     <div class="prompt-box prompt-light">
@@ -793,10 +857,10 @@ while True:
   </div>
   <div class="mission-body">
     <div class="mission-desc">
-      현재 버스만 자동 갱신되는데, 전체 데이터를 JavaScript fetch로 자동 갱신하게 만들어보세요!
+      현재 버스만 자동 갱신되는데, 전체 데이터를 JavaScript fetch로 자동 갱신하게 만들어보세요.
     </div>
     <div class="prompt-box prompt-full">
-      <p>"/data API를 1분마다 호출해서 기온, 미세먼지, 강수확률을 자동 갱신하고, /bus는 30초마다 갱신해줘. 각 HTML 요소에 id를 부여하고 fetch 응답으로 textContent를 업데이트."</p>
+      <p>"/data API를 1분마다 호출해서 기온, 미세먼지, 강수확률을 자동 갱신하고, /bus는 30초마다 갱신해줘. 각 HTML 요소에 id를 부여하고 fetch 응답으로 textContent를 업데이트. 마지막 갱신 시각도 표시해줘."</p>
       <p>[전체 코드 붙여넣기]</p>
     </div>
     <div class="prompt-box prompt-light">
@@ -813,11 +877,11 @@ while True:
   </div>
   <div class="mission-body">
     <div class="prompt-box prompt-full">
-      <p>"이 전광판을 학교 복도에 설치할 대형 모니터용 레이아웃으로 바꿔줘. 좌측에 날씨+미세먼지, 우측에 버스+급식, 2단 구성. 글씨 크기도 키워줘."</p>
+      <p>"전광판을 학교 복도 대형 모니터용 레이아웃으로 바꿔줘. 넓은 화면에서는 2열 그리드(왼쪽: 버스+날씨, 오른쪽: 미세먼지+급식), 모바일에서는 1열. CSS media query 사용."</p>
       <p>[make_page() 붙여넣기]</p>
     </div>
     <div class="prompt-box prompt-light">
-      <p>"대형 모니터용 2단 레이아웃으로 바꿔줘"</p>
+      <p>"반응형 2열 그리드 레이아웃으로 바꿔줘"</p>
       <p>[make_page() 붙여넣기]</p>
     </div>
   </div>
@@ -830,14 +894,14 @@ while True:
   </div>
   <div class="mission-body">
     <div class="mission-desc">
-      스마트폰 화면에 모든 섹션이 길게 나열되는 대신, 탭으로 전환되게 만들어보세요!
+      정보가 많아졌으니, 탭(버스/날씨/미세먼지/급식)으로 전환하면서 보여주세요. 5초마다 자동 슬라이드도 추가하면 더 전광판답습니다.
     </div>
     <div class="prompt-box prompt-full">
-      <p>"상단에 🚌 🌡️ 🌂 😷 🍽️ 탭 버튼을 만들고, 클릭하면 해당 섹션만 표시되게 해줘. 기본은 버스 탭이 선택된 상태. CSS transition으로 부드럽게 전환."</p>
+      <p>"상단에 🚌 🌡️ 🌂 😷 🍽️ 탭 버튼을 만들고, 클릭하면 해당 섹션만 표시되게 해줘. 5초마다 자동으로 다음 탭으로 전환되고, 수동 클릭하면 자동 전환이 리셋되게."</p>
       <p>[make_page() 붙여넣기]</p>
     </div>
     <div class="prompt-box prompt-light">
-      <p>"이모지 탭으로 섹션 전환되게 해줘"</p>
+      <p>"이모지 탭 전환 + 5초 자동 슬라이드 만들어줘"</p>
       <p>[make_page() 붙여넣기]</p>
     </div>
   </div>
@@ -849,7 +913,7 @@ while True:
     <span class="mission-difficulty">난이도 ★★★★★</span>
   </div>
   <div class="mission-body">
-    <div class="mission-desc">아래 라이트 프롬프트 중 골라서 도전!</div>
+    <div class="mission-desc">아래 라이트 프롬프트 중 골라서 도전! 자기만의 아이디어도 한 줄로 요청해보세요.</div>
     <div class="prompt-box prompt-light">
       <p>"버스가 3분 이내면 알림 소리 재생해줘"</p>
       <p>"섹션 순서를 드래그로 바꿀 수 있게 해줘"</p>
@@ -860,39 +924,70 @@ while True:
   </div>
 </div>
 
-<div class="class-scene">
-  <div class="scene-line"><span class="speaker speaker-student">수연:</span> "카운트다운 타이머 했는데 '큰 카운트다운 타이머로 바꿔줘'만으로 3:42 이런 식으로 나오고, 1초마다 줄어들어요!"</div>
-  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "JavaScript setInterval이 1초마다 동작하는 거죠?"</div>
-  <div class="scene-line"><span class="speaker speaker-student">수연:</span> "네, 그리고 30초마다 서버에서 새 데이터 받아서 리셋해요!"</div>
+### 바이브 코딩 사이클
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">💬</div>
+    <div class="flow-label">요청</div>
+    <div class="flow-desc">프롬프트 작성</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">🤖</div>
+    <div class="flow-label">받기</div>
+    <div class="flow-desc">AI 응답 코드</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">▶️</div>
+    <div class="flow-label">실행</div>
+    <div class="flow-desc">Thonny 실행</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-icon">🤔</div>
+    <div class="flow-label">판단</div>
+    <div class="flow-desc">원하는 결과?</div>
+  </div>
+  <div class="flow-arrow flow-return">↩️</div>
 </div>
 
+<div class="compare-summary">YES → 다음 미션! &nbsp;|&nbsp; NO → 프롬프트 수정해서 다시 요청!</div>
+
 <div class="class-scene">
-  <div class="scene-line"><span class="speaker speaker-student">민수:</span> "탭 전환 미션 했는데, 이모지 버튼 누르면 해당 섹션만 보여요! 스마트폰에서 앱 같아요."</div>
-  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "실제 앱도 이 원리예요. HTML+CSS+JavaScript만으로 앱 같은 경험을 만들 수 있어요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">수아:</span> "카운트다운 넣었더니 2분 43초, 42초, 41초... 진짜 전광판 같아요!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "자동 갱신 했더니 페이지 새로고침 안 해도 버스 시간이 바뀌어요!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">민수:</span> "탭 전환 했는데 5초마다 자동으로 넘어가요. 실제 버스정류장 전광판이랑 같아요!"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "좋아요. 이제 4종 API 통합이 끝났으니, 다음 시간부터는 디자인과 완성도를 높일 거예요."</div>
 </div>
 
 <div class="patrol-point">
   <p><strong>순회 시 확인:</strong></p>
   <ol>
     <li>코드 수정 후 <strong>Ctrl+C → 다시 실행</strong> 하고 있는지</li>
-    <li>AI에게 코드를 붙여넣고 있는지</li>
-    <li>에러가 나면 에러 메시지를 AI에게 보내고 있는지</li>
+    <li>카운트다운에서 시간 파싱이 올바른지 (sec1 값 활용)</li>
+    <li>자동 갱신 fetch URL이 /bus 또는 /data인지 확인</li>
   </ol>
 </div>
 
 <div class="qa-pair">
-  <div class="qa-q">"버스 도착 정보가 '운행 종료'라고 나와요"</div>
-  <div class="qa-a">관악11번 운행 시간이 아닌 거예요. 평일 첫차~막차 시간에 테스트하세요.</div>
+  <div class="qa-q">"버스 도착 시간이 안 바뀌어요"</div>
+  <div class="qa-a">Pico 서버 쪽에서 30초마다 갱신하고 있어요. JavaScript에서는 fetch('/bus')로 최신 데이터를 가져오세요. 서버 갱신과 클라이언트 갱신은 별개입니다.</div>
 </div>
 
 <div class="qa-pair">
-  <div class="qa-q">"버스 API가 XML이라 읽기 어려워요"</div>
-  <div class="qa-a">맞아요. 서울시 버스 API는 XML이 기본이에요. 코드에서 간단한 문자열 파싱으로 처리했는데, AI에게 '이 XML 파싱을 개선해줘'라고 요청해도 좋아요.</div>
+  <div class="qa-q">"XML 파싱이 이상해요 / 값이 안 나와요"</div>
+  <div class="qa-a">Shell에서 XML 응답 원본을 print해서 태그 이름을 확인하세요. AI에게 "이 XML을 파싱해줘"라고 원본을 보내면 잘 처리해줘요.</div>
 </div>
 
 <div class="qa-pair">
-  <div class="qa-q">"API 5개를 호출하니까 메모리 에러가 자주 나요"</div>
-  <div class="qa-a">각 API 호출 사이에 gc.collect()가 있는지 확인하세요. HTML도 최대한 짧게 유지하는 게 좋아요.</div>
+  <div class="qa-q">"카운트다운이 음수로 내려가요"</div>
+  <div class="qa-a">0 이하가 되면 '곧 도착' 또는 '도착 예정'으로 바뀌는 조건을 추가하라고 AI에게 요청하세요.</div>
 </div>
 
 ---
@@ -901,52 +996,83 @@ while True:
 
 <div class="step-header">
   <span class="step-num">6</span>
-  <span class="step-title">핵심 정리 & 다음 시간 예고</span>
+  <span class="step-title">오늘 배운 것 & 다음 시간 예고</span>
   <span class="step-time">45-50분</span>
 </div>
 
 <div class="teacher-script">
-  <p>"오늘로 전광판의 **핵심 기능이 모두 완성**됐어요! 4종 API — 급식, 날씨, 미세먼지, 버스."</p>
-  <p>"오늘 핵심 개념은 **실시간 데이터와 예보 데이터의 차이**예요. 버스는 30초마다 바뀌는 실시간이고, 강수확률은 하루 8번 발표되는 예보예요. 갱신 주기를 다르게 가져가야 하죠."</p>
-  <p>"다음 시간에는 전광판의 **디자인과 사용성**을 집중적으로 개선할 거예요. 진짜 학교에 설치할 수 있을 만큼!"</p>
+  <p>"오늘로 전광판의 <strong>핵심 기능이 모두 완성</strong>됐어요. 4종 API — 급식, 날씨, 미세먼지, 버스."</p>
+  <p>"첫째, <strong>실시간 API vs 예보 API</strong>의 차이를 배웠어요. 버스 도착은 30초마다 바뀌는 실시간 데이터이고, 날씨 예보는 하루에 8번만 업데이트돼요. 그래서 갱신 주기를 다르게 설정하는 거예요."</p>
+  <p>"둘째, <strong>XML 파싱</strong>이에요. JSON 말고 XML 형식도 있다는 것, MicroPython에서는 문자열 split으로 간단하게 파싱할 수 있다는 것."</p>
+  <p>"셋째, <strong>정보 우선순위</strong>예요. 가장 급한 정보(버스)를 맨 위에, 변화가 적은 정보(급식)를 아래에 배치했어요."</p>
 </div>
 
 <div class="key-terms">
   <dl>
+    <dt>XML</dt>
+    <dd>JSON과 다른 데이터 형식 — 태그로 감싸서 표현</dd>
     <dt>실시간 API</dt>
     <dd>현재 상태를 즉시 반환 (버스 도착정보)</dd>
     <dt>예보 API</dt>
     <dd>미래 예측값을 반환 (강수확률)</dd>
-    <dt>XML 파싱</dt>
-    <dd>태그 구조에서 데이터 추출</dd>
     <dt>갱신 주기 전략</dt>
-    <dd>데이터 변화 속도에 맞게 조절</dd>
+    <dd>데이터 변화 속도에 맞게 조절 (30초/10분/1회)</dd>
     <dt>정보 우선순위</dt>
     <dd>급한 것을 위에 배치 (버스 → 날씨 → 급식)</dd>
+    <dt>arsId</dt>
+    <dd>서울시 버스 정류장 고유 번호</dd>
   </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"다음 시간에는 <strong>디자인 완성</strong>이에요. 새 코드 없이 바이브 코딩만으로 전광판의 가독성, 정보 계층, 가시성을 높일 거예요. 진짜 실용적인 전광판으로 만드는 시간입니다!"</p>
 </div>
 
 ---
 
 ## 교사용 참고사항
 
-### 서울시 버스 API 상세
+### 서울시 버스 도착 API 상세
+
+<Aside type="caution" title="버스 API도 HTTP만 지원합니다">
+에어코리아와 마찬가지로 HTTPS가 아닌 HTTP로 호출해야 합니다. 코드에서 `fetch_http()` 함수를 사용합니다. 응답 형식은 JSON이 아닌 XML입니다.
+</Aside>
 
 | 항목 | 내용 |
 |------|------|
 | 엔드포인트 | `http://ws.bus.go.kr/api/rest/stationinfo/getStationByUid` |
-| 파라미터 | `ServiceKey`, `arsId` |
-| 응답 형식 | XML |
-| 주요 태그 | `<rtNm>` 노선명, `<arrmsg1>` 도착 메시지, `<traTime1>` 도착 시간(초) |
-| 프로토콜 | HTTP (HTTPS 아님) |
-| 참고 | 정류장에 여러 노선이 정차 → rtNm으로 "관악11" 필터링 필요 |
+| 프로토콜 | **HTTP** (HTTPS 미지원) |
+| 필수 파라미터 | `ServiceKey`, `arsId=20522` |
+| 응답 형식 | **XML** (JSON 아님) |
+| 주요 응답 태그 | `rtNm`(노선명), `arrmsg1`(첫번째 도착), `arrmsg2`(두번째 도착), `traTime1`/`traTime2`(도착예정 초) |
 
-### 흔한 문제 & 해결
+### XML 응답 구조 예시
+
+```
+<itemList>
+  <rtNm>관악11</rtNm>
+  <arrmsg1>3분12초후[1번째 전]</arrmsg1>
+  <arrmsg2>8분5초후[3번째 전]</arrmsg2>
+  <traTime1>192</traTime1>
+  <traTime2>485</traTime2>
+</itemList>
+```
+
+### 갱신 주기 전략
+
+| 데이터 | 갱신 주기 | 이유 |
+|--------|----------|------|
+| 버스 도착 | 30초 | 실시간 데이터, 빠르게 변함 |
+| 날씨·미세먼지 | 10분 | 발표 주기가 길고 급변하지 않음 |
+| 급식 | 시작시 1회 | 하루 동안 변하지 않음 |
+
+### 트러블슈팅
 
 | 증상 | 원인 | 해결 |
 |------|------|------|
-| 버스 "도착 정보 없음" | 운행 시간 외 | 운행 시간 확인 (보통 06:00~23:00) |
-| 버스 API XML 파싱 실패 | 응답 형식 변경 | AI에게 XML 파싱 개선 요청 |
-| 전체 로딩 40초+ | API 5개 순차 호출 | 정상 범위, 캐싱으로 이후 빠름 |
-| ENOMEM 빈발 | HTML 코드 길이 증가 | CSS 변수명 축약, 불필요한 요소 제거 |
-| 버스 데이터 갱신 느림 | 30초 주기 | 정상, 더 빠르게 하면 API 제한 |
+| 버스 '도착 정보 없음' | 운행 시간 외 (심야/새벽) | 운행 시간에 테스트 (보통 06:00~23:00) |
+| 버스 API 연결 실패 | HTTPS로 호출 | URL이 `http://ws.bus.go.kr`인지, fetch_http() 사용하는지 확인 |
+| XML 파싱 에러 | 태그 이름 불일치 | Shell에서 원본 XML print해서 태그 확인 |
+| 다른 노선만 나옴 | BUS_ROUTE_NAME 불일치 | api_config.py에서 정확한 노선명 확인 |
+| ENOMEM 빈발 | API 5개 순차 호출 + HTML 길이 | 각 호출 사이 gc.collect(), CSS 변수명 축약 |
+| 30초 갱신이 느림 | HTTP 요청 오버헤드 | 정상 범위. HTTP는 HTTPS보다 빠름 |

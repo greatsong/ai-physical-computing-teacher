@@ -141,6 +141,114 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
   </div>
 </div>
 
+### 센서 데이터가 브라우저까지 오는 길
+
+<div class="teacher-script">
+  <p>"센서를 연결하기 전에, 데이터가 센서에서 여러분 화면까지 어떻게 오는지 전체 그림을 봅시다."</p>
+</div>
+
+<div class="net-topo">
+  <div class="net-topo-title">
+    <span class="title-icon">🔬</span>
+    센서 연구소 — 데이터가 흘러가는 길
+  </div>
+
+  {/* 물리 센서 영역 */}
+  <div class="net-zone zone-rose">
+    <div class="net-zone-label">물리 세계 — 센서가 측정</div>
+    <div class="net-devices">
+      <div class="net-device dev-rose">
+        <div class="dev-icon">🌡️</div>
+        <div class="dev-name">DHT20 센서</div>
+        <div class="dev-detail">온도 + 습도<br/>I2C 통신</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="net-signal">
+    <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    <span class="signal-label">전선 4개 (VCC, GND, SDA, SCL)</span>
+    <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+  </div>
+
+  {/* Pico + 학교 LAN */}
+  <div class="net-zone zone-purple">
+    <div class="net-zone-label">학교 LAN — Pico가 센서 데이터를 웹으로 중계</div>
+
+    <div class="net-devices" style="margin-bottom: 0.5rem;">
+      <div class="net-device dev-highlight">
+        <div class="dev-icon">🌐</div>
+        <div class="dev-name">학교 공유기</div>
+        <div class="dev-detail">Wi-Fi AP</div>
+      </div>
+    </div>
+
+    <div class="net-signal">
+      <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+      <span class="signal-label">2.4GHz Wi-Fi (같은 네트워크!)</span>
+      <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="net-devices">
+      <div class="net-device dev-highlight" style="border-color: var(--teacher-rose);">
+        <div class="dev-icon">📡</div>
+        <div class="dev-name">Pico 2 WH</div>
+        <div class="dev-detail">센서 읽기 + 가공<br/>웹 서버 운영<br/>IP: 192.168.1.xxx</div>
+        <span class="dev-badge badge-dual">센서 + 서버</span>
+      </div>
+      <div class="net-device dev-emerald">
+        <div class="dev-icon">💻</div>
+        <div class="dev-name">내 노트북</div>
+        <div class="dev-detail">브라우저 접속<br/>실시간 그래프</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+      <div class="net-device dev-emerald">
+        <div class="dev-icon">📱</div>
+        <div class="dev-name">모둠원 스마트폰</div>
+        <div class="dev-detail">같은 대시보드<br/>동시 관찰!</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="data-flow">
+  <div class="flow-phase">
+    <div class="phase-icon">🌡️</div>
+    <div class="phase-title">센서 측정</div>
+    <div class="phase-desc">온도/습도<br/>전기 신호</div>
+    <div class="phase-time">10초마다</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">🔌</div>
+    <div class="phase-title">I2C 전송</div>
+    <div class="phase-desc">전선으로<br/>Pico에 전달</div>
+    <div class="phase-time">순간</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">🧮</div>
+    <div class="phase-title">Pico 처리</div>
+    <div class="phase-desc">데이터 변환<br/>기록 저장</div>
+    <div class="phase-time">순간</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">🌐</div>
+    <div class="phase-title">웹 서버</div>
+    <div class="phase-desc">GET /log →<br/>JSON 데이터</div>
+    <div class="phase-time">요청 시</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">📊</div>
+    <div class="phase-title">그래프 표시</div>
+    <div class="phase-desc">브라우저가<br/>실시간 그래프</div>
+    <div class="phase-time">5초마다</div>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>핵심:</strong> 센서가 물리적 데이터를 측정 → 전선으로 Pico에 전달 → Pico가 가공해서 웹 서버로 제공 → 같은 Wi-Fi의 브라우저에서 실시간 그래프로 확인! 모둠원 모두가 동시에 볼 수 있어요.</p>
+</div>
+
 ---
 
 ## 센서 연결 (05-15분)

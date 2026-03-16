@@ -145,6 +145,110 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
   <p>"중요한 건 — <strong>AI가 제안하고, 사람이 결정한다</strong>. 이 원칙이에요."</p>
 </div>
 
+### 이 프로젝트의 네트워크 — Pico가 서버가 된다!
+
+<div class="teacher-script">
+  <p>"코드를 보기 전에, 전체 그림을 먼저 봅시다. 이 대시보드가 어떻게 여러분 노트북 화면에 뜨는 건지!"</p>
+</div>
+
+<div class="net-topo">
+  <div class="net-topo-title">
+    <span class="title-icon">🌐</span>
+    Wi-Fi 모니터 프로젝트 — 네트워크 구성도
+  </div>
+
+  <div class="net-zone zone-purple">
+    <div class="net-zone-label">학교 LAN — 같은 공유기에 연결된 기기들</div>
+
+    <div class="net-devices" style="margin-bottom: 0.5rem;">
+      <div class="net-device dev-highlight">
+        <div class="dev-icon">🌐</div>
+        <div class="dev-name">학교 공유기</div>
+        <div class="dev-detail">Wi-Fi AP<br/>SSID: School_WiFi</div>
+        <span class="dev-badge badge-ap">AP</span>
+      </div>
+    </div>
+
+    <div class="net-signal">
+      <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+      <span class="signal-label">2.4GHz Wi-Fi (모두 같은 네트워크!)</span>
+      <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="net-devices">
+      <div class="net-device dev-highlight" style="border-color: var(--teacher-rose);">
+        <div class="dev-icon">📡</div>
+        <div class="dev-name">Pico 2 WH</div>
+        <div class="dev-detail">STA 모드로 접속<br/>IP: 192.168.1.xxx<br/><strong>웹 서버 운영!</strong></div>
+        <span class="dev-badge badge-sta">STA + 서버</span>
+      </div>
+      <div class="net-device">
+        <div class="dev-icon">💻</div>
+        <div class="dev-name">내 노트북</div>
+        <div class="dev-detail">브라우저로<br/>Pico IP 접속</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+      <div class="net-device">
+        <div class="dev-icon">💻</div>
+        <div class="dev-name">짝꿍 노트북</div>
+        <div class="dev-detail">같은 IP로<br/>접속 가능!</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+      <div class="net-device">
+        <div class="dev-icon">📱</div>
+        <div class="dev-name">스마트폰</div>
+        <div class="dev-detail">모바일에서도<br/>접속 가능!</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+      <div class="net-device">
+        <div class="dev-icon">📺</div>
+        <div class="dev-name">전자칠판</div>
+        <div class="dev-detail">같은 Wi-Fi라면<br/>대시보드 표시 가능</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"Pico가 학교 Wi-Fi에 접속하면 IP 주소를 받아요. 그게 이 작은 보드의 인터넷 주소예요."</p>
+  <p>"그리고 Pico가 그 IP에서 웹 서버를 돌려요. 그러면 <strong>같은 Wi-Fi에 연결된 모든 기기</strong> — 노트북, 스마트폰, 심지어 전자칠판까지! — 브라우저에서 그 IP를 치면 대시보드가 뜨는 거예요."</p>
+  <p>"이게 바로 <strong>LAN(Local Area Network)</strong>이에요. 같은 공유기에 연결된 기기들끼리는 서로 통신할 수 있어요!"</p>
+</div>
+
+<div class="data-flow">
+  <div class="flow-phase">
+    <div class="phase-icon">📡</div>
+    <div class="phase-title">Pico 측정</div>
+    <div class="phase-desc">Wi-Fi 신호 세기<br/>RSSI 측정</div>
+    <div class="phase-time">3초마다</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">🧮</div>
+    <div class="phase-title">데이터 가공</div>
+    <div class="phase-desc">RSSI → 퍼센트<br/>메모리, 업타임</div>
+    <div class="phase-time">순간</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">📦</div>
+    <div class="phase-title">JSON 응답</div>
+    <div class="phase-desc">GET /data →<br/>&#123;"rssi":-45&#125;</div>
+    <div class="phase-time">요청 시</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">💻</div>
+    <div class="phase-title">브라우저</div>
+    <div class="phase-desc">fetch() →<br/>화면 갱신</div>
+    <div class="phase-time">3초마다</div>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>핵심:</strong> Pico가 신호 세기를 측정 → JSON으로 가공 → 브라우저가 주기적으로 요청 → 화면 갱신. 같은 Wi-Fi에 있는 누구나 접속 가능!</p>
+</div>
+
+---
+
 <div class="step-header">
   <span class="step-num">2</span>
   <span class="step-title">환경 확인</span>

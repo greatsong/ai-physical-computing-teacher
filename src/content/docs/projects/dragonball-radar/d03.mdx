@@ -173,6 +173,190 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
   <p>"실생활에서 비유하면... 편의점 알바생이 물건 입고(STA, 외부 정보 수집)도 하면서 동시에 카운터에서 손님 응대(AP, 정보 제공)도 하는 거예요!"</p>
 </div>
 
+### 전체 시스템 구성도 — 신호는 어디서 와서 어디로 가는가?
+
+<div class="teacher-script">
+  <p>"코드를 쓰기 전에, 전체 그림을 먼저 이해합시다. 이 교실에서 신호가 어떻게 흘러가는지 한눈에 봅시다."</p>
+</div>
+
+{/* === 전체 토폴로지: 교실의 모든 기기 === */}
+<div class="net-topo">
+  <div class="net-topo-title">
+    <span class="title-icon">🗺️</span>
+    교실 전체 네트워크 구성도 (3차시)
+  </div>
+
+  {/* 드래곤볼 영역 */}
+  <div class="net-zone zone-rose">
+    <div class="net-zone-label">드래곤볼 영역 — AP 모드로 신호 송출 중</div>
+    <div class="net-devices">
+      <div class="net-device dev-rose">
+        <div class="dev-icon">🟠</div>
+        <div class="dev-name">DB1</div>
+        <div class="dev-detail">복도 끝<br/>보조배터리 연결</div>
+        <span class="dev-badge badge-ap">AP</span>
+      </div>
+      <div class="net-device dev-rose">
+        <div class="dev-icon">🟠</div>
+        <div class="dev-name">DB2</div>
+        <div class="dev-detail">계단 아래</div>
+        <span class="dev-badge badge-ap">AP</span>
+      </div>
+      <div class="net-device dev-rose">
+        <div class="dev-icon">🟠</div>
+        <div class="dev-name">DB3</div>
+        <div class="dev-detail">교실 뒤편</div>
+        <span class="dev-badge badge-ap">AP</span>
+      </div>
+      <div class="net-device" style="opacity: 0.4; border-style: dashed;">
+        <div class="dev-icon">🟠</div>
+        <div class="dev-name">DB4-DB7</div>
+        <div class="dev-detail">교내 곳곳</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="net-signal">
+    <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    <span class="signal-label">2.4GHz 전파 — RSSI로 거리 추정 가능</span>
+    <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+  </div>
+
+  {/* 레이더 피코: 듀얼 모드 */}
+  <div class="net-zone zone-purple">
+    <div class="net-zone-label">레이더 피코 — 핵심! 동시에 두 역할</div>
+
+    <div class="net-dual-card">
+      <div class="dual-side side-sta">
+        <div class="dual-icon">🔍</div>
+        <div class="dual-label">STA 모드</div>
+        <div class="dual-detail">
+          드래곤볼 스캔<br/>
+          <code style="font-size: 0.6rem;">sta.scan()</code><br/>
+          접속 없이 신호만 감지
+        </div>
+      </div>
+      <div class="dual-side side-ap">
+        <div class="dual-icon">📡</div>
+        <div class="dual-label">AP 모드</div>
+        <div class="dual-detail">
+          "DragonRadar" 네트워크<br/>
+          <code style="font-size: 0.6rem;">192.168.4.1</code><br/>
+          HTTP 웹 서버 운영
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="net-signal">
+    <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    <span class="signal-label">스마트폰이 "DragonRadar" Wi-Fi에 접속</span>
+    <div class="signal-wave"><span></span><span></span><span></span><span></span><span></span></div>
+  </div>
+
+  {/* 접속 기기들 */}
+  <div class="net-zone zone-emerald">
+    <div class="net-zone-label">레이더 네트워크 (LAN) — 같은 AP에 접속한 기기들</div>
+    <div class="net-devices">
+      <div class="net-device dev-emerald">
+        <div class="dev-icon">📱</div>
+        <div class="dev-name">내 스마트폰</div>
+        <div class="dev-detail">Wi-Fi: DragonRadar<br/>브라우저 → 192.168.4.1</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+      <div class="net-device dev-emerald">
+        <div class="dev-icon">📱</div>
+        <div class="dev-name">짝꿍 스마트폰</div>
+        <div class="dev-detail">Wi-Fi: DragonRadar<br/>같은 대시보드!</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+      <div class="net-device dev-emerald">
+        <div class="dev-icon">💻</div>
+        <div class="dev-name">선생님 노트북</div>
+        <div class="dev-detail">Wi-Fi: DragonRadar<br/>모니터링 가능</div>
+        <span class="dev-badge badge-sta">STA</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">학생A:</span> "잠깐, 그러면 피코가 공유기 역할을 하는 건가요?"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "맞아요! 피코의 AP 모드가 바로 작은 공유기예요. 'DragonRadar'라는 이름의 Wi-Fi를 만들어서, 스마트폰이 거기에 접속하는 거죠."</div>
+  <div class="scene-line"><span class="speaker speaker-student">학생B:</span> "그러면 학교 Wi-Fi랑은 별개인 건가요?"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "네! 완전 별개의 네트워크예요. 학교 Wi-Fi에 연결된 기기와 DragonRadar에 연결된 기기는 서로 다른 LAN이에요. 그래서 인터넷은 안 되지만, 피코랑은 통신할 수 있어요!"</div>
+</div>
+
+{/* === 데이터 흐름 타임라인 === */}
+<div class="data-flow">
+  <div class="flow-phase">
+    <div class="phase-icon">🟠</div>
+    <div class="phase-title">드래곤볼</div>
+    <div class="phase-desc">AP 비콘 송출</div>
+    <div class="phase-time">상시</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">🔍</div>
+    <div class="phase-title">STA 스캔</div>
+    <div class="phase-desc">sta.scan()<br/>RSSI 수집</div>
+    <div class="phase-time">2초 간격</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">🧮</div>
+    <div class="phase-title">데이터 처리</div>
+    <div class="phase-desc">필터링 + 이동평균<br/>→ JSON 생성</div>
+    <div class="phase-time">순간</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">🌐</div>
+    <div class="phase-title">HTTP 응답</div>
+    <div class="phase-desc">GET /data →<br/>JSON 전송</div>
+    <div class="phase-time">폰 요청 시</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">📱</div>
+    <div class="phase-title">JS 업데이트</div>
+    <div class="phase-desc">fetch() →<br/>화면 갱신</div>
+    <div class="phase-time">2초마다</div>
+  </div>
+  <div class="flow-phase">
+    <div class="phase-icon">👀</div>
+    <div class="phase-title">사용자</div>
+    <div class="phase-desc">레이더 UI<br/>실시간 확인</div>
+    <div class="phase-time">즉시</div>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>핵심:</strong> 데이터는 이렇게 흘러갑니다 — 드래곤볼이 전파를 쏘면 → 레이더 피코가 스캔해서 RSSI를 수집하고 → 이동평균으로 노이즈를 줄여서 JSON 데이터를 만들고 → 스마트폰이 2초마다 그 데이터를 요청(fetch)해서 → 화면을 갱신합니다. 총 2-3초의 지연 시간!</p>
+</div>
+
+{/* === API 라우팅 테이블 === */}
+<div class="route-table">
+  <div class="route-row route-header">
+    <div class="route-req">스마트폰 요청</div>
+    <div class="route-arrow">→</div>
+    <div class="route-res">피코 응답</div>
+  </div>
+  <div class="route-row">
+    <div class="route-req"><code>GET /</code> (처음 1번)</div>
+    <div class="route-arrow">→</div>
+    <div class="route-res">전체 HTML+CSS+JS (레이더 UI)</div>
+  </div>
+  <div class="route-row">
+    <div class="route-req"><code>GET /data</code> (2초마다)</div>
+    <div class="route-arrow">→</div>
+    <div class="route-res">JSON: &#123;"DB1":-45, "DB3":-67&#125;</div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"처음에 스마트폰이 접속하면 전체 페이지(HTML)를 보내요. 이건 한 번만! 그 다음부터는 데이터(JSON)만 2초마다 가볍게 주고받아요. 매번 전체 페이지를 보내는 건 낭비니까요."</p>
+  <p>"이건 실제 웹 서비스에서도 쓰는 패턴이에요. 네이버 실시간 검색어가 페이지 새로고침 없이 바뀌는 것도 같은 원리!"</p>
+</div>
+
+---
+
 <div class="step-header">
   <span class="step-num">3</span>
   <span class="step-title">실습 — 피코 웹 서버 만들기</span>

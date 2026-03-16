@@ -1404,3 +1404,427 @@
 .project-progress .prog-4 { background: #10b981; }
 .project-progress .prog-5 { background: #3b82f6; }
 .project-progress .prog-6 { background: #6366f1; }
+
+/* ============================================
+   네트워크 토폴로지 & 데이터 흐름 다이어그램
+   ============================================ */
+
+/* === 토폴로지 컨테이너 === */
+.net-topo {
+  background:
+    radial-gradient(circle, rgba(124,58,237,0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  border: 2px solid rgba(124,58,237,0.15);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  position: relative;
+}
+
+.net-topo-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--teacher-purple);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.net-topo-title .title-icon {
+  font-size: 1.3rem;
+}
+
+/* === 네트워크 존 (LAN, AP 네트워크 등) === */
+.net-zone {
+  border: 2px dashed rgba(124,58,237,0.25);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1rem 1rem;
+  margin: 0.75rem 0;
+  position: relative;
+  background: rgba(255,255,255,0.6);
+}
+
+.net-zone.zone-purple {
+  border-color: rgba(124,58,237,0.3);
+  background: rgba(124,58,237,0.03);
+}
+
+.net-zone.zone-rose {
+  border-color: rgba(244,63,94,0.3);
+  background: rgba(244,63,94,0.03);
+}
+
+.net-zone.zone-emerald {
+  border-color: rgba(16,185,129,0.3);
+  background: rgba(16,185,129,0.03);
+}
+
+.net-zone.zone-blue {
+  border-color: rgba(59,130,246,0.3);
+  background: rgba(59,130,246,0.03);
+}
+
+.net-zone-label {
+  position: absolute;
+  top: -0.65rem;
+  left: 1rem;
+  background: white;
+  padding: 0 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--teacher-purple);
+  border-radius: 0.25rem;
+}
+
+.net-zone.zone-rose .net-zone-label { color: var(--teacher-rose); }
+.net-zone.zone-emerald .net-zone-label { color: var(--teacher-emerald); }
+.net-zone.zone-blue .net-zone-label { color: #3b82f6; }
+
+:root[data-theme='dark'] .net-zone {
+  background: rgba(255,255,255,0.02);
+}
+
+:root[data-theme='dark'] .net-zone-label {
+  background: #1e293b;
+}
+
+/* === 디바이스 목록 === */
+.net-devices {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* === 디바이스 카드 === */
+.net-device {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.65rem 0.75rem;
+  background: white;
+  border: 1.5px solid rgba(124,58,237,0.15);
+  border-radius: 0.6rem;
+  min-width: 75px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.net-device:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(124,58,237,0.12);
+}
+
+.net-device.dev-highlight {
+  border-color: var(--teacher-purple);
+  border-width: 2px;
+  box-shadow: 0 2px 8px rgba(124,58,237,0.15);
+}
+
+.net-device.dev-rose {
+  border-color: var(--teacher-rose);
+}
+
+.net-device.dev-emerald {
+  border-color: var(--teacher-emerald);
+}
+
+.net-device.dev-blue {
+  border-color: #3b82f6;
+}
+
+:root[data-theme='dark'] .net-device {
+  background: rgba(255,255,255,0.05);
+}
+
+.net-device .dev-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.net-device .dev-name {
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #1e293b;
+}
+
+:root[data-theme='dark'] .net-device .dev-name {
+  color: #e2e8f0;
+}
+
+.net-device .dev-detail {
+  font-size: 0.6rem;
+  color: var(--teacher-slate);
+  line-height: 1.3;
+}
+
+.net-device .dev-badge {
+  display: inline-block;
+  font-size: 0.55rem;
+  font-weight: 700;
+  padding: 0.1rem 0.35rem;
+  border-radius: 9999px;
+  color: white;
+  margin-top: 0.15rem;
+}
+
+.dev-badge.badge-ap { background: var(--teacher-purple); }
+.dev-badge.badge-sta { background: #3b82f6; }
+.dev-badge.badge-dual { background: linear-gradient(90deg, var(--teacher-purple), #3b82f6); }
+
+/* === 파이프/커넥터 (디바이스 간 연결) === */
+.net-pipe {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin: 0.5rem 0;
+}
+
+.net-pipe .pipe-line {
+  width: 2px;
+  height: 1.5rem;
+  background: linear-gradient(to bottom, var(--teacher-purple), rgba(124,58,237,0.3));
+}
+
+.net-pipe .pipe-label {
+  font-size: 0.6rem;
+  color: var(--teacher-slate);
+  background: white;
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(124,58,237,0.15);
+  white-space: nowrap;
+}
+
+:root[data-theme='dark'] .net-pipe .pipe-label {
+  background: #1e293b;
+}
+
+.net-pipe .pipe-arrow {
+  color: var(--teacher-purple);
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+/* === 수평 연결 허브 === */
+.net-hub {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 0.25rem 0;
+}
+
+.net-hub .hub-line {
+  height: 2px;
+  flex: 1;
+  max-width: 100%;
+  background: var(--teacher-purple);
+  opacity: 0.3;
+}
+
+.net-hub .hub-branch {
+  width: 2px;
+  height: 1rem;
+  background: var(--teacher-purple);
+  opacity: 0.3;
+}
+
+/* === 신호 웨이브 (무선 신호 표현) === */
+.net-signal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  margin: 0.35rem 0;
+  font-size: 0.7rem;
+  color: var(--teacher-purple);
+}
+
+.net-signal .signal-wave {
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  opacity: 0.6;
+}
+
+.net-signal .signal-wave span {
+  display: inline-block;
+  width: 3px;
+  background: var(--teacher-purple);
+  border-radius: 1px;
+  animation: signal-pulse 1.5s ease-in-out infinite;
+}
+
+.net-signal .signal-wave span:nth-child(1) { height: 4px; animation-delay: 0s; }
+.net-signal .signal-wave span:nth-child(2) { height: 8px; animation-delay: 0.15s; }
+.net-signal .signal-wave span:nth-child(3) { height: 12px; animation-delay: 0.3s; }
+.net-signal .signal-wave span:nth-child(4) { height: 8px; animation-delay: 0.45s; }
+.net-signal .signal-wave span:nth-child(5) { height: 4px; animation-delay: 0.6s; }
+
+@keyframes signal-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.net-signal .signal-label {
+  font-size: 0.65rem;
+  color: var(--teacher-slate);
+  font-weight: 500;
+}
+
+/* === 데이터 흐름 타임라인 === */
+.data-flow {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin: 1.5rem 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid rgba(124,58,237,0.15);
+}
+
+.data-flow .flow-phase {
+  flex: 1;
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  border-right: 1px solid rgba(124,58,237,0.1);
+  position: relative;
+  min-width: 0;
+}
+
+.data-flow .flow-phase:last-child {
+  border-right: none;
+}
+
+.data-flow .flow-phase::after {
+  content: '→';
+  position: absolute;
+  right: -0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--teacher-purple);
+  z-index: 1;
+}
+
+.data-flow .flow-phase:last-child::after {
+  display: none;
+}
+
+.data-flow .phase-icon {
+  font-size: 1.3rem;
+  margin-bottom: 0.25rem;
+}
+
+.data-flow .phase-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  color: var(--teacher-purple);
+  margin-bottom: 0.15rem;
+}
+
+.data-flow .phase-desc {
+  font-size: 0.6rem;
+  color: var(--teacher-slate);
+  line-height: 1.3;
+}
+
+.data-flow .phase-time {
+  display: inline-block;
+  margin-top: 0.3rem;
+  font-size: 0.55rem;
+  font-weight: 700;
+  background: rgba(124,58,237,0.1);
+  color: var(--teacher-purple);
+  padding: 0.1rem 0.3rem;
+  border-radius: 9999px;
+}
+
+/* 타임라인 색상 그라데이션 */
+.data-flow .flow-phase:nth-child(1) { background: rgba(124,58,237,0.06); }
+.data-flow .flow-phase:nth-child(2) { background: rgba(244,63,94,0.06); }
+.data-flow .flow-phase:nth-child(3) { background: rgba(59,130,246,0.06); }
+.data-flow .flow-phase:nth-child(4) { background: rgba(245,158,11,0.06); }
+.data-flow .flow-phase:nth-child(5) { background: rgba(16,185,129,0.06); }
+.data-flow .flow-phase:nth-child(6) { background: rgba(99,102,241,0.06); }
+
+/* === 듀얼 모드 디바이스 카드 (AP+STA 동시) === */
+.net-dual-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 2px solid var(--teacher-purple);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin: 0.5rem auto;
+  max-width: 320px;
+  box-shadow: 0 4px 12px rgba(124,58,237,0.12);
+}
+
+.net-dual-card .dual-side {
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.75rem;
+}
+
+.net-dual-card .dual-side.side-sta {
+  background: rgba(59,130,246,0.08);
+  border-right: 1px solid rgba(124,58,237,0.15);
+}
+
+.net-dual-card .dual-side.side-ap {
+  background: rgba(124,58,237,0.08);
+}
+
+.net-dual-card .dual-icon {
+  font-size: 1.3rem;
+  margin-bottom: 0.2rem;
+}
+
+.net-dual-card .dual-label {
+  font-weight: 700;
+  font-size: 0.7rem;
+  margin-bottom: 0.15rem;
+}
+
+.net-dual-card .dual-side.side-sta .dual-label {
+  color: #3b82f6;
+}
+
+.net-dual-card .dual-side.side-ap .dual-label {
+  color: var(--teacher-purple);
+}
+
+.net-dual-card .dual-detail {
+  font-size: 0.6rem;
+  color: var(--teacher-slate);
+  line-height: 1.4;
+}
+
+:root[data-theme='dark'] .net-dual-card {
+  border-color: rgba(124,58,237,0.5);
+}
+
+/* === 모바일 대응 === */
+@media (max-width: 640px) {
+  .net-topo { padding: 1rem; }
+  .net-devices { gap: 0.5rem; }
+  .net-device { min-width: 65px; padding: 0.5rem; }
+  .net-device .dev-icon { font-size: 1.4rem; }
+  .net-device .dev-name { font-size: 0.7rem; }
+  .data-flow { flex-direction: column; }
+  .data-flow .flow-phase { border-right: none; border-bottom: 1px solid rgba(124,58,237,0.1); }
+  .data-flow .flow-phase::after { right: 50%; top: auto; bottom: -0.5rem; transform: rotate(90deg) translateX(50%); }
+  .data-flow .flow-phase:last-child { border-bottom: none; }
+  .net-dual-card { max-width: 100%; }
+}
