@@ -6,6 +6,9 @@ next: false
 ---
 
 import { Aside, Steps } from '@astrojs/starlight/components';
+import ClassroomNetwork from '../../../components/diagrams/ClassroomNetwork';
+import DataJourney from '../../../components/diagrams/DataJourney';
+import FullNetworkMap from '../../../components/diagrams/FullNetworkMap';
 
 <div class="teacher-script">
   <p>"여러분, 지금 이 순간에도 이 교실에는 <strong>수백만 개의 데이터</strong>가 공기 중을 날아다니고 있어요. 눈에 안 보일 뿐이죠. 오늘은 그 보이지 않는 세계를 <strong>눈에 보이게</strong> 만들어 볼 거예요."</p>
@@ -106,7 +109,11 @@ import { Aside, Steps } from '@astrojs/starlight/components';
 
 ### 눈에 보이는 것 — 기기들
 
-<div class="net-topo">
+아래 다이어그램에서 **빛나는 점**을 따라가 보세요. 데이터가 공유기를 거쳐 각 기기로 흘러가는 모습입니다!
+
+<ClassroomNetwork />
+
+<div class="net-topo" style="display:none;">
   <div class="net-topo-title">
     <span class="title-icon">🏫</span>
     우리 교실을 위에서 보면
@@ -219,7 +226,11 @@ import { Aside, Steps } from '@astrojs/starlight/components';
 
 센서 연구소 프로젝트를 예로 들어볼게요. 교실 온도 26.5°C라는 숫자가 어떻게 여러분의 스마트폰 화면에 나타나는지 따라가봅시다.
 
-<div class="packet-tracker">
+아래 다이어그램에서 **빛나는 점이 색상을 바꾸며 이동**합니다. 센서(빨강) → Pico(주황) → Wi-Fi(파랑) → 화면(초록)!
+
+<DataJourney />
+
+<div class="packet-tracker" style="display:none;">
   <div class="tracker-title">🔵 데이터 패킷의 여행 (빛나는 점을 따라가 보세요!)</div>
 
   <div class="packet-track-rail">
@@ -676,7 +687,11 @@ Pico는 **웹 서버**입니다. 웹 서버란 "누군가 요청하면 응답해
   <p>"자, 마지막으로 4개 프로젝트를 <strong>하나의 지도</strong>에 올려봅시다. 큰 그림이 보일 거예요!"</p>
 </div>
 
-<div class="net-topo">
+아래 지도에서 **3개 영역**(인터넷/학교 LAN/독립 네트워크)을 관통하며 데이터가 흐르는 **빛나는 점들**을 관찰해보세요!
+
+<FullNetworkMap />
+
+<div class="net-topo" style="display:none;">
   <div class="net-topo-title">
     <span class="title-icon">🗺️</span>
     바이브 코딩 프로젝트 — 전체 네트워크 지도
