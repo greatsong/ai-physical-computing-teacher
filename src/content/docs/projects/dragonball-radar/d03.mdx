@@ -1,0 +1,1062 @@
+---
+title: "3차시: 스마트폰 레이더 — 웹 대시보드"
+description: "AP+STA 동시 운용, 피코 웹 서버, 스마트폰 실시간 레이더 대시보드"
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+{/* 프로젝트 진행 바 */}
+<div class="project-progress">
+  <div class="prog-item prog-1 done">1. AP vs STA</div>
+  <div class="prog-item prog-2 done">2. RSSI→LED</div>
+  <div class="prog-item prog-3 current">3. 웹 대시보드</div>
+  <div class="prog-item prog-4">4. 바이브코딩</div>
+  <div class="prog-item prog-5">5. 드래곤볼 헌트</div>
+</div>
+
+{/* 결과물 미리보기 */}
+<div class="outcome-preview">
+  <div class="outcome-badge">이 차시가 끝나면</div>
+  <h4>스마트폰이 진짜 레이더가 됩니다</h4>
+  <p>피코가 <strong>AP와 STA를 동시에 운용</strong>하여, 드래곤볼을 스캔하면서 동시에 스마트폰에 <strong>실시간 레이더 대시보드</strong>를 서빙합니다. LED만으로는 알 수 없던 정밀한 RSSI 수치와 여러 드래곤볼의 위치를 한눈에 확인할 수 있습니다.</p>
+  <div class="outcome-items">
+    <div class="outcome-item">
+      <div class="item-icon">📡</div>
+      <div class="item-label">AP+STA 동시</div>
+      스캔 + 서빙 병행
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🌐</div>
+      <div class="item-label">피코 웹 서버</div>
+      socket으로 HTTP 서빙
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">📱</div>
+      <div class="item-label">레이더 UI</div>
+      실시간 RSSI 시각화
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🔄</div>
+      <div class="item-label">JSON API</div>
+      2초 간격 데이터 갱신
+    </div>
+  </div>
+</div>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">프로젝트</div>
+      드래곤볼 레이더 (3/5차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      150분 (3교시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">형태</div>
+      개인 실습 → 모둠 활동
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">선수학습</div>
+      2차시 — RSSI→LED 매핑, Wi-Fi 스캔, 이동 평균
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">학습목표</div>
+      AP+STA 동시 운용, 피코 웹 서버, 스마트폰 실시간 레이더 대시보드 구현
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">컴퓨팅 사고력</span> <span class="badge badge-emerald">네트워크 이해</span> <span class="badge badge-rose">협력적 문제해결</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (모둠 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 W x15</li>
+    <li>Micro USB **데이터** 케이블</li>
+    <li>보조배터리</li>
+    <li>스마트폰 (대시보드 확인용)</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>2차시 LED 레이더 코드가 정상 실행되는지 확인</li>
+    <li>3차시 코드 2개 배포 준비 (Classroom, USB 등)</li>
+    <li>교사 피코로 AP+STA 동시 운용 사전 테스트 필수</li>
+    <li>드래곤볼 AP 피코 3개 이상 교실/복도에 배치 준비</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 5">1교시 50분</div>
+  <div class="main" style="flex: 5">2교시 50분</div>
+  <div class="wrap-up" style="flex: 5; background: var(--teacher-emerald);">3교시 50분</div>
+</div>
+
+---
+
+## 1교시: 피코를 웹 서버로! (50분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">복습 & 오늘의 목표</span>
+  <span class="step-time">00-05분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"지난 시간에 LED 깜빡임으로 드래곤볼 찾았죠? 재밌었지만 아쉬운 점도 있었어요. LED로는 정확한 숫자를 모르잖아요. 그리고 드래곤볼이 7개인데 지금 어느 걸 추적 중인지도 모르고요."</p>
+  <p>"오늘은 스마트폰 화면에 진짜 레이더를 띄울 거예요. 피코가 웹 서버가 되어서 스마트폰에 실시간 정보를 보여주는 겁니다!"</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">AP+STA 동시 운용 개념</span>
+  <span class="step-time">05-20분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"여기서 문제가 하나 있어요. 레이더 피코가 해야 할 일이 두 가지예요."</p>
+</div>
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-icon">🔍</div>
+    <div class="flow-label">임무 1: STA</div>
+    <div class="flow-desc">드래곤볼 스캔</div>
+  </div>
+  <div class="flow-arrow">+</div>
+  <div class="flow-step">
+    <div class="flow-icon">📡</div>
+    <div class="flow-label">임무 2: AP</div>
+    <div class="flow-desc">스마트폰에 서빙</div>
+  </div>
+  <div class="flow-arrow">=</div>
+  <div class="flow-step" style="border-color: var(--teacher-purple); border-width: 2px;">
+    <div class="flow-icon">🐉</div>
+    <div class="flow-label">레이더 피코</div>
+    <div class="flow-desc">AP+STA 동시!</div>
+  </div>
+</div>
+
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">STA</div>
+    <div class="map-content">
+      <div class="map-title">드래곤볼 찾기</div>
+      <div class="map-desc">레이더 피코가 주변 Wi-Fi를 스캔하여 DB1-DB7을 탐색</div>
+    </div>
+    <div class="map-note">외부 정보 수집</div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n2">AP</div>
+    <div class="map-content">
+      <div class="map-title">스마트폰에 화면 보여주기</div>
+      <div class="map-desc">스마트폰이 레이더 피코의 AP에 접속하여 웹 페이지를 요청</div>
+    </div>
+    <div class="map-note">정보 제공</div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"다행히 Pico 2W는 AP와 STA를 동시에 쓸 수 있어요. 하나의 Wi-Fi 칩이 두 역할을 번갈아 처리하는 거죠. STA로 드래곤볼을 스캔하면서, 동시에 AP로 스마트폰에게 결과를 보여주는 겁니다."</p>
+  <p>"실생활에서 비유하면... 편의점 알바생이 물건 입고(STA, 외부 정보 수집)도 하면서 동시에 카운터에서 손님 응대(AP, 정보 제공)도 하는 거예요!"</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">실습 — 피코 웹 서버 만들기</span>
+  <span class="step-time">20-40분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"먼저 드래곤볼 스캔 없이, 단순한 웹 서버부터 만들어봅시다. 피코가 웹 페이지 하나를 띄우는 거예요."</p>
+</div>
+
+<div class="code-file-label">step1_web_server_basic.py</div>
+
+```python
+# ============================================
+# 🌐 피코 웹 서버 — 기초 버전
+# ============================================
+# 피코가 AP를 열고, 접속한 스마트폰에
+# 간단한 웹 페이지를 보여줍니다.
+# ============================================
+
+import network
+import socket
+import time
+
+# === AP 모드 설정 ===
+RADAR_AP_NAME = "DragonRadar"
+RADAR_AP_PASS = "radarpass"
+
+ap = network.WLAN(network.AP_IF)
+ap.active(True)
+ap.config(essid=RADAR_AP_NAME, password=RADAR_AP_PASS)
+
+while not ap.active():
+    time.sleep(1)
+
+print(f"📡 AP 활성화: &#123;RADAR_AP_NAME&#125;")
+print(f"   IP: &#123;ap.ifconfig()[0]&#125;")
+
+# === 웹 페이지 HTML ===
+def make_html():
+    return """<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dragon Radar</title>
+    <style>
+        body &#123;
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            text-align: center;
+            padding: 20px;
+        &#125;
+        h1 &#123; color: #ff6b35; font-size: 2em; &#125;
+        .status &#123;
+            font-size: 1.5em;
+            margin: 30px;
+            padding: 20px;
+            background: #16213e;
+            border-radius: 15px;
+        &#125;
+    </style>
+</head>
+<body>
+    <h1>🐉 Dragon Radar</h1>
+    <div class="status">
+        ✅ 레이더 서버 작동 중!<br>
+        접속 성공!
+    </div>
+    <p>다음 단계에서 실시간 데이터가 여기에 표시됩니다.</p>
+</body>
+</html>"""
+
+# === 웹 서버 시작 ===
+addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
+s = socket.socket()
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+s.bind(addr)
+s.listen(1)
+
+print(f"🌐 웹 서버 시작! http://&#123;ap.ifconfig()[0]&#125;")
+print("   스마트폰으로 위 주소에 접속하세요!")
+
+while True:
+    try:
+        cl, addr = s.accept()
+        print(f"   📱 접속: &#123;addr[0]&#125;")
+
+        request = cl.recv(1024)
+
+        response = make_html()
+        cl.send('HTTP/1.0 200 OK\r\n')
+        cl.send('Content-type: text/html\r\n')
+        cl.send('\r\n')
+        cl.send(response)
+        cl.close()
+    except Exception as e:
+        print(f"   에러: &#123;e&#125;")
+        try:
+            cl.close()
+        except:
+            pass
+```
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">스마트폰으로 접속 테스트</span>
+  <span class="step-time">40-50분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"코드를 실행하면 'http://192.168.4.1'이라고 뜰 거예요. 스마트폰으로 'DragonRadar' Wi-Fi에 접속한 다음, 브라우저에서 그 주소를 입력하세요!"</p>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"192.168.4.1이 뭐예요?"</div>
+  <div class="qa-a">피코가 AP 모드일 때 자동으로 받는 기본 IP 주소예요. 집 공유기의 '관리자 페이지'가 보통 192.168.0.1인 것과 비슷해요. 스마트폰이 이 주소로 접속하면 피코가 응답하는 거예요.</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"접속이 안 돼요!"</div>
+  <div class="qa-a">세 가지 확인해보세요: (1) 스마트폰이 'DragonRadar' Wi-Fi에 접속됐는지, (2) 브라우저 주소창에 'http://'를 포함해서 정확히 입력했는지, (3) 혹시 '모바일 데이터'가 켜져있으면 Wi-Fi 대신 데이터로 갈 수 있으니 데이터를 잠시 끄세요.</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"socket이 뭐예요?"</div>
+  <div class="qa-a">네트워크 통신의 창구예요. 전화기의 수화기처럼, 데이터를 주고받는 통로를 만드는 거예요. 서버는 <code>listen()</code>으로 기다리고, 클라이언트가 <code>accept()</code>로 연결되면 데이터를 주고받아요.</div>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">수빈:</span> (스마트폰 브라우저에서 192.168.4.1을 입력한다) "오!! 폰에 'Dragon Radar' 화면이 떴어요!"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "축하해요! 지금 수빈이 폰이 보고 있는 화면은 인터넷에서 온 게 아니에요. 책상 위의 이 피코가 보내준 거예요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">수빈:</span> "와... 피코가 네이버 같은 웹사이트가 된 거예요?"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "원리는 완전히 같아요! 네이버 서버가 HTML을 보내주는 것처럼, 피코가 HTML을 보내주는 거예요. 규모만 다를 뿐!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">준혁:</span> "나도 접속해도 돼요?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">수빈:</span> "응 와봐!" (준혁 폰에서도 같은 화면 표시)</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "여러 대가 동시 접속도 돼요. 진짜 웹 서버처럼!"</div>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">스마트폰에서 페이지가 안 뜸</div>
+    <span class="label">원인</span>
+    <span class="value">모바일 데이터가 켜져 있어 Wi-Fi를 우회</span>
+    <span class="label">대응</span>
+    <span class="value">모바일 데이터를 끄고, DragonRadar Wi-Fi 연결 후 http://192.168.4.1 접속</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"이 사이트에 연결할 수 없음" 에러</div>
+    <span class="label">원인</span>
+    <span class="value">https로 접속했거나 주소 오타</span>
+    <span class="label">대응</span>
+    <span class="value"><code>http://192.168.4.1</code>을 정확히 입력 (https가 아닌 http)</span>
+  </div>
+</div>
+
+---
+
+## 2교시: 실시간 레이더 대시보드 (50분)
+
+<div class="step-header">
+  <span class="step-num">5</span>
+  <span class="step-title">웹에서 실시간 데이터 갱신 원리</span>
+  <span class="step-time">00-10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"1교시 웹 페이지는 정적이었어요. 한 번 뜨면 끝. 레이더는 실시간으로 계속 바뀌어야 하잖아요?"</p>
+  <p>"방법은 간단해요. 웹 페이지에 자바스크립트를 넣어서 '몇 초마다 새 데이터를 달라'고 피코에 요청하는 거예요."</p>
+</div>
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">📄</div>
+    <div class="flow-label">페이지 받기</div>
+    <div class="flow-desc">GET / → HTML</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">🔄</div>
+    <div class="flow-label">2초마다 요청</div>
+    <div class="flow-desc">GET /data → JSON</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">📱</div>
+    <div class="flow-label">화면 갱신</div>
+    <div class="flow-desc">JS가 UI 업데이트</div>
+  </div>
+</div>
+
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">①</div>
+    <div class="map-content">
+      <div class="map-title"><code>GET /</code> <span class="map-tag">최초 1회</span></div>
+      <div class="map-desc">전체 HTML 페이지 전송 (레이더 UI + JavaScript)</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n2">②</div>
+    <div class="map-content">
+      <div class="map-title"><code>GET /data</code> <span class="map-tag">2초마다 반복</span></div>
+      <div class="map-desc">JSON 데이터만 전송 &#8212; 예: &#123;"DB1": -45, "DB3": -67, "DB5": -82&#125;</div>
+    </div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"첫 접속에서는 전체 페이지(HTML)를 보내고, 그 다음부터는 데이터(JSON)만 보내요. 전체 페이지를 매번 다시 보내는 건 낭비니까요."</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">6</span>
+  <span class="step-title">실습 — 레이더 대시보드 만들기</span>
+  <span class="step-time">10-40분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이번 코드가 좀 길어요. 하지만 구조는 간단해요 &#8212; STA로 스캔하고, AP로 결과를 웹에 뿌리는 거. 전체를 이해하려 하지 말고, 주석에 '🔥' 표시된 부분을 중심으로 보세요."</p>
+</div>
+
+### 코드 구조 한눈에 보기
+
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">①</div>
+    <div class="map-content">
+      <div class="map-title">설정 & 초기화</div>
+      <div class="map-desc">AP 켜기 + STA 켜기, 이동 평균 클래스</div>
+    </div>
+    <div class="map-note">준비 단계</div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n2">②</div>
+    <div class="map-content">
+      <div class="map-title">함수 정의</div>
+      <div class="map-desc"><code>scan_dragonballs()</code> &#8212; STA로 주변 스캔, <code>make_dashboard_html()</code> &#8212; 레이더 UI</div>
+    </div>
+    <div class="map-note">도구 만들기</div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n3">③</div>
+    <div class="map-content">
+      <div class="map-title">메인 루프</div>
+      <div class="map-desc">스캔 → 웹 요청 확인 → /data면 JSON, /면 HTML → 반복</div>
+    </div>
+    <div class="map-note">무한 반복</div>
+  </div>
+</div>
+
+<Aside type="tip" title="코드가 길어요!">
+아래 코드에서 HTML/CSS/JavaScript 부분이 길지만, Python 서버 로직은 1교시와 거의 동일합니다. 학생에게는 "🔥 표시된 부분"만 집중하라고 안내하세요.
+</Aside>
+
+<div class="code-file-label">step2_radar_dashboard.py</div>
+
+```python
+# ============================================
+# 🐉 드래곤볼 레이더 — 스마트폰 대시보드
+# ============================================
+# STA로 드래곤볼을 스캔하고,
+# AP로 스마트폰에 실시간 레이더 UI를 서빙합니다.
+# ============================================
+
+import network
+import socket
+import machine
+import time
+import json
+
+# === 설정 ===
+RADAR_AP_NAME = "DragonRadar"    # 레이더 AP 이름
+RADAR_AP_PASS = "radarpass"      # 레이더 AP 비밀번호
+DB_PREFIX = "DB"                  # 드래곤볼 SSID 접두사
+SCAN_INTERVAL = 2                 # 스캔 간격 (초)
+WINDOW_SIZE = 5                   # 이동 평균 창 크기
+
+# === LED ===
+led = machine.Pin("LED", machine.Pin.OUT)
+
+# === AP 모드 (스마트폰 접속용) ===
+ap = network.WLAN(network.AP_IF)
+ap.active(True)
+ap.config(essid=RADAR_AP_NAME, password=RADAR_AP_PASS)
+while not ap.active():
+    time.sleep(1)
+print(f"📡 AP: &#123;RADAR_AP_NAME&#125; (&#123;ap.ifconfig()[0]&#125;)")
+
+# === STA 모드 (드래곤볼 스캔용) ===
+sta = network.WLAN(network.STA_IF)
+sta.active(True)
+print("🔍 STA: 스캔 준비 완료")
+
+# === 이동 평균 ===
+class MovingAverage:
+    def __init__(self, size):
+        self.size = size
+        self.buffer = []
+    def add(self, v):
+        self.buffer.append(v)
+        if len(self.buffer) > self.size:
+            self.buffer.pop(0)
+    def avg(self):
+        return sum(self.buffer) / len(self.buffer) if self.buffer else None
+
+# 드래곤볼별 이동평균 저장소
+db_smoothers = &#123;&#125;
+
+# === 드래곤볼 스캔 ===
+scan_results = &#123;&#125;         # &#123;"DB1": -45, "DB3": -67, ...&#125;
+last_scan_time = 0
+
+def scan_dragonballs():
+    """주변 스캔 → 드래곤볼만 필터 → 이동평균 적용"""
+    global scan_results, last_scan_time
+
+    now = time.ticks_ms()
+    if time.ticks_diff(now, last_scan_time) < SCAN_INTERVAL * 1000:
+        return  # 스캔 간격 아직 안 됨
+
+    last_scan_time = now
+    networks = sta.scan()
+
+    found = &#123;&#125;
+    for net in networks:
+        ssid = net[0].decode('utf-8')
+        rssi = net[3]
+        if ssid.startswith(DB_PREFIX):
+            # 이동평균 객체 없으면 생성
+            if ssid not in db_smoothers:
+                db_smoothers[ssid] = MovingAverage(WINDOW_SIZE)
+            db_smoothers[ssid].add(rssi)
+            found[ssid] = round(db_smoothers[ssid].avg(), 1)
+
+    scan_results = found
+
+    # LED: 가장 가까운 드래곤볼 기준으로 깜빡임
+    if found:
+        strongest = max(found.values())
+        # 간단한 매핑: 강할수록 빠르게 깜빡
+        delay = max(0.05, min(1.0, (strongest + 90) / 60 * -0.95 + 1.0))
+        led.on()
+        time.sleep(delay / 4)
+        led.off()
+
+# === 🔥 웹 페이지 HTML ===
+def make_dashboard_html():
+    return """<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dragon Radar</title>
+    <style>
+        * &#123; margin: 0; padding: 0; box-sizing: border-box; &#125;
+        body &#123;
+            font-family: 'Courier New', monospace;
+            background: #0a0a1a;
+            color: #00ff88;
+            min-height: 100vh;
+            padding: 15px;
+        &#125;
+
+        h1 &#123;
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(255,107,53,0.5);
+            color: #ff6b35;
+        &#125;
+
+        /* 레이더 화면 */
+        .radar-container &#123;
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #0a2a1a 0%, #0a0a1a 70%);
+            border: 3px solid #00ff88;
+            box-shadow: 0 0 30px rgba(0,255,136,0.3);
+            overflow: hidden;
+        &#125;
+
+        /* 레이더 링 */
+        .radar-ring &#123;
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(0,255,136,0.2);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        &#125;
+        .ring1 &#123; width: 75%; height: 75%; &#125;
+        .ring2 &#123; width: 50%; height: 50%; &#125;
+        .ring3 &#123; width: 25%; height: 25%; &#125;
+
+        /* 십자선 */
+        .crosshair-h, .crosshair-v &#123;
+            position: absolute;
+            background: rgba(0,255,136,0.15);
+        &#125;
+        .crosshair-h &#123;
+            width: 100%; height: 1px;
+            top: 50%; left: 0;
+        &#125;
+        .crosshair-v &#123;
+            width: 1px; height: 100%;
+            top: 0; left: 50%;
+        &#125;
+
+        /* 드래곤볼 점 */
+        .db-dot &#123;
+            position: absolute;
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: #ff6b35;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(255,107,53,0.8);
+            transition: all 0.5s ease;
+        &#125;
+        .db-dot.close &#123; background: #ff0000; box-shadow: 0 0 20px rgba(255,0,0,0.8); &#125;
+        .db-dot.mid   &#123; background: #ff6b35; &#125;
+        .db-dot.far   &#123; background: #666; box-shadow: none; &#125;
+
+        /* 데이터 리스트 */
+        .db-list &#123; margin-top: 15px; &#125;
+        .db-item &#123;
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            margin: 5px 0;
+            background: #111;
+            border-radius: 10px;
+            border-left: 4px solid #333;
+        &#125;
+        .db-item.close &#123; border-left-color: #ff0000; &#125;
+        .db-item.mid   &#123; border-left-color: #ff6b35; &#125;
+        .db-item.far   &#123; border-left-color: #666; &#125;
+
+        .db-name &#123; font-size: 1.2em; font-weight: bold; min-width: 50px; &#125;
+        .db-rssi &#123; font-size: 1.5em; margin: 0 15px; min-width: 80px; text-align: right; &#125;
+        .db-bar &#123; flex: 1; height: 8px; background: #222; border-radius: 4px; overflow: hidden; &#125;
+        .db-bar-fill &#123; height: 100%; border-radius: 4px; transition: width 0.5s; &#125;
+
+        .status &#123;
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.9em;
+        &#125;
+
+        .no-signal &#123;
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.2em;
+        &#125;
+    </style>
+</head>
+<body>
+    <h1>&#x1F432; DRAGON RADAR</h1>
+
+    <div class="radar-container">
+        <div class="crosshair-h"></div>
+        <div class="crosshair-v"></div>
+        <div class="radar-ring ring1"></div>
+        <div class="radar-ring ring2"></div>
+        <div class="radar-ring ring3"></div>
+        <div id="radar-dots"></div>
+    </div>
+
+    <div id="db-list" class="db-list">
+        <div class="no-signal">스캔 중...</div>
+    </div>
+
+    <div class="status">
+        <span id="scan-time">-</span> |
+        <span id="db-count">0</span>개 감지
+    </div>
+
+    <script>
+        // 🔥 2초마다 데이터 요청
+        async function fetchData() &#123;
+            try &#123;
+                const res = await fetch('/data');
+                const data = await res.json();
+                updateUI(data);
+            &#125; catch(e) &#123;
+                console.log('fetch error:', e);
+            &#125;
+        &#125;
+
+        function rssiToPercent(rssi) &#123;
+            // -90 - -30 → 0% - 100%
+            return Math.max(0, Math.min(100, (rssi + 90) / 60 * 100));
+        &#125;
+
+        function rssiToClass(rssi) &#123;
+            if (rssi > -50) return 'close';
+            if (rssi > -70) return 'mid';
+            return 'far';
+        &#125;
+
+        function rssiToColor(rssi) &#123;
+            if (rssi > -50) return '#ff0000';
+            if (rssi > -70) return '#ff6b35';
+            return '#666';
+        &#125;
+
+        function updateUI(data) &#123;
+            const entries = Object.entries(data).sort((a,b) => b[1] - a[1]);
+
+            // 레이더 점 업데이트
+            let dotsHtml = '';
+            entries.forEach((item, i) => &#123;
+                const [name, rssi] = item;
+                const pct = rssiToPercent(rssi);
+                const cls = rssiToClass(rssi);
+                // 거리에 따라 중심에서 바깥으로 (가까우면 중심)
+                const dist = (100 - pct) / 100 * 130;
+                const angle = (i / Math.max(entries.length, 1)) * Math.PI * 2 - Math.PI/2;
+                const x = 150 + Math.cos(angle) * dist;
+                const y = 150 + Math.sin(angle) * dist;
+                dotsHtml += '<div class="db-dot ' + cls + '" style="left:' + x + 'px;top:' + y + 'px;" title="' + name + '"></div>';
+            &#125;);
+            document.getElementById('radar-dots').innerHTML = dotsHtml;
+
+            // 리스트 업데이트
+            if (entries.length === 0) &#123;
+                document.getElementById('db-list').innerHTML = '<div class="no-signal">드래곤볼을 찾지 못했습니다...</div>';
+            &#125; else &#123;
+                let listHtml = '';
+                entries.forEach(function(item) &#123;
+                    const name = item[0];
+                    const rssi = item[1];
+                    const pct = rssiToPercent(rssi);
+                    const cls = rssiToClass(rssi);
+                    const color = rssiToColor(rssi);
+                    listHtml += '<div class="db-item ' + cls + '">' +
+                        '<span class="db-name">' + name + '</span>' +
+                        '<span class="db-rssi" style="color:' + color + '">' + rssi + '</span>' +
+                        '<div class="db-bar"><div class="db-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div>' +
+                        '</div>';
+                &#125;);
+                document.getElementById('db-list').innerHTML = listHtml;
+            &#125;
+
+            // 상태 업데이트
+            const now = new Date();
+            document.getElementById('scan-time').textContent =
+                now.getHours().toString().padStart(2,'0') + ':' +
+                now.getMinutes().toString().padStart(2,'0') + ':' +
+                now.getSeconds().toString().padStart(2,'0');
+            document.getElementById('db-count').textContent = entries.length;
+        &#125;
+
+        // 2초마다 반복
+        setInterval(fetchData, 2000);
+        fetchData();  // 최초 1회 즉시 실행
+    </script>
+</body>
+</html>"""
+
+# === 웹 서버 ===
+addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
+s = socket.socket()
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+s.bind(addr)
+s.listen(2)
+s.settimeout(0.5)   # 비차단 모드 (스캔과 서버를 번갈아 실행)
+
+print(f"\n🐉 드래곤볼 레이더 대시보드 시작!")
+print(f"   📱 스마트폰으로 '&#123;RADAR_AP_NAME&#125;' 접속 후")
+print(f"   🌐 http://&#123;ap.ifconfig()[0]&#125; 에서 확인!")
+print("=" * 50)
+
+# === 메인 루프 ===
+while True:
+    # 1. 드래곤볼 스캔
+    scan_dragonballs()
+
+    # 2. 웹 요청 처리
+    try:
+        cl, addr = s.accept()
+        request = cl.recv(1024).decode('utf-8')
+
+        if 'GET /data' in request:
+            # 🔥 JSON 데이터 응답 (2초마다 호출됨)
+            response = json.dumps(scan_results)
+            cl.send('HTTP/1.0 200 OK\r\n')
+            cl.send('Content-type: application/json\r\n')
+            cl.send('Access-Control-Allow-Origin: *\r\n')
+            cl.send('\r\n')
+            cl.send(response)
+        elif 'GET / ' in request or 'GET / HTTP' in request:
+            # HTML 페이지 응답 (최초 접속)
+            response = make_dashboard_html()
+            cl.send('HTTP/1.0 200 OK\r\n')
+            cl.send('Content-type: text/html\r\n')
+            cl.send('\r\n')
+            cl.send(response)
+
+        cl.close()
+    except OSError:
+        pass  # 타임아웃 — 접속 요청 없음 (정상)
+    except Exception as e:
+        print(f"   에러: &#123;e&#125;")
+        try:
+            cl.close()
+        except:
+            pass
+```
+
+<div class="step-header">
+  <span class="step-num">7</span>
+  <span class="step-title">스마트폰에서 레이더 확인!</span>
+  <span class="step-time">40-50분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"코드를 실행하고, 스마트폰에서 'DragonRadar' Wi-Fi에 접속한 다음 브라우저에서 192.168.4.1로 가보세요!"</p>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"JSON이 뭐예요?"</div>
+  <div class="qa-a">데이터를 주고받기 위한 형식이에요. <code>&#123;"DB1": -45, "DB3": -67&#125;</code> 이렇게 생겼어요. 사람도 읽을 수 있고, 프로그램도 바로 처리할 수 있어서 웹에서 엄청 많이 쓰여요.</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"settimeout(0.5)는 왜 넣었어요?"</div>
+  <div class="qa-a">웹 서버가 접속을 기다릴 때, 접속이 없으면 영원히 멈춰있거든요. 0.5초만 기다리고 안 오면 넘어가라는 거예요. 그래야 스캔도 할 수 있고 서버도 할 수 있어요. '멀티태스킹'의 간단한 구현이에요.</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"스마트폰에서 접속이 안 돼요 / 페이지가 안 떠요."</div>
+  <div class="qa-a">(1) 스마트폰이 DragonRadar Wi-Fi에 연결됐는지 확인, (2) 모바일 데이터 끄기, (3) http://192.168.4.1 정확히 입력 (https 아님!), (4) 피코를 리부팅하고 다시 실행해보세요.</div>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">다연:</span> (스마트폰 브라우저에서 대시보드를 연다) "와!!! 이거 진짜 레이더 같아요! 초록색 동그라미에 점이 찍혀있어요!"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "점이 몇 개 보여요?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">다연:</span> "세 개요! DB1, DB3, DB5! DB1이 제일 가까운가봐요, 중앙에 가까이 있어요."</div>
+  <div class="scene-line">(다연이가 DB1 방향으로 걸어간다)</div>
+  <div class="scene-line"><span class="speaker speaker-student">다연:</span> "숫자가 바뀌어요! -58에서 -47로! 점도 중앙으로 더 가까워졌어!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">옆 모둠:</span> "우리도 보여줘!" (여러 학생이 같은 DragonRadar에 접속)</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "여러 스마트폰이 동시에 접속해서 같은 화면을 볼 수 있어요. 모둠원 전체가 각자 폰으로 보면서 '거기 말고 이쪽!'하고 협력할 수 있겠죠?"</div>
+</div>
+
+---
+
+## 3교시: 확장 & 실전 (50분)
+
+<div class="step-header">
+  <span class="step-num">8</span>
+  <span class="step-title">대시보드 꾸미기</span>
+  <span class="step-time">00-15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이제 코드 수정 시간! HTML 부분에서 바꿀 수 있는 것들을 바꿔보세요."</p>
+</div>
+
+### 꾸미기 미션 카드
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">미션 1: 쉬움 — 텍스트 & 색상 변경</span>
+    <span class="mission-difficulty">난이도 ★☆☆☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-light">
+      <p>제목 바꾸기: "DRAGON RADAR" → "우리 모둠 레이더"</p>
+      <p>배경색 바꾸기: <code>background: #0a0a1a</code> → <code>#1a0a0a</code> (붉은 톤)</p>
+      <p>테마색 바꾸기: <code>#00ff88</code> → <code>#00aaff</code> (파란 톤)</p>
+    </div>
+  </div>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">미션 2: 보통 — 동작 파라미터 수정</span>
+    <span class="mission-difficulty">난이도 ★★☆☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-light">
+      <p>거리 임계값 바꾸기: <code>rssiToClass</code>에서 -50, -70 값을 조정</p>
+      <p>스캔 주기 바꾸기: <code>setInterval(fetchData, 2000)</code> → <code>1000</code> (1초)</p>
+    </div>
+  </div>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">미션 3: 도전 — UI 확장</span>
+    <span class="mission-difficulty">난이도 ★★★☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-full">
+      <p>드래곤볼 번호 옆에 별 이모지 추가</p>
+      <p>가장 가까운 드래곤볼에 "🔥 가장 가까움!" 표시 추가</p>
+    </div>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p>이건 정답이 없는 자유 과제예요. 수정한 후 피코를 리부팅해서 결과를 확인하도록 안내하세요. 시간이 부족한 학생은 미션 1만 해도 충분합니다.</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">9</span>
+  <span class="step-title">모둠 활동 — 스마트폰 레이더 보물찾기</span>
+  <span class="step-time">15-35분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이번에는 모둠 단위로 해봅시다! 이건 최종 대항전의 예행연습이에요."</p>
+  <p>"규칙을 알려줄게요:"</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">스마트폰 레이더 보물찾기 규칙</span>
+    <span class="mission-difficulty">모둠 활동 20분</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">
+      1. 선생님이 드래곤볼 3개(DB1, DB2, DB3)를 교실 + 복도에 숨김<br/>
+      2. 각 모둠은 레이더 피코 1대 + 스마트폰으로 대시보드 확인<br/>
+      3. 3개를 다 찾은 모둠이 우승!<br/>
+      4. 찾으면 드래곤볼의 전원을 뽑아서 가져오기 (사라지면 다른 모둠 레이더에서도 없어짐)
+    </div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"스마트폰 대시보드를 보면서 '어떤 드래곤볼이 가장 가까운지' 전략을 세워보세요. 가까운 것부터? 아니면 분산해서?"</p>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line">3모둠이 대시보드를 보며 작전 회의 중.</div>
+  <div class="scene-line"><span class="speaker speaker-student">모둠장:</span> "DB1이 -52로 제일 가까워. DB3은 -78이니까 멀어. DB1부터 가자!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">모둠원A:</span> "나는 폰으로 대시보드 계속 볼게. 네가 들고 뛰어."</div>
+  <div class="scene-line"><span class="speaker speaker-student">모둠원B:</span> "복도 왼쪽으로 가보자. 수치 변하는지 봐봐."</div>
+  <div class="scene-line">(이동 중)</div>
+  <div class="scene-line"><span class="speaker speaker-student">모둠원A:</span> "DB1이 -48로 올라갔어! 맞는 방향이야!"</div>
+  <div class="scene-line">(과학실 앞에서)</div>
+  <div class="scene-line"><span class="speaker speaker-student">모둠원A:</span> "DB1 -39!! 거의 다 왔다!!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">모둠장:</span> "여기다!! 캐비닛 위!!!" (피코 발견, 전원 뽑기)</div>
+  <div class="scene-line"><span class="speaker speaker-student">모둠원A:</span> "대시보드에서 DB1이 사라졌어! 남은 건 DB2, DB3!"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "3모둠이 첫 번째 드래곤볼 확보! 다른 모둠 대시보드에서도 DB1이 사라졌을 거예요!"</div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>모둠 활동 순회 시 확인:</strong></p>
+  <ol>
+    <li>보조배터리로 피코 전원이 안정적인지</li>
+    <li>복도 이동 시 안전 수칙 준수하는지</li>
+    <li>모둠원 간 역할 분담이 되고 있는지 (레이더 확인, 이동, 전략 등)</li>
+  </ol>
+</div>
+
+<div class="step-header">
+  <span class="step-num">10</span>
+  <span class="step-title">결과 공유 & LED vs 웹 비교 토론</span>
+  <span class="step-time">35-45분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"LED만으로 찾을 때랑, 스마트폰 대시보드로 찾을 때 어떤 차이가 있었어요?"</p>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">학생A:</span> "대시보드는 여러 개를 동시에 볼 수 있어서 전략을 세울 수 있었어요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">학생B:</span> "숫자가 정확히 보여서 방향 판단이 쉬웠어요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">학생C:</span> "근데 폰을 계속 보느라 앞을 잘 못 봤어요. LED가 오히려 편한 점도 있어요."</div>
+</div>
+
+<div class="teacher-script">
+  <p>"각각 장단점이 있죠. 그래서 우리 레이더는 둘 다 지원하는 거예요! LED로 대략적인 방향을 잡고, 스마트폰으로 정밀하게 추적. 이게 '다중 출력(Multi-output)'의 힘이에요."</p>
+</div>
+
+<div class="compare-cards">
+  <div class="compare-card">
+    <strong>LED 출력</strong><br/>
+    직관적, 화면 안 봐도 됨
+    <div style="color: #888; margin-top: 8px;">대략적 방향 잡기에 유리</div>
+  </div>
+  <div class="compare-arrow">vs</div>
+  <div class="compare-card">
+    <strong>웹 대시보드</strong><br/>
+    정밀하고, 여러 정보 동시 표시
+    <div style="color: #888; margin-top: 8px;">전략 수립과 협력에 유리</div>
+  </div>
+</div>
+<div class="compare-summary">둘 다 지원 = 다중 출력(Multi-output)의 힘!</div>
+
+<div class="step-header">
+  <span class="step-num">11</span>
+  <span class="step-title">정리 & 다음 차시 예고</span>
+  <span class="step-time">45-50분</span>
+</div>
+
+<div class="key-terms">
+  <dl>
+    <dt>AP+STA 동시</dt>
+    <dd>한 피코가 스캔(STA)도 하고 서빙(AP)도 하는 이중 모드</dd>
+    <dt>socket 웹 서버</dt>
+    <dd>socket으로 HTTP 요청을 받아 HTML과 JSON을 제공하는 서버</dd>
+    <dt>JSON API</dt>
+    <dd>데이터를 주고받는 경량 형식 &#8212; 웹 표준</dd>
+    <dt>실시간 갱신</dt>
+    <dd>JavaScript fetch()로 주기적 데이터 요청 후 UI 업데이트</dd>
+    <dt>다중 출력</dt>
+    <dd>LED + 웹 대시보드처럼 여러 출력 채널을 동시에 활용</dd>
+  </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"다음 시간이 재미있어요. 여러분이 직접 AI와 대화하면서 코드를 만드는 '바이브코딩' 시간! 지금까지는 제가 코드를 드렸는데, 4차시에서는 여러분이 AI한테 '이런 기능 만들어줘'하고 시키는 거예요. 7개 드래곤볼 동시 탐지, 발견 등록, 팀 순위... 상상하는 걸 AI가 만들어줄 거예요!"</p>
+</div>
+
+---
+
+## 교사용 참고사항
+
+### 학습목표 정리
+
+| 번호 | 학습목표 | 확인 방법 |
+|------|----------|-----------|
+| 1 | Pico 2W에서 AP+STA 동시 운용 원리 설명 | 편의점 비유를 자기 말로 설명 |
+| 2 | 피코를 웹 서버로 만들어 HTML 서빙 | step1 코드로 스마트폰 접속 성공 |
+| 3 | 스마트폰에서 실시간 RSSI 대시보드 구현 | step2 코드로 레이더 UI 동작 확인 |
+
+### HTML 크기 주의
+
+<Aside type="caution">
+- step2 코드는 HTML/CSS/JS가 포함되어 크기가 큽니다
+- 학생이 꾸미기에서 많이 추가하면 메모리 이슈 가능
+- `gc.collect()` 추가하거나 CSS 간소화를 안내하세요
+</Aside>
+
+### 흔한 문제 & 해결
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">스마트폰에서 접속 안 됨</div>
+    <span class="label">원인</span>
+    <span class="value">모바일 데이터가 켜져 있거나 DragonRadar Wi-Fi 미연결</span>
+    <span class="label">대응</span>
+    <span class="value">모바일 데이터 끄기 → DragonRadar Wi-Fi 연결 → http://192.168.4.1</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">레이더에 점이 안 나타남</div>
+    <span class="label">원인</span>
+    <span class="value">드래곤볼 AP 피코가 켜져있지 않거나 범위 밖</span>
+    <span class="label">대응</span>
+    <span class="value">드래곤볼 피코 전원 확인, 가까이 가서 테스트</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">ENOMEM 에러</div>
+    <span class="label">원인</span>
+    <span class="value">HTML이 커서 메모리 부족</span>
+    <span class="label">대응</span>
+    <span class="value">코드 상단에 <code>import gc; gc.collect()</code> 추가, CSS 간소화</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">AP와 STA가 동시에 안 됨</div>
+    <span class="label">원인</span>
+    <span class="value">펌웨어 버전 문제 또는 Wi-Fi 칩 초기화 순서</span>
+    <span class="label">대응</span>
+    <span class="value">AP를 먼저 켜고 STA를 나중에 켜기, 피코 리부팅 후 재시도</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>전체 수업 순회 체크:</strong></p>
+  <ol>
+    <li>1교시: 모든 학생이 스마트폰으로 피코 웹 서버 접속에 성공했는지</li>
+    <li>2교시: 레이더 대시보드에서 드래곤볼 점이 표시되는지</li>
+    <li>3교시: 모둠 활동에서 안전하게 이동하며 협력하는지</li>
+  </ol>
+</div>

@@ -1,0 +1,809 @@
+---
+title: "5차시: 최종 미션 — 교실 드래곤볼 헌트"
+description: "드래곤볼 7개를 학교에 숨기고 8모둠 팀 대항전, 순위 발표와 프로젝트 회고"
+next: false
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+{/* 프로젝트 진행 바 */}
+<div class="project-progress">
+  <div class="prog-item prog-1 done">1. AP vs STA</div>
+  <div class="prog-item prog-2 done">2. RSSI&#8594;LED</div>
+  <div class="prog-item prog-3 done">3. 웹 대시보드</div>
+  <div class="prog-item prog-4 done">4. 바이브코딩</div>
+  <div class="prog-item prog-5 current">5. 드래곤볼 헌트</div>
+</div>
+
+{/* 결과물 미리보기 */}
+<div class="outcome-preview">
+  <div class="outcome-badge">이 차시가 끝나면</div>
+  <h4>드래곤볼 7개를 모두 찾고, 프로젝트를 마무리합니다</h4>
+  <p>5주간 만든 레이더를 들고 학교 곳곳에 숨겨진 드래곤볼을 찾는 <strong>팀 대항전</strong>을 펼칩니다. 대항전 후에는 기술 회고와 확장 토론으로 프로젝트 전체를 되돌아봅니다.</p>
+  <div class="outcome-items">
+    <div class="outcome-item">
+      <div class="item-icon">&#x1F525;</div>
+      <div class="item-label">대항전</div>
+      8모둠 팀 대항 드래곤볼 헌트
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">&#x1F3C6;</div>
+      <div class="item-label">시상</div>
+      순위 발표 &amp; 전략 공유
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">&#x1F5FA;&#xFE0F;</div>
+      <div class="item-label">회고</div>
+      기술 지도 &amp; 큰 그림 정리
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">&#x1F4DD;</div>
+      <div class="item-label">성찰</div>
+      개인 회고 &amp; 확장 토론
+    </div>
+  </div>
+</div>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">프로젝트</div>
+      드래곤볼 레이더 (5/5차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      150분 (3교시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">형태</div>
+      팀 대항전 &#8594; 발표 &#8594; 회고
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">선수학습</div>
+      1-4차시 전체
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">학습목표</div>
+      프로젝트 전 과정(기획-구현-테스트-실전)을 완수하고, 실전에서 팀 협력으로 문제를 해결하며, 배운 개념과 경험을 정리하여 발표
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">협업 능력</span> <span class="badge badge-emerald">문제 해결력</span> <span class="badge badge-blue">메타인지</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 W x15 (드래곤볼 7대 + 레이더 8대)</li>
+    <li>보조배터리 x15 (최소 2시간 이상 잔량)</li>
+    <li>Micro USB 데이터 케이블 x15</li>
+    <li>스마트폰 (모둠별 1대 이상)</li>
+  </ul>
+  <h5>운영 준비</h5>
+  <ul>
+    <li>타이머 (30분 카운트다운용)</li>
+    <li>상품 (선택 - 순위별 보상)</li>
+    <li>프로젝터 (결과 발표용)</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>드래곤볼 Pico x7에 AP 코드 저장 완료 (DB1-DB7)</li>
+    <li>모둠별 레이더 AP 이름 구분 확인 (Radar1-Radar8)</li>
+    <li>숨길 장소 7곳 사전 답사 (Wi-Fi 신호 탐지 가능 범위 확인)</li>
+    <li>드래곤볼 7대 전원 켜서 AP 정상 작동 확인</li>
+    <li>보조배터리 잔량 확인 &amp; 숨길 장소에 미리 전원 연결</li>
+    <li>안전 확인 (위험한 장소 제외)</li>
+  </ul>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>숨기는 장소 난이도 조절:</strong></p>
+  <ul>
+    <li><strong>쉬움</strong> - 교실 내부: 사물함 위, 칠판 뒤, 창가 화분 옆</li>
+    <li><strong>보통</strong> - 같은 층: 복도 소화기함, 계단 난간, 화장실 입구</li>
+    <li><strong>어려움</strong> - 다른 층: 다른 교실 문 앞, 도서관 서가</li>
+  </ul>
+  <p>너무 밀폐된 곳은 Wi-Fi 신호가 약해져서 탐지 자체가 불가능할 수 있습니다!</p>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 5">1교시: 대항전 50분</div>
+  <div class="main" style="flex: 5">2교시: 결과 &amp; 회고 50분</div>
+  <div class="wrap-up" style="flex: 5">3교시: 토론 &amp; 마무리 50분</div>
+</div>
+
+---
+
+## 1교시: 대항전! (50분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">규칙 설명 &amp; 장비 최종 점검</span>
+  <span class="step-time">00-10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"오늘이 바로 그 날입니다! 드래곤볼 7개가 학교 어딘가에 숨겨져 있어요. 여러분의 레이더로 찾아오세요!"</p>
+</div>
+
+### 공식 규칙
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">드래곤볼 헌트 - 공식 규칙</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">
+      <p><strong>기본 규칙</strong></p>
+      <ol>
+        <li>드래곤볼 7개 (DB1-DB7)가 학교에 숨겨져 있음</li>
+        <li>제한시간: <strong>30분</strong></li>
+        <li>모둠 전원이 함께 다녀야 함 (분리 금지!)</li>
+        <li>발견하면 대시보드에서 "발견" 버튼으로 등록</li>
+        <li>드래곤볼의 전원은 뽑지 마세요! (다른 모둠도 찾아야 하니까)</li>
+      </ol>
+      <p><strong>순위 기준</strong></p>
+      <ol>
+        <li>1순위: 7개 모두 발견 (가장 빠른 시간)</li>
+        <li>2순위: 발견 개수 많은 순</li>
+        <li>3순위: 같은 개수면 총 소요시간 짧은 순</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">안전 규칙</div>
+    <span class="label">1</span>
+    <span class="value">뛰지 않기! (복도에서 사고 위험)</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">안전 규칙</div>
+    <span class="label">2</span>
+    <span class="value">교실 수업 중인 곳은 조용히</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">안전 규칙</div>
+    <span class="label">3</span>
+    <span class="value">위험한 곳 (옥상, 기계실 등) 출입 금지</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">안전 규칙</div>
+    <span class="label">4</span>
+    <span class="value">문제 생기면 즉시 선생님에게 연락</span>
+  </div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>탐색 범위:</strong></p>
+  <ul>
+    <li>본관 1-3층</li>
+    <li>복도, 교실 앞, 계단 부근</li>
+    <li>교실 안 (수업 중), 교무실, 옥상은 출입 금지</li>
+  </ul>
+</div>
+
+<div class="teacher-script">
+  <p>"출발 전 장비 최종 점검! 각 모둠:"</p>
+</div>
+
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">&#x2776;</div>
+    <div class="map-content">
+      <div class="map-title">레이더 Pico 전원 ON <span class="map-tag">확인</span></div>
+      <div class="map-desc">보조배터리 연결, LED 깜빡임 확인</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n2">&#x2777;</div>
+    <div class="map-content">
+      <div class="map-title">스마트폰 접속 <span class="map-tag">확인</span></div>
+      <div class="map-desc">모둠 레이더 Wi-Fi 접속 &amp; 대시보드 화면 표시</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n3">&#x2778;</div>
+    <div class="map-content">
+      <div class="map-title">발견 기록 초기화 <span class="map-tag">확인</span></div>
+      <div class="map-desc">시작 전 이전 기록 리셋</div>
+    </div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"다 됐으면, 10번까지 셀 거예요. 10이 되면 출발!"</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">드래곤볼 숨기기 (선생님 + 보조)</span>
+  <span class="step-time">10-15분</span>
+</div>
+
+<Aside type="note" title="학생들이 장비 점검하는 동안">
+선생님 + 보조가 드래곤볼 7대를 사전에 정한 장소에 배치합니다. 보조배터리를 연결하고 AP가 정상 작동하는지 확인하세요.
+</Aside>
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">3F</div>
+    <div class="flow-icon">&#x1F409;</div>
+    <div class="flow-label">DB7</div>
+    <div class="flow-desc">과학실 앞 복도</div>
+  </div>
+  <div class="flow-arrow">&nbsp;</div>
+  <div class="flow-step">
+    <div class="flow-num">3F</div>
+    <div class="flow-icon">&#x1F409;</div>
+    <div class="flow-label">DB4</div>
+    <div class="flow-desc">계단 창문 틀</div>
+  </div>
+  <div class="flow-arrow">&nbsp;</div>
+  <div class="flow-step">
+    <div class="flow-num">2F</div>
+    <div class="flow-icon">&#x1F409;</div>
+    <div class="flow-label">DB1</div>
+    <div class="flow-desc">교실 옆 사물함</div>
+  </div>
+  <div class="flow-arrow">&nbsp;</div>
+  <div class="flow-step">
+    <div class="flow-num">2F</div>
+    <div class="flow-icon">&#x1F409;</div>
+    <div class="flow-label">DB5</div>
+    <div class="flow-desc">화장실 입구</div>
+  </div>
+  <div class="flow-arrow">&nbsp;</div>
+  <div class="flow-step">
+    <div class="flow-num">2F</div>
+    <div class="flow-icon">&#x1F409;</div>
+    <div class="flow-label">DB2</div>
+    <div class="flow-desc">도서관 앞 벤치</div>
+  </div>
+  <div class="flow-arrow">&nbsp;</div>
+  <div class="flow-step">
+    <div class="flow-num">1F</div>
+    <div class="flow-icon">&#x1F409;</div>
+    <div class="flow-label">DB3</div>
+    <div class="flow-desc">현관 안내 데스크</div>
+  </div>
+  <div class="flow-arrow">&nbsp;</div>
+  <div class="flow-step">
+    <div class="flow-num">1F</div>
+    <div class="flow-icon">&#x1F409;</div>
+    <div class="flow-label">DB6</div>
+    <div class="flow-desc">체육관 신발장</div>
+  </div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">대항전 진행!</span>
+  <span class="step-time">15-45분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"자, 준비됐죠? 시간은 30분! 타이머 시작... 10, 9, 8, 7, 6, 5, 4, 3, 2, 1... 출발!"</p>
+</div>
+
+### 선생님 역할 - 대항전 중
+
+<div class="patrol-point">
+  <p><strong>교실에서 대기하며 모니터링:</strong></p>
+  <ol>
+    <li><strong>장비 모니터링</strong> - 드래곤볼 AP가 모두 살아있는지 확인, 보조배터리 방전 시 교체 대비</li>
+    <li><strong>비상 대응</strong> - 모둠에서 연락 오면 원격 지원</li>
+    <li><strong>안전 관리</strong> - 복도 순찰 (필요시), 뛰는 모둠 주의</li>
+    <li><strong>분위기 조성</strong> - 5분마다 방송/메시지: "현재 가장 많이 찾은 모둠은 N개!"</li>
+  </ol>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">"코드가 멈췄어요!"</div>
+    <span class="label">대응</span>
+    <span class="value">피코 리셋 버튼 눌러보세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"Wi-Fi가 안 잡혀요!"</div>
+    <span class="label">대응</span>
+    <span class="value">스마트폰 Wi-Fi를 껐다 다시 켜보세요</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">"배터리가 방전됐어요!"</div>
+    <span class="label">대응</span>
+    <span class="value">교실에 여분 배터리 있어요. 한 명만 가져가세요</span>
+  </div>
+</div>
+
+### 대항전 하이라이트
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">장면 1 - 출발 직후:</span> 8개 모둠이 교실을 나서자마자 각자의 레이더를 확인한다.</div>
+  <div class="scene-line"><span class="speaker speaker-student">6모둠:</span> "DB1이 -48로 제일 가까워! 바로 옆 어딘가야!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">3모둠:</span> "우리는 일단 아래층부터 가자. 위에는 사람 많을 거야."</div>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">장면 2 - 첫 발견:</span> 4모둠이 2층 복도에서 DB1을 발견한다.</div>
+  <div class="scene-line"><span class="speaker speaker-student">4모둠:</span> "찾았다!! 발견 버튼!! ... -38dBm, 조건 통과! 발견 등록 완료!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">4모둠:</span> "DB1 완료! 이제 6개 남았어! 다음 가까운 거 뭐야?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">4모둠:</span> "DB5가 -61이야. 이 방향인 것 같아!"</div>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">장면 3 - 기술적 문제:</span> 7모둠의 레이더가 갑자기 멈춘다.</div>
+  <div class="scene-line"><span class="speaker speaker-student">7모둠:</span> "선생님! 피코가 먹통이에요!"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> (전화로) "화면에 뭐라고 나와요?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">7모둠:</span> "아무것도 안 나와요. LED도 안 깜빡여요."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "보조배터리 확인해보세요. 방전된 거 아니에요?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">7모둠:</span> "아!! 배터리 빨간불이에요!"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "교실에 여분 배터리 있어요. 한 명만 가져가세요."</div>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">장면 4 - 최종 순간:</span> 남은 시간 5분. 2모둠이 6개 발견, 마지막 DB6를 찾고 있다.</div>
+  <div class="scene-line"><span class="speaker speaker-student">2모둠:</span> "DB6이 -75... 1층인 것 같은데 어디지?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">2모둠:</span> "체육관 쪽으로 가보자. 숫자 변하는지 봐!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">2모둠:</span> (이동 중) "-70... -65... 올라간다!!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">2모둠:</span> "신발장?! 여기!!!! DB6!!!!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">2모둠:</span> "발견 등록! 7/7!! 우리가 다 모았다!!!!"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "2모둠, 전원 확보!! 시간은... 23분 47초!"</div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">종료 &amp; 결과 취합</span>
+  <span class="step-time">45-50분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"시간 종료! 모두 교실로 돌아와주세요!"</p>
+  <p>"각 모둠은 대시보드의 발견 기록을 스크린샷 찍어서 보내주세요. 발견 개수와 시간이 나와야 해요."</p>
+</div>
+
+---
+
+## 2교시: 결과 발표 &amp; 기술 회고 (50분)
+
+<div class="step-header">
+  <span class="step-num">5</span>
+  <span class="step-title">순위 발표 &amp; 시상</span>
+  <span class="step-time">00-10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"자, 결과가 나왔습니다!"</p>
+</div>
+
+### 최종 결과 (실제 결과로 채우기)
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">드래곤볼 헌트 최종 결과</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">
+
+| 순위 | 모둠 | 발견 | 시간 | 비고 |
+|------|------|------|------|------|
+| 1 | ?모둠 | 7/7 | ??분 ??초 | 전원 확보! |
+| 2 | ?모둠 | 7/7 | ??분 ??초 | |
+| 3 | ?모둠 | ?/7 | ??분 ??초 | |
+| 4 | ?모둠 | ?/7 | ??분 ??초 | |
+| ... | | | | |
+
+**드래곤볼별 최초 발견 모둠** - DB1: ?모둠 (?분 ?초) / DB2: ?모둠 (?분 ?초) / ...
+
+    </div>
+  </div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">6</span>
+  <span class="step-title">모둠별 전략 &amp; 경험 발표</span>
+  <span class="step-time">10-25분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"각 모둠별로 2분씩 발표해주세요. 다음 내용을 포함해서:"</p>
+</div>
+
+<div class="prompt-box">
+  <p><strong>발표 가이드</strong></p>
+  <ol>
+    <li><strong>우리 모둠의 전략은?</strong> - 가까운 것부터? 위에서 아래로? 분산?</li>
+    <li><strong>가장 기억에 남는 순간은?</strong> - 첫 발견? 어려웠던 드래곤볼? 기술 문제?</li>
+    <li><strong>기술적으로 도움이 된 것 / 아쉬웠던 것은?</strong> - LED가 더 유용? 대시보드가 더 유용? 코드에서 개선하고 싶은 점?</li>
+  </ol>
+</div>
+
+### 발표 장면
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">1모둠:</span> "저희는 가까운 것부터 찾는 전략이었는데, 다른 모둠이랑 겹쳐서 시간을 낭비했어요. 차라리 다른 층부터 가는 게 나았을 것 같아요."</div>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">5모둠:</span> "저희 레이더에 바이브코딩으로 '가장 가까운 드래곤볼 방향 화살표'를 넣었는데, 실제로는 RSSI로 방향을 알 수 없어서 의미가 없었어요. 1차시에서 배운 한계가 진짜였어요."</div>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">8모둠:</span> "대시보드에서 7개 동시에 보는 게 전략 세우기에 진짜 좋았어요. 'DB4가 -82니까 멀고, DB7이 -55니까 가까우니 DB7 먼저 가자' 이런 판단이 가능했거든요."</div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">7</span>
+  <span class="step-title">기술 회고 - 뭘 배웠나?</span>
+  <span class="step-time">25-40분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"5차시 동안 만든 것을 기술적으로 정리해봅시다."</p>
+</div>
+
+### 기술 지도
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">&#x1F4E1;</div>
+    <div class="flow-label">1차시</div>
+    <div class="flow-desc">Wi-Fi AP/STA, RSSI, 스캔</div>
+  </div>
+  <div class="flow-arrow">&#8594;</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">&#x1F4CA;</div>
+    <div class="flow-label">2차시</div>
+    <div class="flow-desc">매핑함수, 이동평균, LED 제어</div>
+  </div>
+  <div class="flow-arrow">&#8594;</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">&#x1F310;</div>
+    <div class="flow-label">3차시</div>
+    <div class="flow-desc">웹서버, HTTP, HTML/CSS/JS</div>
+  </div>
+  <div class="flow-arrow">&#8594;</div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-icon">&#x1F916;</div>
+    <div class="flow-label">4차시</div>
+    <div class="flow-desc">프롬프트, 코드검증, AI 협업</div>
+  </div>
+  <div class="flow-arrow">&#8594;</div>
+  <div class="flow-step">
+    <div class="flow-num">5</div>
+    <div class="flow-icon">&#x1F525;</div>
+    <div class="flow-label">5차시</div>
+    <div class="flow-desc">문제해결, 팀워크, 전략 수립</div>
+  </div>
+</div>
+
+<div class="key-terms">
+  <dl>
+    <dt>네트워크</dt>
+    <dd>AP, STA, SSID, RSSI, IP</dd>
+    <dt>데이터 처리</dt>
+    <dd>필터링, 매핑, 이동평균</dd>
+    <dt>웹 기술</dt>
+    <dd>HTTP, HTML, JSON, fetch</dd>
+    <dt>프로그래밍</dt>
+    <dd>함수, 클래스, 조건문</dd>
+    <dt>AI 활용</dt>
+    <dd>프롬프트, 검증, 디버깅</dd>
+    <dt>소프트스킬</dt>
+    <dd>협업, 전략, 문제해결</dd>
+  </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"드래곤볼을 찾으러 뛰어다닌 것 같지만, 사실 이 모든 개념을 배운 거예요!"</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">8</span>
+  <span class="step-title">선생님 총정리 - 큰 그림</span>
+  <span class="step-time">40-50분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"한 발 물러서서 큰 그림을 봅시다. 우리가 만든 게 뭐였어요?"</p>
+  <p>"무선 신호를 감지해서 &#8594; 데이터로 바꾸고 &#8594; 처리해서 &#8594; 사람이 이해할 수 있는 형태로 보여주는 시스템."</p>
+  <p>"이 구조가 바로 <strong>IoT(사물인터넷)</strong>의 본질이에요."</p>
+</div>
+
+### 우리 프로젝트 = IoT의 축소판
+
+<div class="compare-cards">
+  <div class="compare-card">
+    <strong>우리가 만든 것</strong><br/>
+    <ul style="text-align: left; padding-left: 16px; margin-top: 8px;">
+      <li>Wi-Fi RSSI 감지</li>
+      <li>이동 평균 처리</li>
+      <li>웹 대시보드</li>
+      <li>발견 등록</li>
+      <li>스마트폰 UI</li>
+    </ul>
+  </div>
+  <div class="compare-card">
+    <strong>실제 IoT 시스템</strong><br/>
+    <ul style="text-align: left; padding-left: 16px; margin-top: 8px;">
+      <li>온도/습도/GPS 센서</li>
+      <li>엣지 컴퓨팅</li>
+      <li>클라우드 대시보드</li>
+      <li>이벤트 트리거/알림</li>
+      <li>모바일 앱</li>
+    </ul>
+  </div>
+</div>
+
+### 실제로 비슷한 원리가 쓰이는 곳
+
+<div class="qa-pair">
+  <div class="qa-q">실내 위치 추적 (Indoor Positioning)</div>
+  <div class="qa-a">매장에서 고객 동선 분석, 공항/병원에서 사람 위치 파악</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">Bluetooth 비콘 (iBeacon)</div>
+  <div class="qa-a">박물관에서 가까운 전시품 설명 자동 표시, 분실물 추적기 (AirTag, SmartTag)</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">전파 지문 (Fingerprinting)</div>
+  <div class="qa-a">Wi-Fi 신호 패턴으로 정밀 위치 추정, 자율주행 실내 로봇</div>
+</div>
+
+<div class="teacher-script">
+  <p>"여러분이 'RSSI가 -50보다 강하면 가까이 있다'고 판단한 것, 애플 AirTag가 블루투스 신호로 물건을 찾는 것, 원리가 같아요!"</p>
+</div>
+
+---
+
+## 3교시: 확장 토론 &amp; 마무리 (50분)
+
+<div class="step-header">
+  <span class="step-num">9</span>
+  <span class="step-title">토론 - 실제 활용</span>
+  <span class="step-time">00-15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"우리 레이더를 개선한다면 어떻게 하고 싶어요?"</p>
+</div>
+
+### 토론 포인트
+
+<div class="qa-pair">
+  <div class="qa-q">RSSI의 한계를 극복하려면?</div>
+  <div class="qa-a">삼각측량: 3개 이상 기지국으로 정확한 위치 계산 / 전파 지문: 각 위치의 RSSI 패턴을 미리 저장 / 블루투스 + Wi-Fi 결합</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">이 기술로 학교에서 할 수 있는 다른 것?</div>
+  <div class="qa-a">교실 출석 자동 체크 (폰의 Wi-Fi로 감지) / 분실물 추적 시스템 / 학교 내 네비게이션</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">윤리적 고려사항은?</div>
+  <div class="qa-a">위치 추적의 프라이버시 문제 / 동의 없는 추적은 위험 / 기술의 양면성</div>
+</div>
+
+<div class="teacher-script">
+  <p>"3번이 중요해요. 우리가 만든 건 재밌는 게임이었지만, 같은 기술로 사람을 몰래 추적할 수도 있어요. 기술을 만드는 사람은 항상 '이게 어떻게 악용될 수 있을까?'를 생각해야 해요."</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">10</span>
+  <span class="step-title">확장 아이디어 브레인스토밍</span>
+  <span class="step-time">15-30분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"모둠별로 5분간 '이 프로젝트를 발전시킨다면?' 아이디어를 내보세요."</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">확장 아이디어 예시</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">
+      <p><strong>하드웨어 확장</strong></p>
+      <ul>
+        <li>부저 추가 &#8594; 소리 레이더</li>
+        <li>OLED 디스플레이 &#8594; 미니맵 표시</li>
+        <li>기압계 센서 &#8594; 층 구분 가능!</li>
+        <li>배터리 잔량 표시</li>
+      </ul>
+      <p><strong>소프트웨어 확장</strong></p>
+      <ul>
+        <li>RSSI 기록 &#8594; 이동 경로 시각화</li>
+        <li>삼각측량 &#8594; 2D 맵에 위치 표시</li>
+        <li>AI 예측 &#8594; "이 방향으로 가면 가까워질 것 같아요"</li>
+        <li>전체 모둠 실시간 순위 통합 서버</li>
+      </ul>
+      <p><strong>게임 확장</strong></p>
+      <ul>
+        <li>드래곤볼에 "함정" 기능 (가짜 드래곤볼!)</li>
+        <li>특정 시간에만 켜지는 드래곤볼</li>
+        <li>암호를 풀어야 발견 등록되는 시스템</li>
+        <li>PvP - 다른 팀의 드래곤볼을 빼앗기</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">11</span>
+  <span class="step-title">개인 회고 작성</span>
+  <span class="step-time">30-45분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"마지막으로 개인 회고를 작성해주세요. 노트나 스마트폰 메모장에 써도 돼요."</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">개인 회고 양식</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">
+      <p><strong>1.</strong> 이 프로젝트에서 내가 <strong>가장 재밌었던 순간</strong>은?</p>
+      <p><strong>2.</strong> 기술적으로 <strong>새로 알게 된 개념 3가지</strong>는?</p>
+      <p><strong>3.</strong> <strong>바이브코딩(AI와 함께 코딩)</strong>을 해본 소감은?</p>
+      <p style="padding-left:1em;">- AI가 잘한 점은?</p>
+      <p style="padding-left:1em;">- AI가 못한 점은?</p>
+      <p style="padding-left:1em;">- "AI가 제안, 인간이 판단" 원칙이 왜 중요한지?</p>
+      <p><strong>4.</strong> <strong>팀 활동</strong>에서 내가 기여한 부분은?</p>
+      <p><strong>5.</strong> 다시 한다면 <strong>다르게 하고 싶은 것</strong>은?</p>
+      <p><strong>6.</strong> 이 프로젝트에서 배운 기술을 활용해 <strong>만들어보고 싶은 것</strong>이 있다면?</p>
+    </div>
+  </div>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">현서:</span> "선생님, RSSI가 정확하지 않다는 게 아쉬웠는데, 진짜 AirTag도 그래요?"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "좋은 질문! AirTag는 블루투스를 써서 좀 다르긴 한데, 기본 원리는 같아요. 그래서 애플은 '정밀 찾기'라고 UWB라는 다른 기술을 추가로 쓰거든요. RSSI 하나로는 한계가 있다는 걸 여러분도 체감한 거죠."</div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">12</span>
+  <span class="step-title">마무리 인사 &amp; 다음 프로젝트 예고</span>
+  <span class="step-time">45-50분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"5차시 동안 고생했어요! 정리하면..."</p>
+</div>
+
+### 드래곤볼 레이더 프로젝트 - 여정 요약
+
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">1</div>
+    <div class="map-content">
+      <div class="map-title">1차시: "피코가 Wi-Fi를 만든다고?!"</div>
+      <div class="map-desc">보이지 않는 전파의 세계에 발을 디딤</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n2">2</div>
+    <div class="map-content">
+      <div class="map-title">2차시: "LED가 미친 듯이 깜빡여!"</div>
+      <div class="map-desc">데이터를 물리적 출력으로 변환하는 힘</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n3">3</div>
+    <div class="map-content">
+      <div class="map-title">3차시: "내 폰이 레이더가 됐다!"</div>
+      <div class="map-desc">웹 기술로 사용자 경험을 만드는 법</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n4">4</div>
+    <div class="map-content">
+      <div class="map-title">4차시: "AI야, 이거 만들어줘!"</div>
+      <div class="map-desc">사람과 AI가 협력하는 새로운 코딩</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n5">5</div>
+    <div class="map-content">
+      <div class="map-title">5차시: "드래곤볼 7개, 다 모았다!"</div>
+      <div class="map-desc">기술이 실제 경험이 되는 순간</div>
+    </div>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>15시간 동안 여러분은:</strong></p>
+  <ul>
+    <li>네트워크 프로그래밍을 했고</li>
+    <li>데이터 처리 알고리즘을 만들었고</li>
+    <li>웹 서버를 구축했고</li>
+    <li>AI와 협업해서 코딩했고</li>
+    <li>팀으로 문제를 해결했습니다.</li>
+  </ul>
+  <p>이 모든 게 <strong>Pico 2W 하나로!</strong></p>
+</div>
+
+<div class="teacher-script">
+  <p>"소원 빌 준비 됐어요? 드래곤볼 7개 모았으니까!"</p>
+  <p>"다음 프로젝트에서는 여기에 센서를 붙여볼 거예요. 기압계를 달면 '몇 층에 있는지'도 알 수 있거든요. 더 정밀한 레이더로 업그레이드하는 거죠. 기대하세요!"</p>
+</div>
+
+---
+
+## 교사용 참고사항
+
+### 평가 루브릭
+
+| 평가 영역 | 비중 | 우수 | 보통 | 노력 필요 |
+|-----------|------|------|------|-----------|
+| 개념 이해 | 30% | AP/STA, RSSI, 매핑, 이동평균을 정확히 설명하고 응용 | 핵심 개념을 이해하고 설명 | 기본 개념을 인식 |
+| 코딩 &amp; 문제해결 | 30% | 코드를 수정하고 새 기능을 독립적으로(또는 AI와) 구현 | 제공된 코드를 이해하고 파라미터 수정 | 제공된 코드를 실행 |
+| AI 활용 &amp; 검증 | 20% | 구체적인 프롬프트를 작성하고, AI 코드의 오류를 발견하여 수정 | AI에게 적절히 요청하고 결과를 테스트 | AI에게 요청하여 코드를 받기 |
+| 협업 &amp; 소통 | 20% | 팀 전략 수립에 기여하고, 경험을 체계적으로 회고 | 팀 활동에 적극 참여 | 팀 활동에 참여 |
+
+<Aside type="note" title="평가의 핵심">
+완성도보다 **과정**을 평가하세요. 대항전에서의 전략 수립, 기술 문제 해결 과정, 팀 내 역할 분담 등 과정 전체가 평가 대상입니다.
+</Aside>
+
+### 전체 프로젝트 리소스
+
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">1차시</div>
+    <div class="map-content">
+      <div class="map-title">Wi-Fi AP &amp; 스캔</div>
+      <div class="map-desc">step1_dragonball_ap.py / step2_scanner.py / step3_db_finder.py</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n2">2차시</div>
+    <div class="map-content">
+      <div class="map-title">LED 레이더</div>
+      <div class="map-desc">step1_led_radar_basic.py / step2_led_radar_smooth.py</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n3">3차시</div>
+    <div class="map-content">
+      <div class="map-title">웹 대시보드</div>
+      <div class="map-desc">step1_web_server_basic.py / step2_radar_dashboard.py</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n4">4차시</div>
+    <div class="map-content">
+      <div class="map-title">바이브코딩</div>
+      <div class="map-desc">학생이 AI와 함께 직접 생성</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n5">5차시</div>
+    <div class="map-content">
+      <div class="map-title">드래곤볼 헌트</div>
+      <div class="map-desc">4차시 결과물 사용</div>
+    </div>
+  </div>
+</div>
+
+<Aside type="tip" title="프로젝트 완료 후">
+- 학생 코드 제출: Thonny에서 main.py를 "이 컴퓨터"로 저장 후 Google Classroom 제출
+- 우수 모둠의 전략/코드를 다음 기수 참고 자료로 활용할 수 있습니다
+- 대항전 사진/영상은 학생 동의 하에 수업 포트폴리오로 활용 가능
+</Aside>

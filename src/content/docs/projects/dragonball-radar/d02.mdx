@@ -1,0 +1,905 @@
+---
+title: "2차시: 레이더를 만들자 — RSSI→LED"
+description: "RSSI를 LED 깜빡임으로 변환, 이동 평균으로 노이즈 제거, 파라미터 튜닝"
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+{/* 프로젝트 진행 바 */}
+<div class="project-progress">
+  <div class="prog-item prog-1 done">1. AP vs STA</div>
+  <div class="prog-item prog-2 current">2. RSSI→LED</div>
+  <div class="prog-item prog-3">3. 웹 대시보드</div>
+  <div class="prog-item prog-4">4. 바이브코딩</div>
+  <div class="prog-item prog-5">5. 드래곤볼 헌트</div>
+</div>
+
+{/* 결과물 미리보기 */}
+<div class="outcome-preview">
+  <div class="outcome-badge">이 차시가 끝나면</div>
+  <h4>LED가 드래곤볼을 감지합니다</h4>
+  <p>RSSI 값을 <strong>LED 깜빡임 속도</strong>로 매핑하여, 드래곤볼에 가까울수록 미친 듯이 빠르게 깜빡이는 레이더를 만듭니다. <strong>이동 평균</strong>으로 노이즈를 제거하고, 파라미터 튜닝으로 자기만의 최적 세팅을 찾습니다.</p>
+  <div class="outcome-items">
+    <div class="outcome-item">
+      <div class="item-icon">💡</div>
+      <div class="item-label">매핑 함수</div>
+      RSSI → LED 딜레이 변환
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">📊</div>
+      <div class="item-label">이동 평균</div>
+      노이즈 제거 기법
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🎛️</div>
+      <div class="item-label">파라미터 튜닝</div>
+      자기만의 최적 세팅
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🔍</div>
+      <div class="item-label">LED 보물찾기</div>
+      화면 없이 LED만으로 탐색
+    </div>
+  </div>
+</div>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">프로젝트</div>
+      드래곤볼 레이더 (2/5차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      150분 (3교시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">형태</div>
+      개인 실습 → 짝 활동
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">선수학습</div>
+      1차시 — AP/STA 모드, RSSI 스캔 경험
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">학습목표</div>
+      매핑 함수로 RSSI→LED 변환, 이동 평균으로 노이즈 제거, 파라미터 튜닝으로 레이더 커스터마이징
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">컴퓨팅 사고력</span> <span class="badge badge-emerald">데이터 처리</span> <span class="badge badge-amber">문제 해결</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 W x15</li>
+    <li>Micro USB 데이터 케이블 x15</li>
+    <li>보조배터리 x7 (짝 활동용)</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE</li>
+    <li>1차시 AP 모드 코드 (드래곤볼 역할)</li>
+    <li>2차시 코드 배포 준비 (Classroom, USB 등)</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>Pico 온보드 LED 정상 동작 확인</li>
+    <li>1차시 AP 코드가 Pico에 남아있는지 확인</li>
+    <li>짝 활동용 복도/교실 공간 확인</li>
+  </ul>
+</div>
+
+## 학습목표
+
+1. RSSI 값을 LED 깜빡임 속도로 매핑하는 함수를 이해하고 수정할 수 있다.
+2. 이동 평균(Moving Average)의 원리를 설명하고 노이즈 감소 효과를 관찰할 수 있다.
+3. 매핑 함수의 파라미터를 조절하여 레이더 감도를 커스터마이징할 수 있다.
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 5">1교시: RSSI→LED 기초 50분</div>
+  <div class="main" style="flex: 5">2교시: 노이즈와의 전쟁 50분</div>
+  <div class="wrap-up" style="flex: 5; background: var(--teacher-emerald);">3교시: 커스터마이징 50분</div>
+</div>
+
+---
+
+## 1교시: RSSI → LED 변환
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">1차시 복습 &amp; 오늘의 목표</span>
+  <span class="step-time">00-05분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"지난 시간에 RSSI 숫자만 보고 드래곤볼 찾아봤죠? 숫자를 보면서 찾는 게 좀 어땠어요?"</p>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">학생A:</span> "화면 계속 쳐다봐야 해서 불편했어요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">학생B:</span> "걸으면서 보기 힘들었어요."</div>
+</div>
+
+<div class="teacher-script">
+  <p>"맞아요. 그래서 오늘은 눈 대신 LED로! 가까우면 미친 듯이 깜빡이고, 멀면 느리게. 화면 안 봐도 느낌으로 찾을 수 있게 만들 거예요."</p>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">매핑 함수 개념 설명</span>
+  <span class="step-time">05-20분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"RSSI는 -90에서 -30 사이 숫자잖아요. LED 깜빡임 속도는 뭘로 표현할까요?"</p>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">학생:</span> "깜빡이는 간격이요?"</div>
+</div>
+
+<div class="teacher-script">
+  <p>"정확해요! 깜빡이는 시간 간격, 즉 딜레이. 그런데 문제가 있어요."</p>
+</div>
+
+<div class="flow-diagram">
+  <h5>매핑(Mapping)이란?</h5>
+  <div class="flow-row">
+    <div class="flow-box" style="background: #1a1a3e; border: 1px solid #2a2a5e;">
+      <strong>입력 범위 (RSSI)</strong><br/>
+      -30 (가까움)<br/>
+      ↕ 매핑 함수 f(x)<br/>
+      -90 (멀리)
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box" style="background: #1a1a3e; border: 1px solid #2a2a5e;">
+      <strong>출력 범위 (LED 딜레이)</strong><br/>
+      0.05초 (미친 듯이 빠르게!)<br/>
+      ↕<br/>
+      1.0초 (느긋하게)
+    </div>
+  </div>
+  <p style="margin-top: 12px; color: #aaa; font-size: 0.9em;">한 범위의 숫자를 다른 범위로 변환하는 것!</p>
+  <p style="color: #888; font-size: 0.85em; margin-top: 8px;">
+    실생활 예시: 시험 원점수(0-100) → 등급(1-9) / 온도(0-40도) → 에어컨 세기(1-5) / 볼륨 노브(0-10) → 스피커 출력(0-100W)
+  </p>
+</div>
+
+<div class="teacher-script">
+  <p>"이걸 '매핑'이라고 해요. 한 범위의 값을 다른 범위의 값으로 변환하는 거. 아두이노 써본 사람은 <code>map()</code> 함수 본 적 있을 수도 있어요. MicroPython에는 없으니까 우리가 직접 만들 거예요!"</p>
+</div>
+
+<div class="code-map">
+  <h5>매핑 공식 - 생각보다 간단!</h5>
+  <div class="map-row">
+    <div class="map-content" style="width: 100%;">
+      <div class="map-title">비례식으로 생각하면</div>
+      <div class="map-desc">
+        입력값이 입력 범위에서 차지하는 비율 = 출력값이 출력 범위에서 차지하는 비율
+      </div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-content" style="width: 100%;">
+      <div class="map-title">공식</div>
+      <div class="map-desc">
+        <code>출력값 = 출력최소 + (입력값 - 입력최소) x (출력최대 - 출력최소) / (입력최대 - 입력최소)</code>
+      </div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-content" style="width: 100%;">
+      <div class="map-title">예시: RSSI = -50일 때 딜레이는?</div>
+      <div class="map-desc">
+        입력: -90 ~ -30, 출력: 1.0 ~ 0.05<br/>
+        딜레이 = 1.0 + (-50 - (-90)) x (0.05 - 1.0) / (-30 - (-90))<br/>
+        = 1.0 + 40 x (-0.95) / 60 = 1.0 + (-0.633) = <strong>0.367초</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"수학 시간에 배운 비례식이 여기서 쓰이네요! 이걸 파이썬 함수로 만들면 됩니다."</p>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">실습 - 기본 LED 레이더 만들기</span>
+  <span class="step-time">20-40분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"오늘은 코드를 드리되, 매핑 함수 부분을 직접 읽고 이해하는 게 목표예요. 코드를 실행한 다음에 '여기를 바꿔보세요' 표시된 부분을 수정해볼 거예요."</p>
+</div>
+
+<Aside type="tip" title="복사 &amp; 붙여넣기">
+아래 코드 블록 오른쪽 위의 복사 버튼으로 전체 코드를 복사하세요. Thonny에서 Ctrl+A → Ctrl+V → Ctrl+S → 실행.
+</Aside>
+
+<div class="code-file-label">step1_led_radar_basic.py - Pico에 저장</div>
+
+```python
+# ============================================
+# 드래곤볼 LED 레이더 - 기본 버전
+# ============================================
+# RSSI 값에 따라 온보드 LED 깜빡임 속도가 변합니다.
+# 드래곤볼에 가까울수록 빠르게 깜빡!
+# ============================================
+
+import network
+import machine
+import time
+
+# === 설정 ===
+TARGET_DB = "DB1"          # 찾을 드래곤볼 이름
+RSSI_MIN = -90             # 가장 약한 신호 (멀리)
+RSSI_MAX = -30             # 가장 강한 신호 (가까이)
+DELAY_SLOW = 1.0           # 멀 때 깜빡임 간격 (초)
+DELAY_FAST = 0.05          # 가까울 때 깜빡임 간격 (초)
+
+# === LED 준비 ===
+led = machine.Pin("LED", machine.Pin.OUT)
+
+# === STA 모드 켜기 ===
+sta = network.WLAN(network.STA_IF)
+sta.active(True)
+
+# === 매핑 함수 ===
+# 한 범위의 값을 다른 범위로 변환
+def map_value(value, in_min, in_max, out_min, out_max):
+    """
+    value:   변환할 값 (예: RSSI = -55)
+    in_min:  입력 범위 최소값 (예: -90)
+    in_max:  입력 범위 최대값 (예: -30)
+    out_min: 출력 범위 최소값 (예: 1.0)
+    out_max: 출력 범위 최대값 (예: 0.05)
+    """
+    # 입력값을 범위 안으로 제한 (clamp)
+    value = max(in_min, min(in_max, value))
+
+    # 비례식으로 변환
+    result = out_min + (value - in_min) * (out_max - out_min) / (in_max - in_min)
+    return result
+
+# === 드래곤볼 RSSI 찾기 함수 ===
+def find_dragonball(target_name):
+    """주변 스캔 -> 특정 드래곤볼의 RSSI 반환. 없으면 None."""
+    networks = sta.scan()
+    for net in networks:
+        ssid = net[0].decode('utf-8')
+        rssi = net[3]
+        if ssid == target_name:
+            return rssi
+    return None
+
+# === 메인 루프 ===
+print(f"드래곤볼 [&#123;TARGET_DB&#125;] 레이더 가동!")
+print(f"   신호 범위: &#123;RSSI_MIN&#125; ~ &#123;RSSI_MAX&#125; dBm")
+print(f"   깜빡임: &#123;DELAY_SLOW&#125;초(멀리) ~ &#123;DELAY_FAST&#125;초(가까이)")
+print("=" * 50)
+
+while True:
+    rssi = find_dragonball(TARGET_DB)
+
+    if rssi is not None:
+        # RSSI -> 딜레이 변환
+        delay = map_value(rssi, RSSI_MIN, RSSI_MAX, DELAY_SLOW, DELAY_FAST)
+
+        print(f"  드래곤볼 &#123;TARGET_DB&#125;: &#123;rssi&#125;dBm -> 딜레이 &#123;delay:.3f&#125;초")
+
+        # LED 깜빡이기
+        led.on()
+        time.sleep(delay)
+        led.off()
+        time.sleep(delay)
+    else:
+        # 드래곤볼을 찾지 못함 -> LED 꺼짐
+        led.off()
+        print(f"  &#123;TARGET_DB&#125; 감지 안 됨...")
+        time.sleep(1)
+```
+
+<div class="teacher-script">
+  <p>"짝꿍 한 명은 드래곤볼 AP를 켜두세요. (1차시 step1 코드) 다른 한 명은 이 레이더 코드를 실행하세요."</p>
+  <p>"LED 보이죠? 이제 드래곤볼 피코를 들고 가까이 와보세요."</p>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">실행 &amp; 관찰 - "가까우면 미친다!"</span>
+  <span class="step-time">40-50분</span>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">서준:</span> "지금 LED가 천천히 깜빡여... 1초에 한 번?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">하은:</span> (2m까지 다가오며) </div>
+  <div class="scene-line"><span class="speaker speaker-student">서준:</span> "오! 좀 빨라졌어!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">하은:</span> (바로 옆까지 다가옴)</div>
+  <div class="scene-line"><span class="speaker speaker-student">서준:</span> "미쳤다 미쳤다!! LED가 미친 듯이 깜빡여!!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">하은:</span> "이거 진짜 레이더 같아!"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "서준이, 쉘에 뭐라고 나와요?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">서준:</span> "DB1: -42dBm → 딜레이 0.117초! 가까우니까 숫자가 0에 가깝고 LED가 빨라요!"</div>
+</div>
+
+<div class="teacher-script">
+  <p>"반대로 멀어지면?"</p>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">하은:</span> (교실 반대편으로 이동)</div>
+  <div class="scene-line"><span class="speaker speaker-student">서준:</span> "느려졌어요... -73dBm → 0.683초..."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "RSSI라는 데이터가 LED라는 물리적 출력으로 변환된 거예요. 이게 물리 컴퓨팅의 핵심이에요!"</div>
+</div>
+
+---
+
+## 2교시: 노이즈와의 전쟁
+
+<div class="step-header">
+  <span class="step-num">5</span>
+  <span class="step-title">문제 인식 - 왜 LED가 불안정할까?</span>
+  <span class="step-time">00-10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"방금 해보면서 뭔가 불편한 점 못 느꼈어요?"</p>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">학생A:</span> "가만히 있는데도 LED 속도가 왔다갔다해요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">학생B:</span> "갑자기 확 빨라졌다 느려졌다 해요."</div>
+</div>
+
+<div class="teacher-script">
+  <p>"맞아요! 그게 바로 '노이즈' 문제예요. 1차시에서도 잠깐 얘기했죠?"</p>
+</div>
+
+<div class="flow-diagram">
+  <h5>실제 RSSI 값의 흔들림 (같은 위치에서!)</h5>
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.9em; margin-bottom: 12px;">
+    <thead>
+      <tr style="border-bottom: 1px solid #444;">
+        <th style="text-align: left; padding: 6px; color: #888;">시간</th>
+        <th style="text-align: left; padding: 6px; color: #888;">RSSI</th>
+        <th style="text-align: left; padding: 6px; color: #888;">LED 딜레이</th>
+        <th style="text-align: left; padding: 6px; color: #888;">변화</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding: 4px 6px;">0초</td><td style="padding: 4px 6px;">-52</td><td style="padding: 4px 6px;">0.412초</td><td style="padding: 4px 6px; color: #ffd43b;">왔다갔다!</td></tr>
+      <tr><td style="padding: 4px 6px;">2초</td><td style="padding: 4px 6px;">-48</td><td style="padding: 4px 6px;">0.349초</td><td style="padding: 4px 6px; color: #ffd43b;">가만히 있는데!</td></tr>
+      <tr><td style="padding: 4px 6px;">4초</td><td style="padding: 4px 6px;">-55</td><td style="padding: 4px 6px;">0.459초</td><td style="padding: 4px 6px;"></td></tr>
+      <tr><td style="padding: 4px 6px;">6초</td><td style="padding: 4px 6px;">-50</td><td style="padding: 4px 6px;">0.381초</td><td style="padding: 4px 6px;"></td></tr>
+      <tr><td style="padding: 4px 6px;">8초</td><td style="padding: 4px 6px;">-61</td><td style="padding: 4px 6px;">0.554초</td><td style="padding: 4px 6px; color: #ff6b6b;">갑자기 확!</td></tr>
+      <tr><td style="padding: 4px 6px;">10초</td><td style="padding: 4px 6px;">-49</td><td style="padding: 4px 6px;">0.365초</td><td style="padding: 4px 6px;"></td></tr>
+    </tbody>
+  </table>
+  <p style="color: #aaa; font-size: 0.9em;">평균하면? → 약 -52.5 dBm (이게 실제 거리)</p>
+  <p style="color: #51cf66; font-size: 0.9em; margin-top: 4px;"><strong>해결책: 여러 번 측정해서 평균을 내자!</strong></p>
+</div>
+
+<div class="teacher-script">
+  <p>"무선 신호는 벽 반사, 사람 이동, 전자기 간섭 등으로 항상 흔들려요. 이건 피코의 문제가 아니라 전파의 특성이에요. 스마트폰 Wi-Fi 아이콘이 가끔 막대 하나가 왔다갔다하는 것도 같은 이유예요."</p>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">6</span>
+  <span class="step-title">이동 평균 개념 설명</span>
+  <span class="step-time">10-25분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"해결 방법은 의외로 간단해요. '이동 평균(Moving Average)'이라는 기법을 쓸 거예요."</p>
+  <p>"비유하면, 주식 차트에서 당일 주가만 보면 너무 출렁거리잖아요? 그래서 '5일 이동 평균선'이라고 최근 5일 평균을 선으로 그리면 전체적인 추세가 보이거든요. 같은 원리예요!"</p>
+</div>
+
+<div class="flow-diagram">
+  <h5>이동 평균 (Moving Average)</h5>
+  <p style="margin-bottom: 10px; color: #aaa;">최근 5개 값을 기억해서 평균!</p>
+  <div style="font-family: monospace; font-size: 0.85em; line-height: 1.6; color: #ccc;">
+    <p>원본 데이터: <span style="color: #ff6b6b;">-52, -48, -55, -50, -61</span>, -49, -53</p>
+    <p style="margin-left: 16px;">→ 이 5개의 평균 = <strong style="color: #51cf66;">-53.2</strong></p>
+    <p>원본 데이터: -52, <span style="color: #ff6b6b;">-48, -55, -50, -61, -49</span>, -53</p>
+    <p style="margin-left: 16px;">→ 이 5개의 평균 = <strong style="color: #51cf66;">-52.6</strong></p>
+    <p>원본 데이터: -52, -48, <span style="color: #ff6b6b;">-55, -50, -61, -49, -53</span></p>
+    <p style="margin-left: 16px;">→ 이 5개의 평균 = <strong style="color: #51cf66;">-53.6</strong></p>
+  </div>
+  <div style="margin-top: 16px; display: flex; gap: 16px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 140px; padding: 8px; background: #2a1a1a; border-radius: 8px; text-align: center;">
+      <div style="color: #ff6b6b; font-weight: bold;">원본</div>
+      <div style="color: #aaa; font-size: 0.85em;">울퉁불퉁!</div>
+    </div>
+    <div style="flex: 1; min-width: 140px; padding: 8px; background: #1a2a1a; border-radius: 8px; text-align: center;">
+      <div style="color: #51cf66; font-weight: bold;">이동평균</div>
+      <div style="color: #aaa; font-size: 0.85em;">부드러움!</div>
+    </div>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>창 크기(window)가 클수록 부드러움, 대신 반응이 느려짐 (트레이드오프!)</strong></p>
+  <ul>
+    <li><code>window=3</code>: 좀 부드러움, 반응 빠름</li>
+    <li><code>window=5</code>: 많이 부드러움, 반응 보통 ← <strong>추천!</strong></li>
+    <li><code>window=10</code>: 매우 부드러움, 반응 느림</li>
+  </ul>
+</div>
+
+<div class="teacher-script">
+  <p>"창 크기를 정해야 해요. 5개 정도면 충분히 부드러우면서도 반응 속도가 괜찮아요."</p>
+  <p>"프로그래밍으로 구현하는 방법은 간단해요. 리스트에 값을 계속 넣되, 5개까지만 유지하면서 평균을 내는 거예요."</p>
+</div>
+
+<div class="flow-diagram">
+  <h5>이동 평균 구현 원리</h5>
+  <div style="font-family: monospace; font-size: 0.85em; line-height: 1.8; color: #ccc;">
+    <p>리스트 = [] (빈 바구니), 창 크기 = 5</p>
+    <p>값 -52 들어옴 → <code>[-52]</code> &nbsp;&nbsp; 평균: <strong>-52.0</strong></p>
+    <p>값 -48 들어옴 → <code>[-52, -48]</code> &nbsp;&nbsp; 평균: <strong>-50.0</strong></p>
+    <p>값 -55 들어옴 → <code>[-52, -48, -55]</code> &nbsp;&nbsp; 평균: <strong>-51.7</strong></p>
+    <p>값 -50 들어옴 → <code>[-52, -48, -55, -50]</code> &nbsp;&nbsp; 평균: <strong>-51.3</strong></p>
+    <p>값 -61 들어옴 → <code>[-52, -48, -55, -50, -61]</code> &nbsp;&nbsp; 평균: <strong>-53.2</strong> ← 5개 꽉 참!</p>
+    <p>값 -49 들어옴 → <code>[-48, -55, -50, -61, -49]</code> &nbsp;&nbsp; 평균: <strong>-52.6</strong> ← 가장 오래된 -52 빠짐!</p>
+  </div>
+  <div style="margin-top: 12px; padding: 10px; background: #1a2a3e; border-radius: 8px; font-family: monospace; font-size: 0.85em; color: #00d4ff;">
+    <p>buffer.append(new_value) &nbsp;&nbsp;&nbsp; # 새 값 추가</p>
+    <p>if len(buffer) &gt; WINDOW: &nbsp;&nbsp; # 창 크기 초과하면</p>
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;buffer.pop(0) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # 가장 오래된 값 제거</p>
+    <p>avg = sum(buffer) / len(buffer) &nbsp; # 평균 계산</p>
+  </div>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">7</span>
+  <span class="step-title">실습 - 이동 평균 적용하기</span>
+  <span class="step-time">25-45분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이번에는 코드를 드리되, 1교시 코드에서 뭐가 추가됐는지 직접 찾아보세요. 찾으면 손!"</p>
+</div>
+
+<Aside type="tip" title="1교시 코드와 비교">
+이동 평균 관련 추가 부분에 "NEW" 주석이 달려 있습니다. `WINDOW_SIZE` 설정, `MovingAverage` 클래스, 메인 루프의 `rssi_smoother` 사용 부분을 찾아보세요.
+</Aside>
+
+<div class="code-file-label">step2_led_radar_smooth.py - Pico에 저장</div>
+
+```python
+# ============================================
+# 드래곤볼 LED 레이더 - 이동 평균 버전
+# ============================================
+# 이동 평균(Moving Average)으로 RSSI 노이즈를 줄여
+# LED 깜빡임이 훨씬 부드럽고 안정적입니다.
+# ============================================
+
+import network
+import machine
+import time
+
+# === 설정 ===
+TARGET_DB = "DB1"          # 찾을 드래곤볼
+RSSI_MIN = -90             # 신호 범위 최소
+RSSI_MAX = -30             # 신호 범위 최대
+DELAY_SLOW = 1.0           # 멀 때 딜레이
+DELAY_FAST = 0.05          # 가까울 때 딜레이
+
+# NEW 이동 평균 설정
+WINDOW_SIZE = 5            # 여기를 바꿔보세요! (3, 5, 7, 10)
+
+# === LED & STA 준비 ===
+led = machine.Pin("LED", machine.Pin.OUT)
+sta = network.WLAN(network.STA_IF)
+sta.active(True)
+
+# === 매핑 함수 (1교시와 동일) ===
+def map_value(value, in_min, in_max, out_min, out_max):
+    value = max(in_min, min(in_max, value))
+    return out_min + (value - in_min) * (out_max - out_min) / (in_max - in_min)
+
+# === 드래곤볼 찾기 함수 (1교시와 동일) ===
+def find_dragonball(target_name):
+    networks = sta.scan()
+    for net in networks:
+        ssid = net[0].decode('utf-8')
+        rssi = net[3]
+        if ssid == target_name:
+            return rssi
+    return None
+
+# === NEW 이동 평균 클래스 ===
+class MovingAverage:
+    """최근 N개 값의 평균을 계산하는 버퍼"""
+
+    def __init__(self, window_size):
+        self.window = window_size    # 창 크기
+        self.buffer = []             # 값 저장 리스트
+
+    def add(self, value):
+        """새 값 추가. 창 크기 초과하면 오래된 값 제거."""
+        self.buffer.append(value)
+        if len(self.buffer) > self.window:
+            self.buffer.pop(0)       # 가장 오래된 값 빼기
+
+    def average(self):
+        """현재 버퍼의 평균값 반환."""
+        if not self.buffer:
+            return None
+        return sum(self.buffer) / len(self.buffer)
+
+    def count(self):
+        """현재 버퍼에 있는 값의 개수."""
+        return len(self.buffer)
+
+# === 이동 평균 객체 생성 ===
+rssi_smoother = MovingAverage(WINDOW_SIZE)
+
+# === 메인 루프 ===
+print(f"드래곤볼 [&#123;TARGET_DB&#125;] 레이더 (이동평균 ver.)")
+print(f"   이동 평균 창 크기: &#123;WINDOW_SIZE&#125;")
+print("=" * 50)
+
+while True:
+    rssi_raw = find_dragonball(TARGET_DB)
+
+    if rssi_raw is not None:
+        # NEW 이동 평균 적용
+        rssi_smoother.add(rssi_raw)
+        rssi_smooth = rssi_smoother.average()
+
+        # 부드러워진 RSSI -> 딜레이 변환
+        delay = map_value(rssi_smooth, RSSI_MIN, RSSI_MAX, DELAY_SLOW, DELAY_FAST)
+
+        print(f"  원본: &#123;rssi_raw&#125;dBm | "
+              f"평균: &#123;rssi_smooth:.1f&#125;dBm "
+              f"(&#123;rssi_smoother.count()&#125;/&#123;WINDOW_SIZE&#125;) | "
+              f"딜레이: &#123;delay:.3f&#125;초")
+
+        # LED 깜빡이기
+        led.on()
+        time.sleep(delay)
+        led.off()
+        time.sleep(delay)
+    else:
+        led.off()
+        print(f"  &#123;TARGET_DB&#125; 감지 안 됨...")
+        time.sleep(1)
+```
+
+### 예상 Q&A
+
+<div class="qa-pair">
+  <div class="qa-q">클래스가 뭐예요? 처음 봐요.</div>
+  <div class="qa-a">관련 있는 데이터와 기능을 묶어놓은 거예요. <code>MovingAverage</code>는 '버퍼 리스트'와 '평균 계산' 기능을 하나로 묶은 거죠. 지금은 '이런 게 있구나' 정도만 알면 돼요. 중요한 건 <code>add()</code>로 넣고 <code>average()</code>로 평균 꺼내는 사용법이에요.</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q"><code>pop(0)</code>이 뭐예요?</div>
+  <div class="qa-a">리스트에서 0번째(가장 앞) 항목을 빼내는 거예요. 새 값이 들어오면 가장 오래된 값을 버리는 거죠. 마치 버스에 사람이 뒤로 타면 앞에서 내리는 것처럼!</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">WINDOW_SIZE를 크게 하면 무조건 좋은 거 아니에요?</div>
+  <div class="qa-a">좋은 질문! 크게 하면 부드럽긴 한데, 반응이 느려져요. 10으로 하면 드래곤볼 바로 옆에 갔는데 LED가 아직도 느리게 깜빡일 수 있어요. 빠르게 움직이면서 찾으려면 3~5가 적당해요.</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">왜 <code>rssi_raw</code>랑 <code>rssi_smooth</code> 이름을 다르게 했어요?</div>
+  <div class="qa-a">원본(raw)과 처리 후(smooth)를 구분하기 위해서예요. 두 값을 비교해볼 수 있으니까요. 데이터 처리에서 원본은 항상 보관하는 게 좋은 습관이에요.</div>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">8</span>
+  <span class="step-title">적용 전 vs 후 비교</span>
+  <span class="step-time">45-50분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"쉘 출력을 보세요. <code>원본</code>이랑 <code>평균</code> 두 숫자가 같이 나오죠? 원본은 왔다갔다하는데 평균은 훨씬 안정적이죠?"</p>
+  <p>"WINDOW_SIZE를 3으로 바꿔보세요. 그 다음 10으로도 바꿔보세요. 차이가 느껴지나요?"</p>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">유진:</span> "3으로 하니까 아직도 좀 떨려요."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "10으로 바꿔보세요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">유진:</span> "오 진짜 부드러워요! 근데... 가까이 갔는데 반응이 좀 늦어요."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "그게 트레이드오프예요! 부드러움과 반응 속도는 반비례. 게임처럼 빠른 반응이 필요하면 3~5, 정밀 측정이면 7~10. 용도에 맞게 고르는 거예요."</div>
+</div>
+
+---
+
+## 3교시: 커스터마이징 &amp; 미니 게임
+
+<div class="step-header">
+  <span class="step-num">9</span>
+  <span class="step-title">파라미터 튜닝 도전</span>
+  <span class="step-time">00-15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이제 여러분이 직접 레이더를 커스터마이징해볼 거예요. 위쪽 설정 부분의 값을 바꿔보세요."</p>
+</div>
+
+<div class="trouble-cards">
+  <h5>튜닝 가이드 - 이 값들을 바꿔보세요!</h5>
+  <div class="trouble-item">
+    <div class="trouble-symptom"><code>RSSI_MIN = -90</code> → <code>-80</code>으로 바꾸면?</div>
+    <div class="trouble-fix">약한 신호 무시! (가까울 때만 반응)</div>
+  </div>
+  <div class="trouble-item">
+    <div class="trouble-symptom"><code>RSSI_MAX = -30</code> → <code>-40</code>으로 바꾸면?</div>
+    <div class="trouble-fix">최고 속도에 더 일찍 도달</div>
+  </div>
+  <div class="trouble-item">
+    <div class="trouble-symptom"><code>DELAY_SLOW = 1.0</code> → <code>2.0</code>으로 바꾸면?</div>
+    <div class="trouble-fix">멀 때 더 느리게 (대비 효과 큼)</div>
+  </div>
+  <div class="trouble-item">
+    <div class="trouble-symptom"><code>DELAY_FAST = 0.05</code> → <code>0.02</code>로 바꾸면?</div>
+    <div class="trouble-fix">가까울 때 더 미친 듯이!</div>
+  </div>
+  <div class="trouble-item">
+    <div class="trouble-symptom"><code>WINDOW_SIZE = 5</code> → <code>3</code>으로 바꾸면?</div>
+    <div class="trouble-fix">민감한 레이더 (노이즈 증가, 반응 증가)</div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"정답은 없어요. 자기 스타일에 맞는 세팅을 찾는 게 목표예요. 5분 드릴 테니 이것저것 바꿔보세요!"</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">도전: 나만의 최적 세팅 찾기</span>
+    <span class="mission-difficulty">5분</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">"내 레이더가 제일 잘 찾는다!" 할 수 있는 세팅을 찾아보세요.</div>
+  </div>
+</div>
+
+### 예상 Q&A
+
+<div class="qa-pair">
+  <div class="qa-q">DELAY_FAST를 0으로 하면요?</div>
+  <div class="qa-a">LED가 사실상 계속 켜져있게 돼요. 깜빡임을 느끼려면 최소 0.02초는 줘야 해요. 너무 빠르면 사람 눈에 안 보이거든요!</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">설정 바꿨는데 차이를 못 느끼겠어요.</div>
+  <div class="qa-a">한 번에 한 값만 바꿔보세요. 여러 개를 동시에 바꾸면 뭐 때문에 달라졌는지 알 수 없어요. 이게 실험의 기본 원칙이에요 - <strong>변인 통제!</strong></div>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">10</span>
+  <span class="step-title">짝 활동 - LED 레이더 보물찾기</span>
+  <span class="step-time">15-35분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"1차시에는 화면의 숫자를 보면서 찾았죠? 이번에는 LED 깜빡임만 보고 찾을 거예요. 스마트폰 화면도 Thonny 쉘도 보면 안 됩니다!"</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">LED 레이더 보물찾기</span>
+    <span class="mission-difficulty">20분</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">LED 깜빡임만으로 드래곤볼을 찾아라!</div>
+    <ol style="margin-top: 8px; padding-left: 20px; color: #ccc; font-size: 0.9em;">
+      <li>짝꿍이 드래곤볼을 복도에 숨긴다 (보조배터리 연결)</li>
+      <li>레이더 피코만 들고 나가서 LED 깜빡임만으로 찾는다</li>
+      <li><strong>Thonny 화면 보기 금지!</strong> 오직 LED만!</li>
+      <li>3분 안에 찾기 도전!</li>
+    </ol>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"레이더를 이리저리 방향 바꿔가면서 '이쪽이 빨라지나 저쪽이 빨라지나' 비교하는 게 핵심이에요. 1차시에서 RSSI는 방향을 모른다고 했죠? 여러 방향을 시도해봐야 해요."</p>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">태민:</span> (복도에서 피코를 앞으로 들고 걸어간다. LED가 느리게 깜빡이고 있다.)</div>
+  <div class="scene-line"><span class="speaker speaker-student">태민:</span> "음... 이 방향 아닌가?" (LED가 좀 더 느려짐)</div>
+  <div class="scene-line"><span class="speaker speaker-student">태민:</span> (뒤돌아서 반대편으로) "오? 좀 빨라졌어!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">태민:</span> (화장실 앞을 지나감) "!!! 빨라진다 빨라진다!!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">태민:</span> (문 앞에서 LED가 매우 빠르게 깜빡임) "여기다!!" (문 옆 소화전 함 위에서 피코 발견)</div>
+  <div class="scene-line"><span class="speaker speaker-student">태민:</span> "2분 10초! LED만 보고 찾았어요!"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "화면 하나도 안 봤어요?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">태민:</span> "네! LED가 미쳐가는 느낌으로 방향 잡았어요!"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "바로 그거예요. 데이터를 직관적인 출력으로 바꾸는 힘!"</div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>보조배터리가 방전된 조 → 여분의 보조배터리 제공</li>
+    <li>LED가 아예 안 깜빡이는 학생 → TARGET_DB 이름이 짝꿍의 AP 이름과 일치하는지 확인</li>
+    <li>복도에서 돌아다니는 학생들이 다른 수업 방해하지 않도록 주의</li>
+  </ol>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">11</span>
+  <span class="step-title">결과 공유 &amp; 토론</span>
+  <span class="step-time">35-45분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"각자 최적 세팅이 뭐였는지 공유해봅시다. 그리고 찾는 데 걸린 시간도요."</p>
+</div>
+
+<div class="teacher-script">
+  <p>"재밌는 게, 세팅이 다 다르죠? 어떤 사람은 DELAY_FAST를 0.02로 했고, 어떤 사람은 WINDOW_SIZE를 3으로 했고. 같은 문제를 다른 방법으로 최적화한 거예요."</p>
+  <p>"그런데 아직 아쉬운 점이 없었어요?"</p>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">학생:</span> "LED만으로는 숫자를 정확히 모르겠어요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">학생:</span> "폰으로 볼 수 있으면 좋겠어요."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "바로 그게 다음 시간 내용이에요! 스마트폰에 진짜 레이더 화면을 띄울 겁니다!"</div>
+</div>
+
+---
+
+<div class="step-header">
+  <span class="step-num">12</span>
+  <span class="step-title">정리 &amp; 다음 차시 예고</span>
+  <span class="step-time">45-50분</span>
+</div>
+
+<div class="key-terms">
+  <h5>2차시 핵심 정리</h5>
+  <dl>
+    <dt>매핑 함수</dt>
+    <dd>한 범위 → 다른 범위 변환. <code>map_value(rssi, -90, -30, 1.0, 0.05)</code></dd>
+    <dt>이동 평균</dt>
+    <dd>노이즈를 줄이는 기법. 최근 N개의 평균. 부드러움 vs 반응속도 트레이드오프</dd>
+    <dt>파라미터 튜닝</dt>
+    <dd>정답은 없다! 용도에 맞게 최적화. 한 번에 하나씩 바꿔서 실험 (변인 통제)</dd>
+    <dt>LED 출력</dt>
+    <dd>데이터를 직관적 피드백으로! 화면 없이도 정보를 전달할 수 있다</dd>
+    <dt>MovingAverage 클래스</dt>
+    <dd>데이터와 기능을 묶어놓은 구조. <code>add()</code>로 넣고 <code>average()</code>로 평균</dd>
+    <dt>clamp (범위 제한)</dt>
+    <dd><code>max(min_val, min(max_val, value))</code> — 값을 범위 안으로 제한</dd>
+  </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"다음 시간에는 피코가 AP 모드와 STA 모드를 동시에 쓰는 걸 배울 거예요. STA로 드래곤볼을 스캔하면서, AP로 웹 페이지를 만들어서 스마트폰에 실시간 레이더 화면을 띄울 겁니다. 스마트폰이 진짜 드래곤 레이더가 되는 거예요!"</p>
+</div>
+
+---
+
+## 교사용 참고사항
+
+### 코드 구조 비교
+
+<Tabs>
+  <TabItem label="step1: 기본 버전">
+    <div class="code-map">
+      <div class="map-row">
+        <div class="map-num n1">①</div>
+        <div class="map-content">
+          <div class="map-title">설정 상수</div>
+          <div class="map-desc">TARGET_DB, RSSI_MIN/MAX, DELAY_SLOW/FAST</div>
+        </div>
+      </div>
+      <div class="map-row">
+        <div class="map-num n2">②</div>
+        <div class="map-content">
+          <div class="map-title">map_value() 함수</div>
+          <div class="map-desc">비례식 기반 범위 변환 + clamp</div>
+        </div>
+      </div>
+      <div class="map-row">
+        <div class="map-num n2">③</div>
+        <div class="map-content">
+          <div class="map-title">find_dragonball() 함수</div>
+          <div class="map-desc">스캔 → 타겟 SSID의 RSSI 반환</div>
+        </div>
+      </div>
+      <div class="map-row">
+        <div class="map-num n3">④</div>
+        <div class="map-content">
+          <div class="map-title">메인 루프</div>
+          <div class="map-desc">스캔 → 매핑 → LED on/off</div>
+        </div>
+      </div>
+    </div>
+  </TabItem>
+  <TabItem label="step2: 이동 평균 버전">
+    <div class="code-map">
+      <div class="map-row">
+        <div class="map-num n1">①</div>
+        <div class="map-content">
+          <div class="map-title">설정 상수 + WINDOW_SIZE <span class="map-tag">NEW</span></div>
+          <div class="map-desc">이동 평균 창 크기 설정 추가</div>
+        </div>
+      </div>
+      <div class="map-row">
+        <div class="map-num n2">②</div>
+        <div class="map-content">
+          <div class="map-title">map_value() / find_dragonball()</div>
+          <div class="map-desc">1교시와 동일</div>
+        </div>
+      </div>
+      <div class="map-row">
+        <div class="map-num n2">③</div>
+        <div class="map-content">
+          <div class="map-title">MovingAverage 클래스 <span class="map-tag">NEW</span></div>
+          <div class="map-desc">buffer + add() + average() + count()</div>
+        </div>
+      </div>
+      <div class="map-row">
+        <div class="map-num n3">④</div>
+        <div class="map-content">
+          <div class="map-title">메인 루프 <span class="map-tag">수정</span></div>
+          <div class="map-desc">스캔 → <strong>이동 평균</strong> → 매핑 → LED on/off</div>
+        </div>
+      </div>
+    </div>
+  </TabItem>
+</Tabs>
+
+### 흔한 문제 &amp; 해결
+
+<div class="trouble-cards">
+  <div class="trouble-item">
+    <div class="trouble-symptom">LED가 전혀 깜빡이지 않음</div>
+    <div class="trouble-fix">TARGET_DB 이름이 AP측 SSID와 정확히 일치하는지 확인. 대소문자 구분됨!</div>
+  </div>
+  <div class="trouble-item">
+    <div class="trouble-symptom">LED가 항상 느리게만 깜빡임</div>
+    <div class="trouble-fix">RSSI_MAX 값 확인. -30이 기본인데 실제로 -30까지 안 나올 수 있음. -40이나 -45로 조정</div>
+  </div>
+  <div class="trouble-item">
+    <div class="trouble-symptom">이동 평균 적용 후 반응이 너무 느림</div>
+    <div class="trouble-fix">WINDOW_SIZE를 3으로 줄이기. scan() 자체가 2-3초 걸리므로 window=10이면 20-30초 지연</div>
+  </div>
+  <div class="trouble-item">
+    <div class="trouble-symptom">"감지 안 됨"만 계속 나옴</div>
+    <div class="trouble-fix">짝꿍의 AP 피코가 켜져 있는지, 보조배터리가 충전되어 있는지 확인</div>
+  </div>
+  <div class="trouble-item">
+    <div class="trouble-symptom">scan() 에러 발생</div>
+    <div class="trouble-fix">STA 모드가 활성화되었는지 확인. <code>sta.active(True)</code> 재실행</div>
+  </div>
+</div>
+
+### 다음 차시 예고
+
+<Aside type="note" title="3차시: 스마트폰 레이더 - 웹 대시보드">
+- AP + STA 동시 운용
+- 피코 웹 서버로 실시간 대시보드 서빙
+- 스마트폰 브라우저에서 레이더 UI 확인
+</Aside>

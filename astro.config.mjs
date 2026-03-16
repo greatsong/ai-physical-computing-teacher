@@ -106,6 +106,16 @@ export default defineConfig({
                 { label: '6차시: 기압 센서', slug: 'projects/sensor-lab/s06' },
               ],
             },
+            {
+              label: '드래곤볼 레이더 (5차시)',
+              items: [
+                { label: '1차시: AP vs STA', slug: 'projects/dragonball-radar/d01' },
+                { label: '2차시: RSSI→LED 레이더', slug: 'projects/dragonball-radar/d02' },
+                { label: '3차시: 웹 대시보드', slug: 'projects/dragonball-radar/d03' },
+                { label: '4차시: 바이브코딩', slug: 'projects/dragonball-radar/d04' },
+                { label: '5차시: 드래곤볼 헌트', slug: 'projects/dragonball-radar/d05' },
+              ],
+            },
           ],
         },
         {
