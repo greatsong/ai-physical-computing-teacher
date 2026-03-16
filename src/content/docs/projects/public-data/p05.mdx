@@ -1,0 +1,363 @@
+---
+title: "5차시: 나만의 API 추가하기"
+description: "자유 API 탐색 + 전광판 통합 — 학생이 직접 문제를 정의하고 데이터를 찾아 추가"
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+{/* 프로젝트 진행 바 */}
+<div class="project-progress">
+  <div class="prog-item prog-1 done">1. 급식 전광판</div>
+  <div class="prog-item prog-2 done">2. 날씨+미세먼지</div>
+  <div class="prog-item prog-3 done">3. 버스 도착</div>
+  <div class="prog-item prog-4 done">4. 디자인 완성</div>
+  <div class="prog-item prog-5 current">5. 나만의 API</div>
+  <div class="prog-item prog-6">6. 발표</div>
+</div>
+
+{/* 결과물 미리보기 */}
+<div class="outcome-preview">
+  <div class="outcome-badge">이 차시가 끝나면</div>
+  <h4>전광판에 나만의 데이터가 들어갑니다</h4>
+  <p>교사가 정해준 4종 API를 넘어, 학생이 <strong>직접 필요한 데이터를 정의</strong>하고 API를 찾아 전광판에 통합합니다. "어떤 데이터가 우리에게 쓸모 있는가?"를 스스로 판단하는 <strong>문제 정의 역량</strong>이 핵심입니다.</p>
+  <div class="outcome-items">
+    <div class="outcome-item">
+      <div class="item-icon">🔍</div>
+      <div class="item-label">API 탐색</div>
+      공공데이터포털에서 직접 검색
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🧩</div>
+      <div class="item-label">통합 개발</div>
+      새 API를 기존 전광판에 추가
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">💡</div>
+      <div class="item-label">문제 정의</div>
+      필요한 데이터를 스스로 결정
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🚀</div>
+      <div class="item-label">자유 확장</div>
+      학사일정, 환율, 명언 등
+    </div>
+  </div>
+</div>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">프로젝트</div>
+      공공데이터 전광판 (5/6차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">형태</div>
+      개인 또는 2인 1조
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">선수학습</div>
+      4차시 — 디자인 완성된 전광판
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">학습목표</div>
+      공공데이터포털에서 API를 탐색·선택하고, 기존 전광판에 통합하는 전체 과정을 수행
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">문제 정의</span> <span class="badge badge-emerald">AI 활용 능력</span> <span class="badge badge-blue">정보 탐색</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (1인 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH</li>
+    <li>Micro USB **데이터** 케이블</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE</li>
+    <li>AI 접근 환경 — Claude, ChatGPT 등</li>
+    <li>스마트폰 (전광판 확인용)</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>4차시까지의 코드가 Pico에 잘 저장되어 있는지 확인</li>
+    <li>공공데이터포털(data.go.kr) 접근 가능 여부 확인</li>
+    <li>학생들에게 "어떤 데이터를 넣고 싶은지 미리 생각해오기" 사전 안내 완료</li>
+  </ul>
+</div>
+
+<Aside type="tip" title="이번 차시의 특징: 학생 주도!">
+이번 차시는 교사가 API를 지정하지 않습니다. 학생이 직접 "어떤 데이터가 필요한가?"를 정의하고, API를 찾고, 호출하고, 전광판에 넣는 전 과정을 수행합니다. AI가 API 탐색 + 코딩을 보조합니다.
+</Aside>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 2">도입 8분</div>
+  <div class="main" style="flex: 7; background: var(--teacher-emerald);">자유 개발 35분</div>
+  <div class="wrap-up" style="flex: 1">정리 7분</div>
+</div>
+
+---
+
+## 도입 (00-08분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">"우리 학교에 필요한 정보가 뭘까?"</span>
+  <span class="step-time">00-04분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"지금까지 선생님이 정해준 4개 API를 사용했어요. 급식, 날씨, 미세먼지, 버스. 근데 여러분이 진짜 전광판에 넣고 싶은 정보는 뭐예요?"</p>
+  <p>(학생들 자유 발언)</p>
+  <p>"오늘은 여러분이 <strong>직접 API를 찾아서</strong> 전광판에 추가하는 시간이에요. '어떤 데이터가 필요한가?'를 정의하는 게 코딩보다 더 중요해요."</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">API 찾는 방법 안내 + 추천 API 리스트</span>
+  <span class="step-time">04-08분</span>
+</div>
+
+### 추천 API 리스트
+
+<div class="key-terms">
+  <dl>
+    <dt>공공데이터포털 (data.go.kr)</dt>
+    <dd>
+      지하철 실시간 도착 (서울교통공사) / 도서관 좌석 현황 (국립중앙도서관) / 주변 주차장 정보 (한국도로공사) / 자외선 지수 (기상청) / 전기차 충전소 현황 (환경부) / 학사일정·시간표 (나이스) / 영화 순위 (영화진흥위원회)
+    </dd>
+    <dt>무료 외부 API (키 불필요)</dt>
+    <dd>
+      환율 (exchangerate-api.com) / 랜덤 고양이 사진 (thecatapi.com) / 오늘의 명언 (quotable.io)
+    </dd>
+  </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"API를 못 찾겠으면 AI에게 물어보세요. '고등학생에게 유용한 한국 공공데이터 API 추천해줘'라고요."</p>
+</div>
+
+### API 추가 프로세스
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">🤔</div>
+    <div class="flow-label">정의</div>
+    <div class="flow-desc">무슨 데이터가 필요?</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">🔍</div>
+    <div class="flow-label">탐색</div>
+    <div class="flow-desc">적합한 API 찾기</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">🤖</div>
+    <div class="flow-label">요청</div>
+    <div class="flow-desc">AI에게 호출 코드 요청</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-icon">🧩</div>
+    <div class="flow-label">통합</div>
+    <div class="flow-desc">전광판에 섹션 추가</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">5</div>
+    <div class="flow-icon">✅</div>
+    <div class="flow-label">테스트</div>
+    <div class="flow-desc">동작 확인 + 개선</div>
+  </div>
+</div>
+
+### 프롬프팅 가이드: 새 API 추가
+
+<Tabs>
+  <TabItem label="라이트 프롬프트 (추천)">
+    ```
+    "이 MicroPython 전광판 코드에 [API 이름] 데이터를
+     추가해줘. API URL은 [URL]이고 키는 [키]야.
+     새 섹션으로 기존 레이아웃에 맞게 넣어줘."
+     [전체 코드 붙여넣기]
+    ```
+  </TabItem>
+  <TabItem label="팁: API 문서도 함께">
+    AI가 API 문서를 모를 수도 있으니, API 문서의 **요청/응답 예시**도 같이 붙여넣으면 정확도가 크게 올라갑니다!
+  </TabItem>
+</Tabs>
+
+---
+
+## 자유 개발 (08-43분)
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">API 선택 + AI에게 호출 코드 요청</span>
+  <span class="step-time">08-15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"먼저 어떤 API를 추가할지 정하고, AI에게 호출 코드를 요청하세요."</p>
+  <p>"공공데이터포털에서 직접 검색해도 좋고, 추천 리스트에서 골라도 좋아요."</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">전광판에 통합 (바이브 코딩)</span>
+  <span class="step-time">15-30분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"API 호출 코드가 동작하면, 기존 전광판에 새 섹션으로 통합하세요."</p>
+  <p>"AI에게 '기존 코드의 <code>make_page()</code>에 새 섹션 추가해줘'라고 요청하면 돼요."</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">5</span>
+  <span class="step-title">테스트 + 디버깅 + 추가 개선</span>
+  <span class="step-time">30-43분</span>
+</div>
+
+### 예상 학생 활동 패턴
+
+<div class="patrol-point">
+  <p><strong>순회 시 학생 유형별 개입:</strong></p>
+  <ol>
+    <li><strong>빠른 학생:</strong> 10분 만에 새 API 추가 → "두 번째 API는 첫 번째와 다른 유형으로 해보세요"</li>
+    <li><strong>보통 학생:</strong> AI 도움으로 30분에 1개 추가 → "잘 하고 있어요, 테스트해보세요"</li>
+    <li><strong>느린 학생:</strong> API 선택에서 막힘 → "추천 리스트에서 하나 골라보세요. 학사일정 D-day는 어때요?"</li>
+    <li><strong>야심찬 학생:</strong> 복잡한 API에 도전 → "먼저 간단한 것부터 성공하고 확장하세요"</li>
+  </ol>
+</div>
+
+<Aside type="note" title="교사 순회 핵심">
+대부분의 코딩 문제는 AI가 해결할 수 있으므로, 교사는 **"어떤 데이터를 왜 선택했는지"** 대화에 집중합니다.
+</Aside>
+
+### 수업 장면
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "나이스 학사일정 API로 중간고사까지 D-day 만들었어요! '중간고사까지 23일' 이렇게 나와요."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "어떤 프롬프트를 썼어요?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "'나이스 학사일정 API 호출 코드 만들어줘' 한 줄로 시작했는데, API 파라미터를 몰라서 나이스 사이트에서 찾아서 붙여넣었어요."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "완벽한 과정이에요! API 문서를 찾아보는 것도 중요한 스킬이에요."</div>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">수아:</span> "환율 API 넣었는데 달러, 엔화, 위안화 환율이 실시간으로 나와요!"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "재미있네요. 학교 전광판에 환율이 필요할까요? 우선순위를 생각해보세요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">수아:</span> "음... 그래도 재밌으니까 맨 아래에 넣었어요."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "좋아요, 정보의 우선순위를 판단한 거네요."</div>
+</div>
+
+### 예상 Q&A
+
+<div class="qa-pair">
+  <div class="qa-q">"API 키 발급에 1~2일 걸린다는데요?"</div>
+  <div class="qa-a">오늘은 키 없이도 되는 API(나이스 샘플 등)를 먼저 시도하거나, 이미 발급받은 기상청/에어코리아 키를 활용해서 같은 API의 다른 기능을 쓸 수 있어요.</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"API를 찾았는데 어떻게 호출하는지 모르겠어요"</div>
+  <div class="qa-a">API 문서 페이지의 '샘플 URL'이나 '요청/응답 예시'를 복사해서 AI에게 '이 API를 MicroPython으로 호출해줘'라고 보내보세요.</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"HTTPS API인데 Pico에서 안 돼요"</div>
+  <div class="qa-a">기존 <code>fetch_https()</code> 함수를 사용하면 돼요. AI에게 '기존 코드의 fetch_https를 사용해서 이 API를 호출해줘'라고 요청하세요.</div>
+</div>
+
+---
+
+## 공유 & 정리 (43-50분)
+
+<div class="step-header">
+  <span class="step-num">6</span>
+  <span class="step-title">시연: 어떤 API를 왜 선택했는지</span>
+  <span class="step-time">43-48분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"2~3명이 어떤 API를 왜 선택했는지, 어떻게 추가했는지 공유해주세요."</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">7</span>
+  <span class="step-title">다음 시간 발표 안내</span>
+  <span class="step-time">48-50분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"내일이 마지막 시간이에요. <strong>발표</strong>를 합니다. 준비할 것은:"</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">발표 준비물</span>
+    <span class="mission-difficulty">다음 시간까지</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">
+      <p><strong>1.</strong> 완성된 전광판 (스마트폰 시연)</p>
+      <p><strong>2.</strong> 발표 내용 (2~3분):</p>
+      <p style="padding-left:1em;">- 어떤 API를 넣었는지 + 왜?</p>
+      <p style="padding-left:1em;">- 바이브 코딩 과정에서 배운 점</p>
+      <p style="padding-left:1em;">- 가장 잘 된 프롬프트 1개 공유</p>
+    </div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"오늘 밤에 전광판을 마무리하세요. 코드가 잘 저장되었는지 꼭 확인하고요!"</p>
+</div>
+
+---
+
+## 교사용 참고사항
+
+### 핵심 평가 포인트
+
+<Aside type="note" title="이번 차시의 핵심은 코딩 능력이 아닌 문제 정의 역량">
+"어떤 데이터가 필요한가?"를 스스로 정의하고, API를 탐색하여 적합한 것을 선택하는 과정을 관찰합니다.
+</Aside>
+
+| 평가 항목 | 관찰 기준 |
+|----------|----------|
+| 문제 정의 | "어떤 데이터가 필요한가?"를 스스로 정의했는가 |
+| API 탐색 | 적합한 API를 탐색하고 선택하는 과정을 수행했는가 |
+| AI 활용 | 프롬프트 품질이 점차 개선되는가 |
+| 회복력 | 실패에서 배우는 과정이 보이는가 (에러 → AI 질문 → 수정 → 재시도) |
+
+### API 키 문제 대안
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">API 키 발급에 시간이 걸려요</div>
+    <span class="label">대안 1</span>
+    <span class="value"><strong>나이스 API:</strong> 키 없이도 샘플 5건 반환 (학사일정, 시간표 등)</span>
+    <span class="label">대안 2</span>
+    <span class="value"><strong>기존 기상청 키:</strong> 같은 키로 초단기/단기/중기예보 모두 사용 가능</span>
+    <span class="label">대안 3</span>
+    <span class="value"><strong>무료 외부 API:</strong> quotable.io(명언), thecatapi(고양이) 등은 키 불필요</span>
+    <span class="label">대안 4</span>
+    <span class="value"><strong>교사 키 공유:</strong> 하나의 키를 전체 학생이 공유 (호출 분산 주의)</span>
+  </div>
+</div>

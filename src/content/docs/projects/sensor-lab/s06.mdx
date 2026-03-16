@@ -1,0 +1,1020 @@
+---
+title: "탐구 6: 1층에서 4층까지 기압 차이가 진짜 측정될까?"
+description: "LPS22HB 기압 센서(I2C)로 층별 기압을 측정하여 고도 차이 확인"
+next: false
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+{/* 프로젝트 진행 바 */}
+<div class="project-progress">
+  <div class="prog-item prog-1 done">1. 온습도</div>
+  <div class="prog-item prog-2 done">2. 조도</div>
+  <div class="prog-item prog-3 done">3. 소리</div>
+  <div class="prog-item prog-4 done">4. 동작 감지</div>
+  <div class="prog-item prog-5 done">5. CO&#8322;</div>
+  <div class="prog-item prog-6 current">6. 기압</div>
+</div>
+
+{/* 결과물 미리보기 */}
+<div class="outcome-preview">
+  <div class="outcome-badge">이 차시가 끝나면</div>
+  <h4>계단 한 층의 기압 차이를 데이터로 확인합니다</h4>
+  <p>LPS22HB 기압 센서로 1층부터 4층까지 각 층의 기압을 측정합니다. <strong>"고작 계단 한 층인데 기압계 숫자가 바뀔까?"</strong>라는 질문에 실측 데이터로 답하고, 기압과 고도의 관계를 건물 단면도로 시각화합니다.</p>
+  <div class="outcome-items">
+    <div class="outcome-item">
+      <div class="item-icon">🏢</div>
+      <div class="item-label">층별 기압 측정</div>
+      1층~4층 이동하며 기록
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">📐</div>
+      <div class="item-label">고도 계산</div>
+      기압 → 고도 변환 공식
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🏗️</div>
+      <div class="item-label">건물 단면도</div>
+      측정값 시각화
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🔬</div>
+      <div class="item-label">이론값 비교</div>
+      실측 vs 계산 오차 분석
+    </div>
+  </div>
+</div>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">프로젝트</div>
+      센서 과학 탐구 (6/6차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">형태</div>
+      모둠 탐험 (2~4인)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">선수학습</div>
+      웹서버 프로젝트 완료 (Wi-Fi, 웹 대시보드, 바이브 코딩)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">학습목표</div>
+      LPS22HB 기압 센서로 층별 기압 차이를 측정하고, 기압-고도 관계를 데이터로 확인
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">과학 탐구력</span> <span class="badge badge-emerald">데이터 분석</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (모둠당 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH</li>
+    <li>브레드보드</li>
+    <li>점퍼선 4개 (빨강, 검정, 노랑, 초록)</li>
+    <li>LPS22HB 기압 센서</li>
+    <li>Micro USB **데이터** 케이블</li>
+    <li>**보조배터리** (교실 밖 이동용!)</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE 설치 완료</li>
+    <li>MicroPython 펌웨어 설치 완료</li>
+    <li>AI 접근 환경 — Claude, ChatGPT 등</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>교실 Wi-Fi **2.4GHz** 대역 확인 (SSID/비밀번호 칠판 게시)</li>
+    <li>LPS22HB I2C 연결 사전 테스트 — I2C 스캔 → 0x5C (또는 0x5D) 확인</li>
+    <li>보조배터리로 Pico 전원 공급 테스트 (Micro USB)</li>
+    <li>학교 건물 이동 동선 사전 답사 (1층~4층, 가능하면 옥상)</li>
+    <li>wifi_config.py가 이미 Pico에 저장되어 있는지 확인</li>
+  </ul>
+</div>
+
+<Aside type="caution" title="보조배터리 필수!">
+이번 실험은 **교실 밖으로 이동**합니다. Pico에 보조배터리를 연결해서 전원을 공급하세요. Wi-Fi 범위를 벗어나면 웹 대시보드는 사용할 수 없지만, **Shell에 기록이 출력**됩니다. 돌아와서 확인하거나, 스마트폰 핫스팟을 사용할 수도 있습니다.
+</Aside>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 2">도입 10분</div>
+  <div class="main" style="flex: 2">배선+코드 10분</div>
+  <div class="wrap-up" style="flex: 4; background: var(--teacher-emerald);">탐험+측정 20분</div>
+  <div class="wrap-up" style="flex: 2">분석+정리 10분</div>
+</div>
+
+---
+
+## 도입 (00-10분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">탐구 질문 제시 & 배경 과학</span>
+  <span class="step-time">00-05분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"높은 곳에 가면 기압이 낮아진다는 거 알죠? 비행기나 높은 산에서는 확실히 느낄 수 있어요."</p>
+  <p>"그런데... <strong>고작 계단 한 층 올라가는 걸로도</strong> 기압 차이가 측정될까요?"</p>
+  <p>"오늘은 기압 센서를 들고 1층에서 4층까지 올라가면서 진짜 차이가 나는지 확인해볼 거예요."</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">개인 활동: 예측하기</span>
+    <span class="mission-difficulty">1분</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">각자 예측을 적어보세요.</div>
+    <div class="prompt-box prompt-light">
+      <p>"1층과 4층의 기압 차이는 약 ___hPa일 것이다"</p>
+      <p>"센서로 측정 가능하다 / 측정 불가능하다 (이유: ___)"</p>
+    </div>
+  </div>
+</div>
+
+### 배경 과학: 기압과 고도
+
+<div class="key-terms">
+  <dl>
+    <dt>기압 1 hPa 차이</dt>
+    <dd>고도 약 8.4m에 해당 (지표면 기준 근사값)</dd>
+    <dt>학교 1개 층</dt>
+    <dd>약 3~3.5m (계단 포함)</dd>
+    <dt>1층 → 4층</dt>
+    <dd>약 10.5m ≈ 약 1.25 hPa 차이 (이론값)</dd>
+    <dt>LPS22HB 정확도</dt>
+    <dd>±0.025 hPa → 약 0.2m 분해능 (충분히 측정 가능!)</dd>
+  </dl>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"1.25 hPa면 진짜 작은 차이인데, 센서가 잡을 수 있어요?"</div>
+  <div class="qa-a">LPS22HB는 ±0.025 hPa 정확도예요. 1.25 hPa는 센서 정확도의 50배니까 충분히 측정 가능해요! 그래서 이 센서가 놀라운 거예요.</div>
+</div>
+
+---
+
+## 센서 연결 (05-15분)
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">LPS22HB 배선 + 연결 확인</span>
+  <span class="step-time">05-10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"LPS22HB도 I2C 통신이에요. 이전 차시에서 했던 것과 같은 핀에 연결합니다."</p>
+  <p>"배선도를 보고 연결하세요. 다 했으면 연결 확인 스크립트를 먼저 돌려보세요."</p>
+</div>
+
+### LPS22HB 배선도
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">🔴</div>
+    <div class="flow-label">VCC</div>
+    <div class="flow-desc">3V3 (36번 핀)</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">⚫</div>
+    <div class="flow-label">GND</div>
+    <div class="flow-desc">GND (38번 핀)</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">🟡</div>
+    <div class="flow-label">SDA</div>
+    <div class="flow-desc">GP4 (6번 핀)</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-icon">🟢</div>
+    <div class="flow-label">SCL</div>
+    <div class="flow-desc">GP5 (7번 핀)</div>
+  </div>
+</div>
+
+<Aside type="tip" title="I2C 주소 확인">
+LPS22HB의 I2C 주소는 **0x5C** (기본) 또는 **0x5D** (SA0 핀 설정에 따라)입니다. 스캔 결과에서 둘 중 하나가 보이면 정상입니다.
+</Aside>
+
+### 연결 확인 스크립트
+
+<div class="teacher-script">
+  <p>"main.py를 실행하기 전에, 센서가 잘 연결됐는지 먼저 확인합니다."</p>
+</div>
+
+<div class="code-file-label">연결 확인 스크립트 — Thonny에서 실행</div>
+
+```python
+# === LPS22HB 연결 확인 ===
+from machine import Pin, I2C
+import time
+
+i2c = I2C(0, sda=Pin(4), scl=Pin(5), freq=100000)
+
+devices = i2c.scan()
+print(f"발견된 I2C 장치: &#123;devices&#125;")
+
+if 0x5C in devices:
+    print("✅ LPS22HB 연결 성공! (주소: 0x5C)")
+elif 0x5D in devices:
+    print("✅ LPS22HB 연결 성공! (주소: 0x5D)")
+    print("   → 코드의 addr을 0x5D로 변경하세요")
+else:
+    print("❌ LPS22HB이 감지되지 않습니다.")
+    print("   → 배선을 확인하세요 (SDA↔GP4, SCL↔GP5)")
+```
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">I2C 스캔에서 센서가 안 잡혀요</div>
+    <span class="label">원인</span>
+    <span class="value">배선 오류 또는 전원 불량</span>
+    <span class="label">대응</span>
+    <span class="value">SDA/SCL 배선 확인, 3V3 전원 확인, 점퍼선 다시 꽂기</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">WHO_AM_I 값이 0xB1이 아니에요</div>
+    <span class="label">원인</span>
+    <span class="value">다른 센서이거나 통신 오류</span>
+    <span class="label">대응</span>
+    <span class="value">센서 모듈 확인, I2C 주소 재확인</span>
+  </div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">기본 코드 실행 + 대시보드 접속</span>
+  <span class="step-time">10-15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"연결 확인이 됐으면 main.py를 Pico에 저장하고 실행하세요. Shell에 현재 기압과 온도가 나오면 성공!"</p>
+  <p>"이번에는 교실에서 1층 기준점을 먼저 설정하고, 보조배터리를 연결한 뒤 건물 탐험을 나갈 거예요."</p>
+</div>
+
+<Aside type="caution" title="Micro USB 데이터 케이블 확인">
+Pico 2 WH는 **Micro USB** 포트를 사용합니다 (USB-C가 아닙니다!). 반드시 **데이터 전송이 가능한** Micro USB 케이블을 사용하세요. 보조배터리 연결 시에도 Micro USB입니다.
+</Aside>
+
+### 코드 구조 설명
+
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">①</div>
+    <div class="map-content">
+      <div class="map-title">LPS22HB 드라이버 클래스</div>
+      <div class="map-desc">WHO_AM_I 확인, 24비트 기압 + 16비트 온도 읽기</div>
+    </div>
+    <div class="map-note">I2C 주소 0x5C</div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n2">②</div>
+    <div class="map-content">
+      <div class="map-title">기준점 캘리브레이션 + 10회 평균 <span class="map-tag">핵심 로직</span></div>
+      <div class="map-desc">1층에서 기준 기압 설정 → 각 층에서 10회 측정 후 평균</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n3">③</div>
+    <div class="map-content">
+      <div class="map-title">make_page() <span class="map-tag">바이브 코딩 영역</span></div>
+      <div class="map-desc">건물 단면도 시각화 + 기압/고도 표시 + 이론값 비교</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n4">④</div>
+    <div class="map-content">
+      <div class="map-title">웹서버 + API</div>
+      <div class="map-desc">/now (현재값), /calibrate (기준점), /measure (10회 평균), /log (기록)</div>
+    </div>
+  </div>
+</div>
+
+### main.py (6차시 기본 코드)
+
+<Aside type="tip" title="복사 & 붙여넣기">
+코드 블록 오른쪽 위의 복사 버튼을 클릭하면 전체 코드가 복사됩니다. Thonny에 붙여넣고 Pico에 저장하세요.
+</Aside>
+
+<div class="code-file-label">main.py — Pico에 저장</div>
+
+```python
+# ============================================
+# 과학 탐구 6: 층별 기압 차이
+# LPS22HB 센서로 1층~4층 기압을 측정하여
+# 기압과 고도의 관계를 실측으로 확인
+# ============================================
+
+import network
+import socket
+import time
+import json
+import gc
+from machine import Pin, I2C
+from wifi_config import WIFI_SSID, WIFI_PASSWORD
+
+# ── Wi-Fi 연결 ──────────────────────────────
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+wlan.connect(WIFI_SSID, WIFI_PASSWORD)
+while not wlan.isconnected():
+    time.sleep(1)
+my_ip = wlan.ifconfig()[0]
+print(f"IP: &#123;my_ip&#125;")
+
+# ── LPS22HB 드라이버 (I2C) ──────────────────
+class LPS22HB:
+    """LPS22HB 기압/온도 센서 (I2C 주소: 0x5C)"""
+    # 레지스터 주소
+    WHO_AM_I = 0x0F
+    CTRL_REG1 = 0x10
+    CTRL_REG2 = 0x11
+    STATUS = 0x27
+    PRESS_OUT_XL = 0x28
+    PRESS_OUT_L = 0x29
+    PRESS_OUT_H = 0x2A
+    TEMP_OUT_L = 0x2B
+    TEMP_OUT_H = 0x2C
+
+    def __init__(self, i2c, addr=0x5C):
+        self.i2c = i2c
+        self.addr = addr
+
+        # WHO_AM_I 확인 (0xB1이면 정상)
+        who = self._read_reg(self.WHO_AM_I)
+        if who != 0xB1:
+            print(f"경고: WHO_AM_I = 0x&#123;who:02X&#125; (0xB1 예상)")
+        else:
+            print("✅ LPS22HB 확인됨")
+
+        # 설정: 25Hz 연속 측정, BDU 활성화
+        self._write_reg(self.CTRL_REG1, 0x30)
+        time.sleep_ms(100)
+
+    def _read_reg(self, reg):
+        """레지스터 1바이트 읽기"""
+        return self.i2c.readfrom_mem(self.addr, reg, 1)[0]
+
+    def _write_reg(self, reg, val):
+        """레지스터 1바이트 쓰기"""
+        self.i2c.writeto_mem(self.addr, reg, bytes([val]))
+
+    def read_pressure(self):
+        """기압(hPa) 반환 — 24비트 읽기"""
+        xl = self._read_reg(self.PRESS_OUT_XL)
+        l = self._read_reg(self.PRESS_OUT_L)
+        h = self._read_reg(self.PRESS_OUT_H)
+
+        raw = (h << 16) | (l << 8) | xl
+        # 음수 처리 (2의 보수)
+        if raw & 0x800000:
+            raw -= 0x1000000
+
+        return raw / 4096.0  # hPa
+
+    def read_temperature(self):
+        """온도(°C) 반환 — 16비트 읽기"""
+        l = self._read_reg(self.TEMP_OUT_L)
+        h = self._read_reg(self.TEMP_OUT_H)
+
+        raw = (h << 8) | l
+        # 음수 처리 (2의 보수)
+        if raw & 0x8000:
+            raw -= 0x10000
+
+        return raw / 100.0  # °C
+
+    def read(self):
+        """기압(hPa), 온도(°C) 반환"""
+        p = round(self.read_pressure(), 2)
+        t = round(self.read_temperature(), 1)
+        return p, t
+
+    def read_avg(self, n=10):
+        """n회 측정 평균 (정밀도 향상)"""
+        p_sum = 0
+        t_sum = 0
+        for _ in range(n):
+            p, t = self.read()
+            p_sum += p
+            t_sum += t
+            time.sleep_ms(50)
+        return round(p_sum / n, 2), round(t_sum / n, 1)
+
+# ── 센서 초기화 ─────────────────────────────
+i2c = I2C(0, sda=Pin(4), scl=Pin(5), freq=100000)
+
+# I2C 스캔
+devices = i2c.scan()
+print(f"I2C 장치: &#123;devices&#125;")
+
+# 주소 자동 감지 (0x5C 또는 0x5D)
+sensor_addr = 0x5C
+if 0x5C in devices:
+    sensor_addr = 0x5C
+elif 0x5D in devices:
+    sensor_addr = 0x5D
+else:
+    print("❌ LPS22HB 미감지! 배선 확인")
+
+sensor = LPS22HB(i2c, sensor_addr)
+time.sleep_ms(200)
+
+# 테스트 읽기
+p, t = sensor.read()
+print(f"현재: &#123;p&#125; hPa, &#123;t&#125;°C")
+
+# ── 고도 계산 ──────────────────────────────
+def calc_altitude(p, p0):
+    """기압으로 고도 계산 (m)
+    h = 44330 * (1 - (P/P0)^0.1903)
+    """
+    if p0 <= 0 or p <= 0:
+        return 0.0
+    ratio = p / p0
+    alt = 44330.0 * (1.0 - pow(ratio, 0.1903))
+    return round(alt, 1)
+
+# ── 데이터 저장소 ───────────────────────────
+base_pressure = 0.0    # 기준점 기압 (1층)
+floor_data = []        # [&#123;"floor": "1층", "p": hPa, ...&#125;]
+
+# ── HTML 페이지 ─────────────────────────────
+def make_page():
+    return """<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>기압 탐구</title>
+    <style>
+        *&#123;margin:0;padding:0;box-sizing:border-box;&#125;
+        body&#123;font-family:-apple-system,sans-serif;background:#0a0a1a;color:#ddd;padding:14px;min-height:100vh;&#125;
+        .hd&#123;text-align:center;padding:8px 0 12px;&#125;
+        .hd h1&#123;color:#748ffc;font-size:1.2em;&#125;
+        .hd .q&#123;color:#aaa;font-size:0.8em;margin-top:4px;font-style:italic;&#125;
+
+        .sc&#123;background:#141428;border-radius:12px;padding:14px;margin:8px auto;max-width:500px;border:1px solid #252550;&#125;
+        .sc-title&#123;color:#748ffc;font-size:0.85em;font-weight:bold;margin-bottom:8px;&#125;
+
+        .now-box&#123;text-align:center;padding:8px 0;&#125;
+        .now-big&#123;font-size:2.5em;font-weight:bold;color:#748ffc;&#125;
+        .now-unit&#123;font-size:0.85em;color:#888;&#125;
+        .now-sub&#123;color:#888;font-size:0.8em;margin-top:4px;&#125;
+
+        .base-info&#123;background:#748ffc22;border:1px solid #748ffc44;border-radius:8px;padding:10px;text-align:center;margin:8px auto;max-width:500px;font-size:0.8em;&#125;
+        .base-info .label&#123;color:#748ffc;font-weight:bold;&#125;
+        .no-base&#123;background:#ff6b6b22;border-color:#ff6b6b44;&#125;
+        .no-base .label&#123;color:#ff6b6b;&#125;
+
+        .controls&#123;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0;&#125;
+        .btn&#123;padding:10px 16px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:0.8em;&#125;
+        .btn-cal&#123;background:#748ffc;color:#fff;&#125;
+        .btn-measure&#123;background:#69db7c;color:#000;&#125;
+        .btn-reset&#123;background:#495057;color:#fff;&#125;
+        .btn:disabled&#123;opacity:0.4;&#125;
+        .status&#123;text-align:center;color:#888;font-size:0.75em;margin:4px 0;&#125;
+
+        .building&#123;max-width:500px;margin:10px auto;&#125;
+        .floor-row&#123;display:flex;align-items:center;gap:8px;padding:8px;border-bottom:1px solid #252550;&#125;
+        .floor-row:last-child&#123;border-bottom:none;&#125;
+        .floor-label&#123;min-width:40px;font-weight:bold;color:#748ffc;font-size:0.85em;&#125;
+        .floor-bar-bg&#123;flex:1;height:24px;background:#1a1a3a;border-radius:4px;overflow:hidden;position:relative;&#125;
+        .floor-bar&#123;height:100%;background:#748ffc;border-radius:4px;transition:width 0.5s;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;&#125;
+        .floor-bar span&#123;font-size:0.65em;color:#fff;font-weight:bold;white-space:nowrap;&#125;
+        .floor-data&#123;min-width:120px;font-size:0.7em;color:#888;text-align:right;&#125;
+        .floor-alt&#123;color:#ffd43b;font-weight:bold;&#125;
+
+        .theory-box&#123;background:#1a1a3a;border-radius:8px;padding:10px;margin:8px auto;max-width:500px;&#125;
+        .theory-title&#123;color:#ffd43b;font-size:0.8em;font-weight:bold;margin-bottom:6px;&#125;
+        .theory-row&#123;display:flex;justify-content:space-between;font-size:0.75em;padding:3px 0;border-bottom:1px solid #252550;&#125;
+        .theory-row:last-child&#123;border-bottom:none;&#125;
+
+        .ft&#123;text-align:center;margin-top:14px;color:#333;font-size:0.6em;&#125;
+    </style>
+</head>
+<body>
+    <div class="hd">
+        <h1>🏢 층별 기압 탐구</h1>
+        <div class="q">"1층에서 4층까지 기압 차이가 진짜 측정될까?"</div>
+    </div>
+
+    <div class="sc">
+        <div class="now-box">
+            <div class="now-big" id="pressure">--</div>
+            <div class="now-unit">hPa</div>
+            <div class="now-sub">🌡️ <span id="temp">--</span>°C</div>
+        </div>
+    </div>
+
+    <div class="base-info no-base" id="base-info">
+        <span class="label">기준점 미설정</span> — 1층에서 '기준점 설정' 버튼을 누르세요
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-cal" onclick="calibrate()">📍 기준점 설정 (1층)</button>
+        <button class="btn btn-measure" id="btn-m" onclick="measure()" disabled>📏 이 층 측정 (10회 평균)</button>
+        <button class="btn btn-reset" onclick="resetData()">↺ 초기화</button>
+    </div>
+    <div class="status" id="status">1층에서 기준점을 먼저 설정하세요</div>
+
+    <div class="sc">
+        <div class="sc-title">🏗️ 건물 단면도</div>
+        <div class="building" id="building">
+            <div style="color:#555;text-align:center;padding:20px;font-size:0.8em;">
+                기준점 설정 후 각 층에서 측정하면 여기에 표시됩니다
+            </div>
+        </div>
+    </div>
+
+    <div class="theory-box" id="theory" style="display:none;">
+        <div class="theory-title">📐 이론값 비교 (1층 = 3.3m 기준)</div>
+        <div id="theory-rows"></div>
+    </div>
+
+    <div class="ft">LPS22HB 센서 · Pico 2 WH · 10회 평균 측정</div>
+
+    <script>
+        let baseP = 0;
+        let floors = [];
+
+        async function fetchNow() &#123;
+            try &#123;
+                const r = await fetch('/now');
+                const d = await r.json();
+                document.getElementById('pressure').textContent = d.p;
+                document.getElementById('temp').textContent = d.t;
+            &#125; catch(e) &#123;&#125;
+        &#125;
+
+        async function calibrate() &#123;
+            document.getElementById('status').textContent = '기준점 측정 중 (10회 평균)...';
+            try &#123;
+                const r = await fetch('/calibrate');
+                const d = await r.json();
+                baseP = d.base;
+                document.getElementById('base-info').className = 'base-info';
+                document.getElementById('base-info').innerHTML =
+                    '<span class="label">기준점 (1층)</span>: ' + baseP + ' hPa';
+                document.getElementById('btn-m').disabled = false;
+                document.getElementById('status').textContent = '기준점 설정 완료! 이제 각 층으로 이동하여 측정하세요';
+            &#125; catch(e) &#123;
+                document.getElementById('status').textContent = '기준점 설정 실패';
+            &#125;
+        &#125;
+
+        async function measure() &#123;
+            const floorName = prompt('현재 몇 층인가요? (예: 2층, 옥상)');
+            if (!floorName) return;
+
+            document.getElementById('status').textContent = floorName + ' 측정 중 (10회 평균)...';
+            try &#123;
+                const r = await fetch('/measure?floor=' + encodeURIComponent(floorName));
+                const d = await r.json();
+                floors = d.log;
+                baseP = d.base;
+                drawBuilding();
+                drawTheory();
+                document.getElementById('status').textContent = floorName + ' 측정 완료! (' + d.p + ' hPa, 고도 ' + d.alt + 'm)';
+            &#125; catch(e) &#123;
+                document.getElementById('status').textContent = '측정 실패';
+            &#125;
+        &#125;
+
+        function drawBuilding() &#123;
+            const el = document.getElementById('building');
+            if (floors.length === 0) &#123;
+                el.innerHTML = '<div style="color:#555;text-align:center;padding:20px;font-size:0.8em;">측정 데이터 없음</div>';
+                return;
+            &#125;
+
+            const maxAlt = Math.max(...floors.map(f => Math.abs(f.alt)), 1);
+            const sorted = [...floors].sort((a,b) => b.alt - a.alt);
+
+            el.innerHTML = sorted.map(f => &#123;
+                const pct = Math.max(10, Math.abs(f.alt) / (maxAlt * 1.2) * 100);
+                const color = f.alt === 0 ? '#748ffc' : f.alt > 0 ? '#69db7c' : '#ff6b6b';
+                return '<div class="floor-row">' +
+                    '<div class="floor-label">' + f.floor + '</div>' +
+                    '<div class="floor-bar-bg"><div class="floor-bar" style="width:' + pct + '%;background:' + color + '"><span>' + f.p + ' hPa</span></div></div>' +
+                    '<div class="floor-data"><span class="floor-alt">' + (f.alt >= 0 ? '+' : '') + f.alt + 'm</span><br>' +
+                    f.diff + ' hPa</div>' +
+                    '</div>';
+            &#125;).join('');
+        &#125;
+
+        function drawTheory() &#123;
+            const el = document.getElementById('theory');
+            const rows = document.getElementById('theory-rows');
+            if (floors.length < 2) &#123; el.style.display = 'none'; return; &#125;
+
+            el.style.display = 'block';
+            rows.innerHTML = floors.map(f => &#123;
+                const floorNum = parseInt(f.floor) || 0;
+                const thAlt = (floorNum - 1) * 3.3;
+                const error = f.alt !== 0 ? Math.abs(f.alt - thAlt).toFixed(1) : '-';
+                return '<div class="theory-row">' +
+                    '<span>' + f.floor + '</span>' +
+                    '<span>실측: ' + f.alt + 'm</span>' +
+                    '<span>이론: ' + thAlt.toFixed(1) + 'm</span>' +
+                    '<span>오차: ' + error + 'm</span>' +
+                    '</div>';
+            &#125;).join('');
+        &#125;
+
+        async function resetData() &#123;
+            if (confirm('데이터를 지울까요?')) &#123;
+                await fetch('/reset');
+                floors = [];
+                baseP = 0;
+                document.getElementById('building').innerHTML =
+                    '<div style="color:#555;text-align:center;padding:20px;font-size:0.8em;">초기화됨</div>';
+                document.getElementById('theory').style.display = 'none';
+                document.getElementById('base-info').className = 'base-info no-base';
+                document.getElementById('base-info').innerHTML =
+                    '<span class="label">기준점 미설정</span> — 1층에서 기준점 설정 버튼을 누르세요';
+                document.getElementById('btn-m').disabled = true;
+                document.getElementById('status').textContent = '초기화 완료';
+            &#125;
+        &#125;
+
+        fetchNow();
+        setInterval(fetchNow, 2000);
+    </script>
+</body>
+</html>"""
+
+# ── 웹서버 ──────────────────────────────────
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.bind(('0.0.0.0', 80))
+server.listen(3)
+
+print(f"\n&#123;'='*45&#125;\n  기압 탐구 대시보드!\n  http://&#123;my_ip&#125;\n&#123;'='*45&#125;")
+
+while True:
+    try:
+        server.settimeout(0.5)
+        try:
+            client, addr = server.accept()
+        except OSError:
+            continue
+
+        request = client.recv(1024).decode()
+
+        if 'GET /now' in request:
+            p, t = sensor.read()
+            body = json.dumps(&#123;"p": p, "t": t&#125;)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+
+        elif 'GET /calibrate' in request:
+            # 1층 기준점 설정 (10회 평균)
+            p_avg, t_avg = sensor.read_avg(10)
+            base_pressure = p_avg
+            floor_data.clear()
+            floor_data.append(&#123;
+                "floor": "1층",
+                "p": p_avg,
+                "t": t_avg,
+                "alt": 0.0,
+                "diff": 0.0,
+            &#125;)
+            body = json.dumps(&#123;"base": p_avg, "t": t_avg&#125;)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+            print(f"📍 기준점: &#123;p_avg&#125; hPa")
+
+        elif 'GET /measure' in request:
+            # 층 측정 (10회 평균)
+            floor_name = "?"
+            if 'floor=' in request:
+                try:
+                    part = request.split('floor=')[1].split(' ')[0].split('&')[0]
+                    # 간단한 URL 디코딩
+                    result = ""
+                    i = 0
+                    while i < len(part):
+                        if part[i] == '%' and i + 2 < len(part):
+                            hex_str = part[i+1:i+3]
+                            result += chr(int(hex_str, 16))
+                            i += 3
+                        else:
+                            result += part[i]
+                            i += 1
+                    floor_name = result
+                except:
+                    pass
+
+            p_avg, t_avg = sensor.read_avg(10)
+            alt = calc_altitude(p_avg, base_pressure)
+            diff = round(p_avg - base_pressure, 2)
+
+            # 같은 층 이름이면 덮어쓰기
+            found = False
+            for item in floor_data:
+                if item["floor"] == floor_name:
+                    item["p"] = p_avg
+                    item["t"] = t_avg
+                    item["alt"] = alt
+                    item["diff"] = diff
+                    found = True
+                    break
+            if not found:
+                floor_data.append(&#123;
+                    "floor": floor_name,
+                    "p": p_avg,
+                    "t": t_avg,
+                    "alt": alt,
+                    "diff": diff,
+                &#125;)
+
+            body = json.dumps(&#123;
+                "floor": floor_name,
+                "p": p_avg,
+                "alt": alt,
+                "diff": diff,
+                "base": base_pressure,
+                "log": floor_data,
+            &#125;)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+            print(f"📏 &#123;floor_name&#125;: &#123;p_avg&#125; hPa (&#123;diff:+.2f&#125; hPa, &#123;alt&#125;m)")
+
+        elif 'GET /log' in request:
+            body = json.dumps(&#123;
+                "base": base_pressure,
+                "log": floor_data,
+            &#125;)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+
+        elif 'GET /reset' in request:
+            floor_data.clear()
+            base_pressure = 0.0
+            body = json.dumps(&#123;"status": "reset"&#125;)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+            gc.collect()
+            print("↺ 데이터 초기화")
+
+        elif 'favicon' in request:
+            client.close(); continue
+
+        else:
+            gc.collect()
+            page = make_page()
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: &#123;len(page.encode())&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(page.encode())
+
+        client.close(); gc.collect()
+    except Exception as e:
+        if "ETIMEDOUT" not in str(e):
+            print(f"에러: &#123;e&#125;")
+        try: client.close()
+        except: pass
+```
+
+---
+
+## 데이터 수집 (15-40분)
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">1층 기준점 설정</span>
+  <span class="step-time">15-18분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"먼저 1층에서 기준점을 설정합니다. 대시보드에서 '기준점 설정' 버튼을 누르세요."</p>
+  <p>"10회 평균으로 측정하니까 정확해요. 기준 기압이 표시되면 이제 탐험 출발!"</p>
+</div>
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">📍</div>
+    <div class="flow-label">1층 기준점</div>
+    <div class="flow-desc">기준 기압 설정</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">🔋</div>
+    <div class="flow-label">보조배터리</div>
+    <div class="flow-desc">전원 연결 후 이동</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">🏃</div>
+    <div class="flow-label">층별 이동</div>
+    <div class="flow-desc">10초 안정화 후 측정</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-icon">📊</div>
+    <div class="flow-label">교실 복귀</div>
+    <div class="flow-desc">건물 단면도 확인</div>
+  </div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">5</span>
+  <span class="step-title">건물 탐험 — 층별 측정</span>
+  <span class="step-time">18-35분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"보조배터리를 연결하고 출발하세요. 각 층에 도착하면 <strong>10초 정도 가만히</strong> 있다가 '이 층 측정' 버튼을 누르세요."</p>
+  <p>"층 이름을 입력하면 10회 평균으로 측정합니다. 2층, 3층, 4층 순서대로 가보세요. 옥상이나 지하도 가능하면 해보세요!"</p>
+</div>
+
+<Aside type="note" title="Wi-Fi 범위를 벗어나면?">
+Wi-Fi 범위를 벗어나면 웹 대시보드는 접속이 안 됩니다. 이 경우 두 가지 방법이 있어요:
+1. **스마트폰 핫스팟**: wifi_config.py의 SSID/비밀번호를 핫스팟으로 변경
+2. **Shell 기록**: Thonny Shell에 측정값이 출력되므로, 교실로 돌아와서 확인
+</Aside>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">수아:</span> "2층에서 측정했는데 기압이 0.4 hPa 줄었어요! 고도 3.4m래요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "진짜요? 계단 한 층인데 숫자가 바뀌어요?"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "이 센서가 그만큼 정밀해요. ±0.025 hPa 정확도니까 계단 한 층 차이도 충분히 잡아내죠."</div>
+  <div class="scene-line"><span class="speaker speaker-student">민수:</span> "4층에서 측정했더니 -1.3 hPa, 10.8m! 이론값이랑 거의 비슷해요!"</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"같은 층에서 측정해도 값이 조금씩 달라요"</div>
+  <div class="qa-a">그래서 10회 평균을 쓰는 거예요. 순간적인 기압 변화(바람, 문 열림 등)가 있으니까요. 그래도 0.01~0.05 hPa 범위의 변동은 정상이에요.</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"엘리베이터를 타면 어떻게 되나요?"</div>
+  <div class="qa-a">엘리베이터 안에서도 측정 가능해요! 올라가는 동안 기압이 실시간으로 줄어드는 걸 관찰할 수 있어요. 재미있는 보너스 실험이죠.</div>
+</div>
+
+---
+
+## 분석 & 결론 (40-50분)
+
+<div class="step-header">
+  <span class="step-num">6</span>
+  <span class="step-title">데이터 해석 + 모둠 토론</span>
+  <span class="step-time">40-46분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"교실로 돌아왔으니 데이터를 분석합시다. 건물 단면도를 보세요."</p>
+  <p>"이론값과 비교했을 때 오차가 어느 정도인가요? 왜 오차가 생겼을까요?"</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">분석 과제</span>
+    <span class="mission-difficulty">모둠별 토론</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">대시보드의 건물 단면도와 이론값 비교표를 보며 분석하세요.</div>
+    <div class="prompt-box prompt-full">
+      <p>1. 1층과 4층의 기압 차이 — 이론값(~1.25 hPa)과 비교하면?</p>
+      <p>2. 각 층 간 기압 차이는 일정한가? 불균일하다면 이유는?</p>
+      <p>3. 고도 계산값과 실제 건물 높이 — 오차는 어느 정도?</p>
+      <p>4. 오차의 원인 — 바람, 문 개방, 환기 시스템, 측정 타이밍?</p>
+      <p>5. 처음 예측과 비교 — 측정 가능하다고 예측했나?</p>
+    </div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"고작 계단 몇 층인데 기압이 바뀐다는 걸 <strong>직접 측정해서 확인</strong>했어요. 이게 센서의 힘이에요."</p>
+  <p>"처음에 '측정 불가능하다'고 예측한 사람도 있었죠? 틀려도 괜찮아요. <strong>데이터로 확인하는 과정 자체</strong>가 과학이에요."</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">7</span>
+  <span class="step-title">바이브 코딩 미션 (시간 여유 시)</span>
+  <span class="step-time">46-50분</span>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">바이브 코딩: 대시보드 확장</span>
+    <span class="mission-difficulty">난이도 ★★★☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">시간이 남는 모둠은 AI에게 아래 프롬프트로 기능을 추가해보세요.</div>
+    <div class="prompt-box prompt-light">
+      <p>"건물 단면도를 실제 건물 모양처럼 그려줘"</p>
+      <p>"엘리베이터 타면서 실시간 기압 변화 그래프 추가해줘"</p>
+      <p>"모둠별 측정 결과를 비교하는 테이블 만들어줘"</p>
+      <p>"고도 계산 공식을 화면에 수식으로 보여줘"</p>
+    </div>
+  </div>
+</div>
+
+---
+
+## 정리
+
+<div class="key-terms">
+  <dl>
+    <dt>LPS22HB</dt>
+    <dd>MEMS 기압/온도 센서 (I2C 주소: 0x5C, 정확도: ±0.025 hPa)</dd>
+    <dt>기압 (hPa)</dt>
+    <dd>대기의 압력. 높이 올라갈수록 낮아짐 (1 hPa ≈ 고도 8.4m)</dd>
+    <dt>고도 계산 공식</dt>
+    <dd>h = 44330 × (1 - (P/P₀)^0.1903) — 국제 표준 대기 기준</dd>
+    <dt>캘리브레이션</dt>
+    <dd>기준점(1층)을 설정하여 상대적인 고도 차이를 계산하는 방법</dd>
+    <dt>10회 평균 측정</dt>
+    <dd>여러 번 측정한 평균을 사용하여 순간적 노이즈를 줄이는 기법</dd>
+  </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"6차시의 센서 실험실이 모두 끝났습니다! 온습도, 조도, 소리, 동작 감지, CO&#8322;, 기압까지 다양한 센서를 사용해봤어요."</p>
+  <p>"가장 재미있었던 탐구는 어떤 거였나요? 가장 놀라운 발견은요?"</p>
+  <p>"이런 센서들은 스마트홈, 날씨 관측, 건강 관리 등 실생활에 폭넓게 사용됩니다. 여러분은 이제 데이터로 세상을 관찰할 수 있는 도구를 갖게 된 거예요!"</p>
+</div>
+
+---
+
+## 교사용 참고사항
+
+### 실험 성공을 위한 팁
+
+<div class="patrol-point">
+  <ol>
+    <li><strong>이동 후 안정화:</strong> 각 층에 도착하면 10초 이상 가만히 있다가 측정 (이동 중 기류 영향)</li>
+    <li><strong>보조배터리 연결:</strong> Micro USB로 Pico에 전원 공급, 브레드보드 고정 주의</li>
+    <li><strong>Wi-Fi 범위:</strong> 학교 Wi-Fi가 전 층에 커버되면 이상적. 안 되면 핫스팟 또는 Shell 기록</li>
+    <li><strong>날씨 영향:</strong> 기압은 날씨에 따라 변하므로, 측정은 가급적 30분 이내에 완료</li>
+    <li><strong>옥상 측정:</strong> 학교 옥상 접근 가능하면 더 큰 차이를 관찰할 수 있음</li>
+  </ol>
+</div>
+
+### LPS22HB 센서 특성
+
+| 항목 | 값 |
+|------|------|
+| I2C 주소 | 0x5C (또는 0x5D) |
+| WHO_AM_I | 0xB1 |
+| 측정 범위 | 260~1260 hPa |
+| 정확도 | ±0.025 hPa (~0.2m 분해능) |
+| 온도 범위 | -40~85°C |
+| 측정 주기 | 최대 75Hz (코드에서 10회 평균 사용) |
+
+### 흔한 문제 & 해결
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">I2C 스캔에서 센서가 안 잡혀요</div>
+    <span class="label">원인</span>
+    <span class="value">배선 오류 / 전원 불량</span>
+    <span class="label">대응</span>
+    <span class="value">SDA/SCL 확인, 3V3 전원 확인, 주소 0x5C 또는 0x5D 확인</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">기압값이 비정상적 (0 또는 음수)</div>
+    <span class="label">원인</span>
+    <span class="value">레지스터 읽기 오류</span>
+    <span class="label">대응</span>
+    <span class="value">센서 전원 재연결, I2C 재초기화</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">같은 층에서 값이 많이 흔들려요</div>
+    <span class="label">원인</span>
+    <span class="value">기류 변화 (문 열림, 바람 등)</span>
+    <span class="label">대응</span>
+    <span class="value">문/창문 닫고 10초 대기 후 측정, 10회 평균 사용</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">고도 계산값이 이론값과 많이 달라요</div>
+    <span class="label">원인</span>
+    <span class="value">기상 조건 변화 (시간 경과)</span>
+    <span class="label">대응</span>
+    <span class="value">전체 측정을 30분 이내에 완료, 기준점 재설정 후 재측정</span>
+  </div>
+</div>

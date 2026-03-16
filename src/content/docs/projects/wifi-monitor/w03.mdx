@@ -1,0 +1,451 @@
+---
+title: "3차시: 차트와 시각화"
+description: "RSSI 이력 그래프 + AP 채널 분포 + 게이지 — 데이터를 그림으로 보여주는 대시보드"
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+{/* 프로젝트 진행 바 */}
+<div class="project-progress">
+  <div class="prog-item prog-1 done">1. 첫 웹서버</div>
+  <div class="prog-item prog-2 done">2. 실시간 대시보드</div>
+  <div class="prog-item prog-3 current">3. 차트 시각화</div>
+  <div class="prog-item prog-4">4. 신호 지도</div>
+  <div class="prog-item prog-5">5. 나만의 기능</div>
+  <div class="prog-item prog-6">6. 발표</div>
+</div>
+
+{/* 결과물 미리보기 */}
+<div class="outcome-preview">
+  <div class="outcome-badge">이 차시가 끝나면</div>
+  <h4>데이터가 그래프로 살아납니다</h4>
+  <p>숫자만 나열된 대시보드가 <strong>꺾은선 그래프, 반원 게이지, 채널 분포 막대차트</strong>로 진화합니다. 서버(Python)는 그대로 두고, 브라우저(JavaScript)가 Canvas에 그래프를 그리는 <strong>클라이언트 사이드 시각화</strong>를 체험합니다.</p>
+  <div class="outcome-items">
+    <div class="outcome-item">
+      <div class="item-icon">📈</div>
+      <div class="item-label">꺾은선 그래프</div>
+      RSSI 이력 30개 포인트
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🎯</div>
+      <div class="item-label">반원 게이지</div>
+      현재 신호 세기 한눈에
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">📊</div>
+      <div class="item-label">채널 분포</div>
+      AP 채널별 막대차트
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🤖</div>
+      <div class="item-label">바이브 코딩</div>
+      나만의 차트 디자인
+    </div>
+  </div>
+</div>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">프로젝트</div>
+      교실 Wi-Fi 품질 모니터 (3/6차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">형태</div>
+      개인 실습
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">선수학습</div>
+      2차시 — 실시간 데이터 대시보드, JSON API
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">학습목표</div>
+      실시간 데이터를 다양한 차트(꺾은선, 막대, 게이지)로 시각화하고, 바이브 코딩으로 나만의 시각화를 구현
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">컴퓨팅 사고력</span> <span class="badge badge-emerald">AI 활용 능력</span> <span class="badge badge-blue">데이터 리터러시</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (1인 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH</li>
+    <li>Micro USB **데이터** 케이블</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE</li>
+    <li>AI 접근 환경 — Claude, ChatGPT 등</li>
+    <li>스마트폰 (대시보드 확인용)</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>2차시 코드가 Pico에 정상 실행되는지 확인</li>
+    <li>3차시 기본 코드 배포 준비 (Classroom, USB 등)</li>
+    <li>시각화가 추가되어 HTML이 커짐 — 교사 Pico로 사전 테스트 필수</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 1">도입 5분</div>
+  <div class="main" style="flex: 2.4">기본 코드 12분</div>
+  <div class="wrap-up" style="flex: 5.6; background: var(--teacher-emerald);">바이브 코딩 28분</div>
+  <div class="wrap-up" style="flex: 1">정리 5분</div>
+</div>
+
+---
+
+## 도입 (00-05분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">숫자 vs 그래프 — 데이터를 그림으로!</span>
+  <span class="step-time">00-05분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"제가 두 개를 보여줄게요."</p>
+  <p>"첫째: <code>-52, -55, -48, -61, -53</code>. 둘째: 이 숫자들을 꺾은선 그래프로 그린 것."</p>
+  <p>"어떤 게 더 빠르게 이해돼요?"</p>
+</div>
+
+<div class="compare-cards">
+  <div class="compare-card">
+    <strong>숫자 나열</strong><br/>
+    -52, -55, -48, -61, -53
+    <div style="color: #888; margin-top: 8px;">추세 파악이 어려움</div>
+  </div>
+  <div class="compare-card">
+    <strong>꺾은선 그래프</strong><br/>
+    한눈에 추세가 보임
+    <div style="color: #888; margin-top: 8px;">변화의 방향과 크기를 즉시 파악</div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"그래프는 <strong>추세</strong>를 보여주고, 게이지는 <strong>현재 상태</strong>를 보여주고, 막대차트는 <strong>비교</strong>를 보여줘요. 오늘 이 세 가지를 다 넣습니다."</p>
+</div>
+
+---
+
+## 기본 코드 실행 (05-17분)
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">3차시 코드 배포 & 실행</span>
+  <span class="step-time">05-10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"코드를 교체하고 실행하세요. 30초 정도 기다리면 그래프에 데이터가 쌓여요."</p>
+</div>
+
+<Aside type="tip" title="복사 & 붙여넣기">
+코드 블록 오른쪽 위의 복사 버튼을 클릭하면 전체 코드가 복사됩니다. Thonny에 붙여넣고 Pico에 저장하세요. `wifi_config.py`는 그대로 사용합니다.
+</Aside>
+
+<Aside type="note" title="2차시 대비 변경점">
+Python 서버 코드는 2차시와 동일합니다. `make_page()` 함수 안의 HTML/CSS/JavaScript 부분에 시각화가 추가됩니다. **서버는 변경 없이, 시각화는 전부 브라우저가 처리합니다.**
+</Aside>
+
+### 추가되는 시각화 요소
+
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">①</div>
+    <div class="map-content">
+      <div class="map-title">반원 게이지</div>
+      <div class="map-desc">CSS transform으로 RSSI를 반원 바늘로 표시</div>
+    </div>
+    <div class="map-note">현재 상태를 직관적으로</div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n2">②</div>
+    <div class="map-content">
+      <div class="map-title">RSSI 이력 꺾은선 <span class="map-tag">Canvas API</span></div>
+      <div class="map-desc">최근 30개 데이터 포인트를 실시간 그래프로</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n3">③</div>
+    <div class="map-content">
+      <div class="map-title">채널 분포 막대차트</div>
+      <div class="map-desc">AP 스캔 결과를 채널 1~13 기준 막대차트로</div>
+    </div>
+  </div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">코드 구조 설명</span>
+  <span class="step-time">10-17분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"서버(Python)는 2차시랑 완전 같아요. <strong>그래프는 브라우저(스마트폰)가 그립니다.</strong> JavaScript가 데이터를 받아서 Canvas에 그리는 거예요."</p>
+</div>
+
+### JavaScript에 추가된 함수
+
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">①</div>
+    <div class="map-content">
+      <div class="map-title"><code>updateGauge(percent, color)</code></div>
+      <div class="map-desc">게이지 바늘 회전 — CSS transform 활용</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n2">②</div>
+    <div class="map-content">
+      <div class="map-title"><code>drawChart()</code></div>
+      <div class="map-desc">Canvas 꺾은선 그래프 렌더링 — RSSI 이력 시각화</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n3">③</div>
+    <div class="map-content">
+      <div class="map-title"><code>drawChannelChart(apList)</code></div>
+      <div class="map-desc">채널별 AP 수 막대차트 — 채널 혼잡도 파악</div>
+    </div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"바이브 코딩 타깃은 이 세 함수예요. '게이지 눈금 추가해줘', '그래프에 평균선 그려줘'처럼 구체적으로 요청하면 돼요."</p>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">그래프가 안 나와요</div>
+    <span class="label">원인</span>
+    <span class="value">데이터가 아직 쌓이지 않음</span>
+    <span class="label">대응</span>
+    <span class="value">30초 정도 기다리세요. 자동 갱신이 데이터를 채웁니다.</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">ENOMEM 에러</div>
+    <span class="label">원인</span>
+    <span class="value">시각화 코드가 추가되어 HTML이 커짐</span>
+    <span class="label">대응</span>
+    <span class="value"><code>gc.collect()</code> 확인, CSS 간소화, 필요시 send() 분할</span>
+  </div>
+</div>
+
+---
+
+## 바이브 코딩 미션 (17-45분)
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">차트를 나만의 스타일로!</span>
+  <span class="step-time">17-35분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"시각화의 기본 3종이 돌아가고 있죠? 이제 이걸 업그레이드할 거예요. 미션 카드를 보고 순서대로 도전하세요."</p>
+</div>
+
+### 미션 카드
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">미션 1: 게이지 업그레이드</span>
+    <span class="mission-difficulty">난이도 ★★☆☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-full">
+      <p>"게이지를 더 크게 만들고, 배경에 눈금을 추가해줘. 신호 강도에 따라 바늘 색이 초록 → 노랑 → 빨강으로 변하게."</p>
+      <p>[게이지 관련 HTML+CSS+JS 붙여넣기]</p>
+    </div>
+    <div class="prompt-box prompt-light">
+      <p>"게이지 더 크고 눈금 있게 바꿔줘"</p>
+      <p>[게이지 관련 코드 붙여넣기]</p>
+    </div>
+  </div>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">미션 2: 그래프에 통계 추가</span>
+    <span class="mission-difficulty">난이도 ★★★☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-full">
+      <p>"RSSI 이력 그래프에 최대값, 최소값, 평균값을 점선으로 표시하고 수치도 라벨로. 평균선은 노랑, 최대/최소는 회색 점선."</p>
+      <p>[drawChart 함수 붙여넣기]</p>
+    </div>
+    <div class="prompt-box prompt-light">
+      <p>"그래프에 최대/최소/평균 선 추가"</p>
+      <p>[drawChart 함수 붙여넣기]</p>
+    </div>
+  </div>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">미션 3: 채널 추천 기능</span>
+    <span class="mission-difficulty">난이도 ★★★☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-full">
+      <p>"채널 분포 차트 아래에 '추천 채널' 표시. AP가 가장 적은 채널을 찾아서 '채널 ○번이 가장 한가합니다' 메시지."</p>
+      <p>[drawChannelChart 함수 붙여넣기]</p>
+    </div>
+    <div class="prompt-box prompt-light">
+      <p>"가장 한가한 채널 추천해줘"</p>
+      <p>[drawChannelChart 함수 붙여넣기]</p>
+    </div>
+  </div>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">미션 4: 새 차트 추가</span>
+    <span class="mission-difficulty">난이도 ★★★★☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">아이디어 중 골라서 도전!</div>
+    <div class="prompt-box prompt-light">
+      <p>"메모리 사용량을 도넛 차트로 보여줘"</p>
+      <p>"AP별 신호 강도 수평 막대 그래프 추가해줘"</p>
+      <p>"신호 품질을 5칸 배터리 아이콘으로 표시해줘"</p>
+      <p>"RSSI 변화량을 위아래 화살표로 표시해줘"</p>
+      <p>[make_page() 붙여넣기]</p>
+    </div>
+  </div>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">보너스: 시각화 자유 설계</span>
+    <span class="mission-difficulty">난이도 ★★★★★</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-light">
+      <p>"AP 신호를 레이더/거미줄 차트로 그려줘"</p>
+      <p>"전체 테마를 레트로 게임 스타일로 바꿔줘"</p>
+      <p>"RSSI를 음파 시각화 느낌으로 애니메이션 해줘"</p>
+      <p>"히트맵 스타일로 시간대별 RSSI 보여줘"</p>
+    </div>
+  </div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">5</span>
+  <span class="step-title">친구 대시보드 구경 + 보너스</span>
+  <span class="step-time">35-45분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"미션 2까지 끝난 사람은 옆 친구의 Pico IP로 접속해서 어떤 차트를 만들었는지 구경해보세요. 영감을 얻으면 자기 것도 더 발전시켜보세요."</p>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">수연:</span> "게이지에 눈금 넣었더니 진짜 자동차 계기판 같아요!"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "좋은 디자인이네요. 실제 계기판도 같은 원리예요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "그래프에 평균선 넣었는데, 지금 RSSI가 평균보다 높은지 낮은지 바로 보여요."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "기준선이 있으면 판단이 쉬워지죠. 그게 통계의 힘이에요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">민수:</span> "채널 추천이 '3번이 가장 한가합니다'라고 나와요. 근데 진짜예요?"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "스캔 결과 기준이니까 꽤 정확해요. 실제 공유기 설정에서도 이런 분석을 참고해요."</div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>Canvas 그래프가 정상적으로 그려지는지</li>
+    <li>데이터가 30초 이상 쌓인 후 그래프 확인하고 있는지</li>
+    <li>AI에게 코드의 특정 함수만 붙여넣어 요청하는지 (전체 코드 대신)</li>
+  </ol>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"Canvas가 뭐예요?"</div>
+  <div class="qa-a">HTML에서 그림을 그릴 수 있는 영역이에요. JavaScript로 점, 선, 도형을 그릴 수 있어요. 게임이나 차트에 많이 쓰여요.</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"AI가 SVG로 차트를 만들어줬는데 괜찮나요?"</div>
+  <div class="qa-a">네! Canvas와 SVG 둘 다 유효해요. SVG는 확대해도 깨지지 않고, Canvas는 복잡한 그래프에 효율적이에요. 둘 다 써보세요.</div>
+</div>
+
+---
+
+## 정리 (45-50분)
+
+<div class="step-header">
+  <span class="step-num">6</span>
+  <span class="step-title">시각화 원칙 + 다음 시간 안내</span>
+  <span class="step-time">45-50분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"시각화 원칙 하나만요. <strong>좋은 차트는 '그래서 뭐?'에 바로 답하는 차트예요.</strong> 신호가 강한지 약한지, 추세가 나아지는지 나빠지는지, 어떤 채널이 붐비는지 — 한눈에!"</p>
+</div>
+
+<div class="key-terms">
+  <dl>
+    <dt>Canvas API</dt>
+    <dd>HTML에서 JavaScript로 그래프, 도형을 그리는 기술</dd>
+    <dt>게이지</dt>
+    <dd>현재 상태를 바늘이나 반원으로 표시하는 시각화</dd>
+    <dt>꺾은선 그래프</dt>
+    <dd>시간에 따른 변화(추세)를 보여주는 차트</dd>
+    <dt>막대차트</dt>
+    <dd>항목 간 크기를 비교하는 차트</dd>
+    <dt>클라이언트 사이드</dt>
+    <dd>서버가 아닌 브라우저에서 처리하는 방식</dd>
+  </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"다음 시간에는 교실을 돌아다니며 위치별로 RSSI를 측정하고, <strong>Wi-Fi 신호 지도</strong>를 만들 거예요!"</p>
+</div>
+
+---
+
+## 교사용 참고사항
+
+### HTML 크기 주의
+
+<Aside type="caution">
+- 시각화 코드가 추가되어 HTML이 커집니다
+- `gc.collect()` 확인, 필요시 `send()` 분할
+- 학생이 바이브 코딩으로 많이 추가하면 메모리 이슈 가능 — CSS 간소화 안내
+</Aside>
+
+### Canvas vs SVG
+
+| 방식 | 장점 | 적합한 상황 |
+|------|------|-------------|
+| Canvas | 메모리 효율적, 복잡한 그래프에 유리 | 실시간 데이터 차트, 게임 |
+| SVG | 확대해도 선명, DOM으로 접근 가능 | 간단한 차트, 인터랙션 |
+
+<div class="patrol-point">
+  <ol>
+    <li>기본 코드는 Canvas를 사용합니다 (메모리 효율적)</li>
+    <li>AI가 SVG를 제안할 수도 있음 — 둘 다 유효하니 학생 선호에 맡기세요</li>
+    <li>바이브 코딩 후 페이지가 너무 커지면 CSS 최소화 또는 기능 분리를 안내하세요</li>
+  </ol>
+</div>
+
+### 흔한 문제 & 해결
+
+| 증상 | 원인 | 해결 |
+|------|------|------|
+| 그래프 빈 화면 | 데이터 미축적 | 30초 이상 대기 후 확인 |
+| `ENOMEM` 에러 | HTML 크기 초과 | `gc.collect()`, CSS 간소화, send() 분할 |
+| 게이지 바늘 안 움직임 | JS 함수 오류 | 에러 메시지를 AI에게 보내서 해결 |
+| 채널 차트 빈 칸 | AP 스캔 지연 | AP 스캔 완료 후 자동 갱신 대기 |

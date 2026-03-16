@@ -1,0 +1,758 @@
+---
+title: "탐구 2: 자리별 밝기가 다를까? 창가 vs 복도쪽"
+description: "조도 센서(ADC)로 교실 격자별 밝기를 측정하여 교실 조도 히트맵 완성"
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+{/* 프로젝트 진행 바 */}
+<div class="project-progress">
+  <div class="prog-item prog-1 done">1. 온습도</div>
+  <div class="prog-item prog-2 current">2. 조도</div>
+  <div class="prog-item prog-3">3. 소리</div>
+  <div class="prog-item prog-4">4. 동작 감지</div>
+  <div class="prog-item prog-5">5. CO&#8322;</div>
+  <div class="prog-item prog-6">6. 기압</div>
+</div>
+
+{/* 결과물 미리보기 */}
+<div class="outcome-preview">
+  <div class="outcome-badge">이 차시가 끝나면</div>
+  <h4>교실 밝기 지도(히트맵)가 완성됩니다</h4>
+  <p>조도 센서를 Pico에 연결하고, 교실을 4x5 격자로 나누어 모둠별로 밝기를 측정합니다. 전체 데이터를 합쳐 <strong>교실 조도 히트맵</strong>을 완성하고, 권장 조도(300lux)와 비교하여 <strong>어두운 자리</strong>를 찾아냅니다.</p>
+  <div class="outcome-items">
+    <div class="outcome-item">
+      <div class="item-icon">💡</div>
+      <div class="item-label">조도 센서 연결</div>
+      아날로그(ADC) 입력으로 밝기 읽기
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🗺️</div>
+      <div class="item-label">조도 히트맵</div>
+      교실 격자별 밝기 시각화
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">📊</div>
+      <div class="item-label">데이터 분석</div>
+      창가 vs 복도, 앞 vs 뒤 비교
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🤖</div>
+      <div class="item-label">바이브 코딩</div>
+      히트맵 기능 확장
+    </div>
+  </div>
+</div>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">프로젝트</div>
+      센서 과학 탐구 (2/6차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">형태</div>
+      모둠 실험 → 전체 데이터 합치기
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">선수학습</div>
+      1차시 (DHT20 센서, I2C 통신) 완료
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">학습목표</div>
+      조도 센서로 교실 자리별 밝기를 측정하고, 히트맵으로 시각화하여 공간별 차이 분석
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">과학 탐구력</span> <span class="badge badge-emerald">공간 데이터 분석</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (모둠당 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH</li>
+    <li>브레드보드</li>
+    <li>점퍼선 3개 (빨강, 검정, 노랑)</li>
+    <li>조도 센서 (아날로그)</li>
+    <li>Micro USB **데이터** 케이블</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE + MicroPython 펌웨어</li>
+    <li>AI 접근 환경 — Claude, ChatGPT 등</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>교실 격자 구분 방법 결정 (4x5 또는 교실 크기에 맞게 조정)</li>
+    <li>조도 센서 1개로 사전 테스트 — ADC 값 변화 확인</li>
+    <li>가능하면 맑은 날 같은 시간대에 수업 배치</li>
+    <li>wifi_config.py가 Pico에 저장되어 있는지 확인</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 1">도입 5분</div>
+  <div class="main" style="flex: 1.6">센서 연결 8분</div>
+  <div class="wrap-up" style="flex: 4.4; background: var(--teacher-emerald);">데이터 수집 22분</div>
+  <div class="wrap-up" style="flex: 3">분석 15분</div>
+</div>
+
+---
+
+## 도입 (00-05분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">탐구 질문 제시 & 가설 세우기</span>
+  <span class="step-time">00-05분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"여러분 자리, 밝기가 다 같을까요? 창가 친구는 눈이 부시고 복도쪽 친구는 어둡다고 느낀 적 없어요?"</p>
+  <p>"오늘 데이터로 확인합니다. 교실 곳곳의 밝기를 측정해서 <strong>밝기 지도</strong>를 만들 거예요."</p>
+  <p>"가설을 세워보세요. 창가와 복도쪽의 밝기 차이가 얼마나 날 것 같아요?"</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">모둠 활동: 가설 세우기</span>
+    <span class="mission-difficulty">1분 토론</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-light">
+      <p>"창가가 복도보다 2배 이상 밝을 것이다"</p>
+      <p>"형광등 바로 아래가 가장 밝을 것이다"</p>
+      <p>"창문에서 먼 자리는 권장 조도(300lux)에 미달할 것이다"</p>
+    </div>
+  </div>
+</div>
+
+---
+
+## 센서 연결 (05-13분)
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">조도 센서 배선 + 코드 실행</span>
+  <span class="step-time">05-13분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"오늘 센서는 선 3개만 연결하면 됩니다. 1차시 때 DHT20은 4개였죠? 이번엔 더 간단해요."</p>
+  <p>"이 센서는 <strong>아날로그 센서</strong>예요. 밝을수록 높은 전압이 나오고, Pico의 ADC가 그걸 숫자로 바꿔줍니다."</p>
+</div>
+
+### 조도 센서 배선도
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">🔴</div>
+    <div class="flow-label">VCC</div>
+    <div class="flow-desc">3V3 (36번 핀)</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">⚫</div>
+    <div class="flow-label">GND</div>
+    <div class="flow-desc">GND (38번 핀)</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">🟡</div>
+    <div class="flow-label">SIG</div>
+    <div class="flow-desc">GP26 (31번 핀) — ADC0</div>
+  </div>
+</div>
+
+<Aside type="tip" title="ADC란?">
+**Analog-to-Digital Converter** (아날로그→디지털 변환기). Pico에서 GP26~GP28이 ADC 핀입니다. 센서의 아날로그 전압(0~3.3V)을 0~65535 사이의 숫자로 변환합니다.
+</Aside>
+
+<Aside type="caution" title="Micro USB 데이터 케이블 확인">
+Pico 2 WH는 **Micro USB** 포트를 사용합니다 (USB-C가 아닙니다!). 반드시 **데이터 전송이 가능한** Micro USB 케이블을 사용하세요.
+</Aside>
+
+### 코드 구조 설명
+
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">①</div>
+    <div class="map-content">
+      <div class="map-title">Wi-Fi 연결 + 조도 센서</div>
+      <div class="map-desc">ADC로 밝기 읽기 → 0~65535를 대략적 lux로 변환</div>
+    </div>
+    <div class="map-note">read_light() 함수</div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n2">②</div>
+    <div class="map-content">
+      <div class="map-title">교실 격자 데이터 <span class="map-tag">4행 x 5열</span></div>
+      <div class="map-desc">행/열 선택 → 현재 밝기 저장 → 히트맵에 반영</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n3">③</div>
+    <div class="map-content">
+      <div class="map-title">make_page() <span class="map-tag">바이브 코딩 영역</span></div>
+      <div class="map-desc">실시간 밝기 표시 + 위치 저장 UI + 히트맵</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n4">④</div>
+    <div class="map-content">
+      <div class="map-title">웹서버 + API</div>
+      <div class="map-desc">/now (현재값), /save (위치 저장), /grid (격자 데이터)</div>
+    </div>
+  </div>
+</div>
+
+### main.py (2차시 기본 코드)
+
+<Aside type="tip" title="복사 & 붙여넣기">
+코드 블록 오른쪽 위의 복사 버튼을 클릭하면 전체 코드가 복사됩니다. Thonny에 붙여넣고 Pico에 저장하세요.
+</Aside>
+
+<div class="code-file-label">main.py — Pico에 저장</div>
+
+```python
+# ============================================
+# 과학 탐구 2: 교실 자리별 밝기
+# 조도 센서로 교실 곳곳의 밝기를 측정하여
+# 조도 히트맵을 웹에서 확인
+# ============================================
+
+import network
+import socket
+import time
+import json
+import gc
+from machine import Pin, ADC
+from wifi_config import WIFI_SSID, WIFI_PASSWORD
+
+# ── Wi-Fi 연결 ──────────────────────────────
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+wlan.connect(WIFI_SSID, WIFI_PASSWORD)
+while not wlan.isconnected():
+    time.sleep(1)
+my_ip = wlan.ifconfig()[0]
+print(f"IP: &#123;my_ip&#125;")
+
+# ── 조도 센서 ───────────────────────────────
+adc = ADC(Pin(26))
+
+def read_light():
+    """조도 센서 읽기 (0~65535 → 대략적 lux 변환)"""
+    raw = adc.read_u16()
+    # 간단한 변환 (센서마다 다름, 대략적 값)
+    # Grove 조도 센서 기준: 0~65535 → 0~1000 lux 근사
+    lux_approx = round(raw / 65535 * 1000, 0)
+    return int(lux_approx), raw
+
+lux, raw = read_light()
+print(f"현재 밝기: ~&#123;lux&#125; lux (raw: &#123;raw&#125;)")
+
+# ── 교실 격자 데이터 ────────────────────────
+# 4행(앞→뒤) × 5열(창가→복도) 격자
+ROWS = 4
+COLS = 5
+grid_data = &#123;&#125;  # &#123;"2-3": &#123;"lux": 450, "raw": 29000&#125;, ...&#125;
+
+def save_point(row, col, lux, raw):
+    key = f"&#123;row&#125;-&#123;col&#125;"
+    grid_data[key] = &#123;"lux": lux, "raw": raw&#125;
+
+# ── HTML 페이지 ─────────────────────────────
+def make_page():
+    return """<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교실 밝기 탐구</title>
+    <style>
+        *&#123;margin:0;padding:0;box-sizing:border-box;&#125;
+        body&#123;font-family:-apple-system,sans-serif;background:#0a0a1a;color:#ddd;padding:14px;min-height:100vh;&#125;
+        .hd&#123;text-align:center;padding:8px 0 12px;&#125;
+        .hd h1&#123;color:#ffd43b;font-size:1.2em;&#125;
+        .hd .q&#123;color:#aaa;font-size:0.8em;margin-top:4px;font-style:italic;&#125;
+
+        .now-box&#123;text-align:center;background:#141428;border-radius:12px;padding:16px;margin:10px auto;max-width:500px;border:1px solid #252550;&#125;
+        .now-val&#123;font-size:2.5em;font-weight:bold;color:#ffd43b;&#125;
+        .now-lbl&#123;color:#888;font-size:0.75em;margin-top:2px;&#125;
+        .now-bar-bg&#123;width:80%;height:12px;background:#252550;border-radius:6px;margin:10px auto 0;overflow:hidden;&#125;
+        .now-bar&#123;height:100%;border-radius:6px;transition:width 0.3s;&#125;
+
+        .save-section&#123;background:#141428;border-radius:12px;padding:14px;margin:10px auto;max-width:500px;border:1px solid #252550;&#125;
+        .save-title&#123;color:#ffd43b;font-size:0.85em;font-weight:bold;margin-bottom:10px;&#125;
+        .grid-select&#123;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:10px;&#125;
+        .grid-select label&#123;color:#888;font-size:0.8em;&#125;
+        .grid-select select&#123;background:#1a1a3a;color:#ddd;border:1px solid #353570;border-radius:6px;padding:6px 10px;font-size:0.85em;&#125;
+        .btn-save&#123;background:#51cf66;color:#000;border:none;padding:10px 24px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:0.9em;&#125;
+        .btn-save:active&#123;background:#40c057;&#125;
+        .save-msg&#123;text-align:center;color:#51cf66;font-size:0.8em;margin-top:6px;min-height:1.2em;&#125;
+
+        .map-section&#123;background:#141428;border-radius:12px;padding:14px;margin:10px auto;max-width:500px;border:1px solid #252550;&#125;
+        .map-title&#123;color:#ffd43b;font-size:0.85em;font-weight:bold;margin-bottom:4px;&#125;
+        .map-subtitle&#123;color:#666;font-size:0.7em;margin-bottom:10px;&#125;
+        .heatmap&#123;display:grid;grid-template-columns:auto repeat(""" + str(COLS) + """,1fr);gap:3px;&#125;
+        .hm-header&#123;text-align:center;color:#666;font-size:0.65em;padding:4px 2px;&#125;
+        .hm-row-label&#123;display:flex;align-items:center;justify-content:center;color:#666;font-size:0.65em;padding:2px 6px;&#125;
+        .hm-cell&#123;text-align:center;padding:10px 4px;border-radius:6px;font-size:0.75em;font-weight:bold;min-height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s;&#125;
+        .hm-cell:hover&#123;border-color:#ffd43b;&#125;
+        .hm-cell.empty&#123;background:#1a1a3a;color:#555;&#125;
+
+        .legend&#123;display:flex;justify-content:center;gap:4px;margin-top:10px;align-items:center;&#125;
+        .legend span&#123;font-size:0.6em;color:#888;&#125;
+        .leg-bar&#123;width:100px;height:10px;border-radius:5px;background:linear-gradient(to right,#862e2e,#ff6b6b,#ffd43b,#94d82d,#51cf66);&#125;
+
+        .stats-row&#123;display:flex;justify-content:center;gap:16px;margin-top:12px;&#125;
+        .stats-row .si&#123;text-align:center;&#125;
+        .stats-row .sv&#123;font-size:1.1em;font-weight:bold;color:#ffd43b;&#125;
+        .stats-row .sl&#123;color:#888;font-size:0.6em;&#125;
+
+        .ft&#123;text-align:center;margin-top:14px;color:#333;font-size:0.6em;&#125;
+    </style>
+</head>
+<body>
+    <div class="hd">
+        <h1>💡 교실 밝기 탐구</h1>
+        <div class="q">"자리별 밝기가 다를까? 창가 vs 복도쪽"</div>
+    </div>
+
+    <div class="now-box">
+        <div class="now-val" id="lux">--</div>
+        <div class="now-lbl">현재 밝기 (lux 근사)</div>
+        <div class="now-bar-bg"><div class="now-bar" id="lux-bar" style="width:0%;background:#666;"></div></div>
+        <div class="now-lbl" style="margin-top:6px;">📖 독서 권장: 300~500 lux | ☀️ 밝은 교실: 500+ lux</div>
+    </div>
+
+    <div class="save-section">
+        <div class="save-title">📍 측정값 저장</div>
+        <div class="grid-select">
+            <label>행(앞→뒤):</label>
+            <select id="sel-row">
+                <option value="0">1행 (칠판 앞)</option>
+                <option value="1">2행</option>
+                <option value="2">3행</option>
+                <option value="3">4행 (뒤)</option>
+            </select>
+            <label>열(창→복도):</label>
+            <select id="sel-col">
+                <option value="0">1열 (창가)</option>
+                <option value="1">2열</option>
+                <option value="2">3열 (가운데)</option>
+                <option value="3">4열</option>
+                <option value="4">5열 (복도)</option>
+            </select>
+        </div>
+        <div style="text-align:center;">
+            <button class="btn-save" onclick="savePoint()">📌 이 위치에 저장</button>
+        </div>
+        <div class="save-msg" id="save-msg"></div>
+    </div>
+
+    <div class="map-section">
+        <div class="map-title">🗺️ 교실 조도 히트맵</div>
+        <div class="map-subtitle">창가(왼쪽) ← → 복도(오른쪽) / 칠판(위) ← → 뒤(아래)</div>
+        <div class="heatmap" id="heatmap"></div>
+        <div class="legend">
+            <span>어두움</span>
+            <div class="leg-bar"></div>
+            <span>밝음</span>
+        </div>
+        <div class="stats-row">
+            <div class="si"><div class="sv" id="st-min">--</div><div class="sl">최소</div></div>
+            <div class="si"><div class="sv" id="st-avg">--</div><div class="sl">평균</div></div>
+            <div class="si"><div class="sv" id="st-max">--</div><div class="sl">최대</div></div>
+            <div class="si"><div class="sv" id="st-cnt">0</div><div class="sl">측정 수</div></div>
+        </div>
+    </div>
+
+    <div class="ft">조도 센서 · Pico 2 WH · 교실 4×5 격자</div>
+
+    <script>
+        const ROWS = """ + str(ROWS) + """;
+        const COLS = """ + str(COLS) + """;
+        let gridData = &#123;&#125;;
+        let currentLux = 0;
+
+        async function fetchNow() &#123;
+            try &#123;
+                const r = await fetch('/now');
+                const d = await r.json();
+                currentLux = d.lux;
+                document.getElementById('lux').textContent = d.lux;
+                const pct = Math.min(100, d.lux / 800 * 100);
+                const bar = document.getElementById('lux-bar');
+                bar.style.width = pct + '%';
+                bar.style.background = d.lux >= 300 ? '#51cf66' : d.lux >= 150 ? '#ffd43b' : '#ff6b6b';
+            &#125; catch(e) &#123;&#125;
+        &#125;
+
+        async function fetchGrid() &#123;
+            try &#123;
+                const r = await fetch('/grid');
+                gridData = await r.json();
+                renderHeatmap();
+            &#125; catch(e) &#123;&#125;
+        &#125;
+
+        async function savePoint() &#123;
+            const row = document.getElementById('sel-row').value;
+            const col = document.getElementById('sel-col').value;
+            try &#123;
+                const r = await fetch('/save?r=' + row + '&c=' + col);
+                const d = await r.json();
+                document.getElementById('save-msg').textContent =
+                    '✅ ' + (parseInt(row)+1) + '행 ' + (parseInt(col)+1) + '열: ' + d.lux + ' lux 저장!';
+                fetchGrid();
+            &#125; catch(e) &#123;
+                document.getElementById('save-msg').textContent = '❌ 저장 실패';
+            &#125;
+        &#125;
+
+        function luxToColor(lux) &#123;
+            if (lux >= 500) return '#51cf66';
+            if (lux >= 300) return '#94d82d';
+            if (lux >= 150) return '#ffd43b';
+            if (lux >= 50) return '#ff922b';
+            return '#ff6b6b';
+        &#125;
+
+        function renderHeatmap() &#123;
+            const container = document.getElementById('heatmap');
+            let html = '<div class="hm-header"></div>';
+
+            const colLabels = ['창가','2열','가운데','4열','복도'];
+            for (let c = 0; c < COLS; c++) &#123;
+                html += '<div class="hm-header">' + colLabels[c] + '</div>';
+            &#125;
+
+            const rowLabels = ['앞','2행','3행','뒤'];
+            let values = [];
+
+            for (let r = 0; r < ROWS; r++) &#123;
+                html += '<div class="hm-row-label">' + rowLabels[r] + '</div>';
+                for (let c = 0; c < COLS; c++) &#123;
+                    const key = r + '-' + c;
+                    const d = gridData[key];
+                    if (d) &#123;
+                        const color = luxToColor(d.lux);
+                        html += '<div class="hm-cell" style="background:' + color + '22;color:' + color + ';">' + d.lux + '</div>';
+                        values.push(d.lux);
+                    &#125; else &#123;
+                        html += '<div class="hm-cell empty">-</div>';
+                    &#125;
+                &#125;
+            &#125;
+            container.innerHTML = html;
+
+            if (values.length > 0) &#123;
+                document.getElementById('st-min').textContent = Math.min(...values);
+                document.getElementById('st-max').textContent = Math.max(...values);
+                document.getElementById('st-avg').textContent = Math.round(values.reduce((a,b)=>a+b,0)/values.length);
+                document.getElementById('st-cnt').textContent = values.length + '/' + (ROWS*COLS);
+            &#125;
+        &#125;
+
+        fetchNow();
+        fetchGrid();
+        setInterval(fetchNow, 2000);
+    </script>
+</body>
+</html>"""
+
+# ── 웹서버 ──────────────────────────────────
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.bind(('0.0.0.0', 80))
+server.listen(3)
+
+print(f"\n&#123;'='*45&#125;\n  조도 탐구 대시보드!\n  http://&#123;my_ip&#125;\n&#123;'='*45&#125;")
+
+while True:
+    try:
+        server.settimeout(0.5)
+        try:
+            client, addr = server.accept()
+        except OSError:
+            continue
+
+        request = client.recv(1024).decode()
+
+        if 'GET /now' in request:
+            lux, raw = read_light()
+            body = json.dumps(&#123;"lux": lux, "raw": raw&#125;)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+
+        elif 'GET /save' in request:
+            # /save?r=2&c=3
+            try:
+                params = request.split('GET /save?')[1].split(' ')[0]
+                parts = &#123;&#125;
+                for p in params.split('&'):
+                    k, v = p.split('=')
+                    parts[k] = int(v)
+                lux, raw = read_light()
+                save_point(parts['r'], parts['c'], lux, raw)
+                body = json.dumps(&#123;"lux": lux, "raw": raw, "r": parts['r'], "c": parts['c']&#125;)
+                print(f"  저장: [&#123;parts['r']&#125;,&#123;parts['c']&#125;] = &#123;lux&#125; lux")
+            except Exception as e:
+                body = json.dumps(&#123;"error": str(e)&#125;)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+
+        elif 'GET /grid' in request:
+            body = json.dumps(grid_data)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+
+        elif 'favicon' in request:
+            client.close(); continue
+
+        else:
+            gc.collect()
+            page = make_page()
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: &#123;len(page.encode())&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(page.encode())
+
+        client.close(); gc.collect()
+    except Exception as e:
+        if "ETIMEDOUT" not in str(e): print(f"에러: &#123;e&#125;")
+        try: client.close()
+        except: pass
+```
+
+---
+
+## 데이터 수집 (13-35분)
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">격자 설명 + 측정 방법 안내</span>
+  <span class="step-time">13-18분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"교실을 4x5 격자로 나눌 거예요. 앞에서 뒤로 4행, 창가에서 복도로 5열이에요."</p>
+  <p>"모둠별로 담당 구역을 정하겠습니다. Pico를 들고 이동하면서, 각 위치에서 센서를 놓고 → 웹에서 행/열을 선택하고 → 저장 버튼을 누르면 됩니다."</p>
+</div>
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">🚶</div>
+    <div class="flow-label">이동</div>
+    <div class="flow-desc">담당 위치로</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">📱</div>
+    <div class="flow-label">행/열 선택</div>
+    <div class="flow-desc">웹 UI에서</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">📌</div>
+    <div class="flow-label">저장</div>
+    <div class="flow-desc">버튼 클릭</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-icon">🗺️</div>
+    <div class="flow-label">히트맵 확인</div>
+    <div class="flow-desc">실시간 반영</div>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>측정 시 주의사항:</strong></p>
+  <ol>
+    <li>센서를 <strong>책상 위 수평</strong>으로 놓기 (각도 통일)</li>
+    <li>센서를 <strong>그림자가 가리지 않도록</strong> 주의</li>
+    <li>창문 커튼 상태를 통일 (열림/닫힘)</li>
+  </ol>
+</div>
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">모둠별 구역 측정</span>
+  <span class="step-time">18-33분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"자, 측정 시작! 모둠별로 담당 구역을 돌면서 측정하세요. 히트맵이 실시간으로 채워지는 걸 전체 화면으로 보여줄게요."</p>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">수아:</span> "창가 1열이 612 lux인데 복도 5열은 180밖에 안 돼요!"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "차이가 3배 넘네요. 히트맵에서 색 차이가 보이죠?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "형광등 바로 아래가 450이에요. 창가보다는 낮네?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">민수:</span> "뒷자리 복도쪽이 제일 어두워요. 120이래요!"</div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">5</span>
+  <span class="step-title">전체 데이터 합치기</span>
+  <span class="step-time">33-35분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"모든 모둠의 데이터가 한 히트맵에 들어왔네요. 전체 화면을 봅시다."</p>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"다른 모둠 Pico에 저장된 데이터도 합칠 수 있어요?"</div>
+  <div class="qa-a">교사 Pico 한 대에 데이터를 모으거나, 같은 Pico로 돌아다니며 측정하는 방식으로 합칠 수 있어요.</div>
+</div>
+
+---
+
+## 분석 & 결론 (35-50분)
+
+<div class="step-header">
+  <span class="step-num">6</span>
+  <span class="step-title">히트맵 분석 + 패턴 찾기</span>
+  <span class="step-time">35-43분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"히트맵을 보세요. 어떤 패턴이 보이나요?"</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">분석 과제</span>
+    <span class="mission-difficulty">모둠별 토론</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-full">
+      <p>1. 창가 vs 복도 — 평균 조도 차이는?</p>
+      <p>2. 앞자리 vs 뒷자리 — 차이는?</p>
+      <p>3. 권장 조도(300lux) 미달인 자리가 있나?</p>
+      <p>4. 가장 밝은 자리와 어두운 자리의 차이는 몇 배?</p>
+      <p>5. 어두운 자리에 앉은 학생의 시력 보호를 위해 조명 배치를 어떻게 바꿔야 할까?</p>
+    </div>
+  </div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">7</span>
+  <span class="step-title">권장 조도 비교 + 결론</span>
+  <span class="step-time">43-48분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"교실 조도 기준은 300lux 이상이에요. 히트맵에서 빨간색/주황색 자리가 미달 구역이죠."</p>
+  <p>"우리 교실 조명을 어떻게 개선하면 좋을까요? 모둠별로 한 가지씩 제안해보세요."</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">8</span>
+  <span class="step-title">바이브 코딩 미션 (시간 여유 시)</span>
+  <span class="step-time">48-50분</span>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">바이브 코딩: 히트맵 확장</span>
+    <span class="mission-difficulty">난이도 ★★★☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-light">
+      <p>"히트맵 색상을 더 세밀한 그라데이션으로 바꿔줘"</p>
+      <p>"각 셀 클릭하면 상세 정보(raw값, 측정시간) 팝업"</p>
+      <p>"300lux 미달 자리를 빨간 테두리로 경고 표시"</p>
+      <p>"모둠별 데이터를 합치는 기능 추가해줘"</p>
+    </div>
+  </div>
+</div>
+
+---
+
+## 정리
+
+<div class="key-terms">
+  <dl>
+    <dt>조도 (lux)</dt>
+    <dd>단위 면적에 도달하는 빛의 양. 교실 권장 기준은 300lux 이상</dd>
+    <dt>ADC</dt>
+    <dd>Analog-to-Digital Converter. 아날로그 전압을 디지털 숫자(0~65535)로 변환</dd>
+    <dt>히트맵</dt>
+    <dd>격자 형태로 데이터 크기를 색상으로 시각화하는 방법</dd>
+    <dt>아날로그 센서</dt>
+    <dd>연속적인 전압으로 값을 전달하는 센서 (vs 디지털/I2C 센서)</dd>
+    <dt>공간 데이터</dt>
+    <dd>위치 정보가 포함된 데이터. 지도 형태로 시각화하면 패턴을 쉽게 발견</dd>
+  </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"다음 시간에는 소리 센서를 사용합니다. 선생님 목소리가 교실 뒤까지 얼마나 줄어드는지, 거리별 소리 크기를 측정할 거예요."</p>
+</div>
+
+---
+
+## 교사용 참고사항
+
+### 조도 변환 참고
+
+<Aside type="note">
+Grove 조도 센서는 정확한 lux 값을 반환하지 않습니다. ADC raw값(0~65535)을 대략적 lux로 변환한 근사치입니다. 정확한 비교보다는 **상대적 차이**에 초점을 맞추세요.
+</Aside>
+
+### 실험 팁
+
+<div class="patrol-point">
+  <ol>
+    <li><strong>센서 위치:</strong> 책상 위 수평으로 놓기. 각도가 달라지면 측정값이 크게 변함</li>
+    <li><strong>그림자 주의:</strong> 학생 몸이 센서를 가리지 않도록 한 걸음 물러서기</li>
+    <li><strong>커튼 통일:</strong> 창문 커튼 상태를 통일해야 공정한 비교 가능</li>
+    <li><strong>격자 크기 조정:</strong> 교실 크기에 따라 코드의 ROWS, COLS 값을 변경 가능 (3x4, 5x6 등)</li>
+  </ol>
+</div>
+
+### 흔한 문제 & 해결
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">조도가 항상 0이에요</div>
+    <span class="label">원인</span>
+    <span class="value">배선 오류 또는 센서 불량</span>
+    <span class="label">대응</span>
+    <span class="value">SIG선이 GP26(31번 핀)에 연결되었는지 확인</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">값이 너무 높거나 변화가 없어요</div>
+    <span class="label">원인</span>
+    <span class="value">VCC/GND 바뀜 또는 ADC 포화</span>
+    <span class="label">대응</span>
+    <span class="value">빨강선=3V3, 검정선=GND 확인. 직사광선 회피</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">히트맵이 비어 있어요</div>
+    <span class="label">원인</span>
+    <span class="value">저장 버튼을 안 눌렀거나 네트워크 문제</span>
+    <span class="label">대응</span>
+    <span class="value">행/열 선택 후 저장 버튼 클릭. 같은 Wi-Fi 확인</span>
+  </div>
+</div>

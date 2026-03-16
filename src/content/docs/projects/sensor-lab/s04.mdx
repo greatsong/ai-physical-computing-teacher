@@ -1,0 +1,730 @@
+---
+title: "4차시: 동작 감지 (PIR)"
+description: "PIR 센서로 쉬는 시간 교실 출입 횟수를 기록하고 시간대별 패턴 분석"
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+{/* 프로젝트 진행 바 */}
+<div class="project-progress">
+  <div class="prog-item prog-1 done">1. 온습도</div>
+  <div class="prog-item prog-2 done">2. 조도</div>
+  <div class="prog-item prog-3 done">3. 소리</div>
+  <div class="prog-item prog-4 current">4. 동작 감지</div>
+  <div class="prog-item prog-5">5. CO&#8322;</div>
+  <div class="prog-item prog-6">6. 기압</div>
+</div>
+
+{/* 결과물 미리보기 */}
+<div class="outcome-preview">
+  <div class="outcome-badge">이 차시가 끝나면</div>
+  <h4>교실 출입 패턴이 데이터로 보입니다</h4>
+  <p>PIR 센서가 교실 문 앞의 움직임을 자동 감지하여 쉬는 시간 10분간 출입 횟수를 기록합니다. 시간대별 빈도 그래프로 <strong>"쉬는 시간 초반 러시 vs 후반 복귀"</strong> 패턴을 데이터로 확인합니다.</p>
+  <div class="outcome-items">
+    <div class="outcome-item">
+      <div class="item-icon">🚶</div>
+      <div class="item-label">움직임 감지</div>
+      PIR 센서로 출입 자동 기록
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">📊</div>
+      <div class="item-label">빈도 그래프</div>
+      30초 구간별 감지 횟수 시각화
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">📋</div>
+      <div class="item-label">타임라인</div>
+      감지 시각 + 경과 시간 기록
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🔍</div>
+      <div class="item-label">패턴 분석</div>
+      쉬는 시간 출입 패턴 발견
+    </div>
+  </div>
+</div>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">프로젝트</div>
+      센서 과학 탐구 (4/6차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">형태</div>
+      모둠 실험
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">센서</div>
+      PIR 움직임 센서 (디지털)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">탐구 질문</div>
+      쉬는 시간 10분 동안 교실 출입 횟수는? 시간대별 패턴은?
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">데이터 리터러시</span> <span class="badge badge-emerald">과학적 탐구</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (모둠별 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH</li>
+    <li>브레드보드</li>
+    <li>점퍼선 3개</li>
+    <li>PIR 움직임 센서</li>
+    <li>Micro USB **데이터** 케이블</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE 설치 완료</li>
+    <li>MicroPython 펌웨어 설치 완료</li>
+    <li>AI 접근 환경 — Claude, ChatGPT 등</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>교실 Wi-Fi **2.4GHz** 대역 확인</li>
+    <li>PIR 센서 동작 사전 테스트 (손 흔들어 HIGH 확인)</li>
+    <li>센서 설치 위치 사전 답사 (교실 문 옆)</li>
+    <li>wifi_config.py가 Pico에 저장되어 있는지 확인</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 2">도입 10분</div>
+  <div class="main" style="flex: 2">배선+코드 10분</div>
+  <div class="wrap-up" style="flex: 4; background: var(--teacher-emerald);">실험+수집 20분</div>
+  <div class="wrap-up" style="flex: 2">분석+정리 10분</div>
+</div>
+
+---
+
+## 도입 (00-10분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">탐구 질문 던지기</span>
+  <span class="step-time">00-05분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"쉬는 시간 10분 동안 우리 교실 문 앞을 몇 명이나 지나갈까요?"</p>
+  <p>"대충 감으로는 알겠는데, <strong>정확한 숫자</strong>를 알 수 있을까요?"</p>
+  <p>"오늘은 PIR 센서라는 걸 써서, 움직임이 있을 때마다 자동으로 기록하는 시스템을 만들어볼 거예요."</p>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"PIR이 뭐예요?"</div>
+  <div class="qa-a">Passive InfraRed — 적외선 움직임 감지 센서예요. 사람이 지나가면 체온(적외선)을 감지해서 신호를 보내요. 자동문, 화장실 조명에 쓰이는 바로 그 센서예요!</div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">센서 원리 & 배선</span>
+  <span class="step-time">05-10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"PIR 센서는 아주 단순해요. 감지하면 1(HIGH), 아니면 0(LOW). 디지털 신호예요."</p>
+  <p>"한 가지 주의할 점! PIR은 한번 감지하면 1-5초 동안 HIGH를 유지해요. 그래서 코드에서 <strong>3초 간격</strong>으로 중복을 방지합니다."</p>
+</div>
+
+<div class="key-terms">
+  <dl>
+    <dt>PIR 센서 배선</dt>
+    <dd>VCC → VBUS (40번 핀, <strong>5V</strong>) / GND → GND (38번) / OUT → GP16 (21번)</dd>
+  </dl>
+</div>
+
+<Aside type="caution" title="5V 전원 필요!">
+PIR 센서는 **5V 전원**이 필요합니다. 3V3 핀에 연결하면 불안정하게 동작할 수 있으니 반드시 **VBUS(40번 핀)**에 연결하세요.
+</Aside>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">PIR 센서가 계속 1만 출력해요</div>
+    <span class="label">원인</span>
+    <span class="value">센서 워밍업 시간 부족 또는 민감도 조절 필요</span>
+    <span class="label">대응</span>
+    <span class="value">전원 연결 후 30초-1분 대기. 센서 뒷면 가변저항으로 민감도/유지시간 조절</span>
+  </div>
+</div>
+
+---
+
+## 코드 실행 (10-20분)
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">코드 배포 & 실행</span>
+  <span class="step-time">10-20분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"wifi_config.py는 이미 저장되어 있죠? main.py만 새로 저장하면 됩니다."</p>
+  <p>"코드를 실행하면 웹 대시보드 주소가 나와요. 브라우저로 접속하면 감지 횟수와 타임라인이 보입니다."</p>
+</div>
+
+<Aside type="tip" title="복사 & 붙여넣기">
+코드 블록 오른쪽 위의 복사 버튼을 클릭하면 전체 코드가 복사됩니다. Thonny에 붙여넣고 Pico에 저장하세요.
+</Aside>
+
+<div class="code-file-label">main.py — Pico에 저장</div>
+
+```python
+# ============================================
+# 과학 탐구 4: 쉬는 시간 교실 출입
+# PIR 센서로 움직임을 감지하여 시간대별 기록
+# ============================================
+
+import network
+import socket
+import time
+import json
+import gc
+from machine import Pin
+from wifi_config import WIFI_SSID, WIFI_PASSWORD
+
+# ── Wi-Fi ────────────────────────────────────
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+wlan.connect(WIFI_SSID, WIFI_PASSWORD)
+while not wlan.isconnected():
+    time.sleep(1)
+my_ip = wlan.ifconfig()[0]
+print(f"IP: {my_ip}")
+
+# ── NTP 시간 ────────────────────────────────
+try:
+    import ntptime
+    ntptime.settime()
+except:
+    pass
+
+def kst_str():
+    t = time.localtime(time.time() + 9 * 3600)
+    return f"{t[3]:02d}:{t[4]:02d}:{t[5]:02d}"
+
+# ── PIR 센서 ────────────────────────────────
+pir = Pin(16, Pin.IN, Pin.PULL_DOWN)
+
+# ── 데이터 ──────────────────────────────────
+detect_log = []    # [{"time": "14:32:05", "sec": 123}, ...]
+recording = False
+start_time = 0
+total_count = 0
+last_detect = 0    # 중복 방지 (최소 3초 간격)
+
+# ── HTML ────────────────────────────────────
+def make_page():
+    return """<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교실 출입 탐구</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:-apple-system,sans-serif;background:#0a0a1a;color:#ddd;padding:14px;min-height:100vh;}
+        .hd{text-align:center;padding:8px 0 12px;}
+        .hd h1{color:#20c997;font-size:1.2em;}
+        .hd .q{color:#aaa;font-size:0.8em;margin-top:4px;font-style:italic;}
+
+        .sc{background:#141428;border-radius:12px;padding:14px;margin:8px auto;max-width:500px;border:1px solid #252550;}
+        .sc-title{color:#20c997;font-size:0.85em;font-weight:bold;margin-bottom:8px;}
+
+        .big-counter{text-align:center;padding:12px 0;}
+        .big-num{font-size:4em;font-weight:bold;color:#20c997;}
+        .big-lbl{color:#888;font-size:0.75em;}
+
+        .pir-status{text-align:center;padding:8px;border-radius:8px;margin:8px 0;font-size:0.9em;font-weight:bold;}
+        .pir-on{background:#20c99722;color:#20c997;animation:pulse 0.5s infinite alternate;}
+        .pir-off{background:#1a1a3a;color:#555;}
+        @keyframes pulse{to{background:#20c99744;}}
+
+        .controls{display:flex;gap:8px;justify-content:center;margin:10px 0;}
+        .btn{padding:10px 20px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:0.85em;}
+        .btn-start{background:#20c997;color:#000;}
+        .btn-stop{background:#ff6b6b;color:#fff;}
+        .btn-reset{background:#495057;color:#fff;}
+        .btn:disabled{opacity:0.4;}
+
+        .status-bar{text-align:center;color:#888;font-size:0.75em;margin:4px 0;}
+        .status-bar .rec{color:#ff6b6b;animation:blink 1s infinite;}
+        @keyframes blink{50%{opacity:0.3;}}
+
+        canvas{width:100%;height:120px;}
+
+        .timeline{max-height:200px;overflow-y:auto;font-size:0.75em;}
+        .tl-item{display:flex;gap:10px;padding:4px 8px;border-bottom:1px solid #1e1e3e;}
+        .tl-num{color:#20c997;font-weight:bold;min-width:24px;}
+        .tl-time{color:#888;}
+        .tl-elapsed{color:#666;}
+
+        .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+        .st{background:#1a1a3a;border-radius:8px;padding:8px;text-align:center;}
+        .st .sv{color:#20c997;font-size:1.1em;font-weight:bold;}
+        .st .sl{color:#888;font-size:0.6em;margin-top:2px;}
+
+        .ft{text-align:center;margin-top:14px;color:#333;font-size:0.6em;}
+    </style>
+</head>
+<body>
+    <div class="hd">
+        <h1>🚶 교실 출입 탐구</h1>
+        <div class="q">"쉬는 시간 10분, 교실 출입은 몇 번?"</div>
+    </div>
+
+    <div class="sc">
+        <div class="big-counter">
+            <div class="big-num" id="count">0</div>
+            <div class="big-lbl">감지 횟수</div>
+        </div>
+        <div class="pir-status pir-off" id="pir-status">대기 중</div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-start" id="btn-start" onclick="startRec()">▶ 기록 시작</button>
+        <button class="btn btn-stop" id="btn-stop" onclick="stopRec()" disabled>⏹ 정지</button>
+        <button class="btn btn-reset" onclick="resetData()">↺ 초기화</button>
+    </div>
+    <div class="status-bar" id="status">대기 중 — 센서를 문 옆에 설치하고 '기록 시작'</div>
+
+    <!-- 시간대별 빈도 그래프 -->
+    <div class="sc">
+        <div class="sc-title">📊 시간대별 감지 빈도 (30초 구간)</div>
+        <canvas id="chart"></canvas>
+    </div>
+
+    <!-- 통계 -->
+    <div class="stats">
+        <div class="st"><div class="sv" id="st-total">0</div><div class="sl">총 감지</div></div>
+        <div class="st"><div class="sv" id="st-elapsed">0:00</div><div class="sl">경과 시간</div></div>
+        <div class="st"><div class="sv" id="st-rate">-</div><div class="sl">분당 감지</div></div>
+    </div>
+
+    <!-- 감지 타임라인 -->
+    <div class="sc">
+        <div class="sc-title">📋 감지 기록 (최신순)</div>
+        <div class="timeline" id="timeline">
+            <div style="color:#555;text-align:center;padding:12px;">기록 시작 후 표시됩니다</div>
+        </div>
+    </div>
+
+    <div class="ft">PIR 센서 · Pico 2 WH · 3초 간격 감지</div>
+
+    <script>
+        const canvas = document.getElementById('chart');
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth * 2;
+        canvas.height = 240;
+
+        async function fetchData() {
+            try {
+                const r = await fetch('/status');
+                const d = await r.json();
+
+                document.getElementById('count').textContent = d.count;
+                document.getElementById('st-total').textContent = d.count;
+
+                const pirEl = document.getElementById('pir-status');
+                if (d.pir) {
+                    pirEl.className = 'pir-status pir-on';
+                    pirEl.textContent = '🟢 움직임 감지!';
+                } else {
+                    pirEl.className = 'pir-status pir-off';
+                    pirEl.textContent = d.recording ? '⏳ 감시 중...' : '대기 중';
+                }
+
+                if (d.elapsed > 0) {
+                    const min = Math.floor(d.elapsed / 60);
+                    const sec = d.elapsed % 60;
+                    document.getElementById('st-elapsed').textContent = min + ':' + String(sec).padStart(2,'0');
+                    const rate = d.count / (d.elapsed / 60);
+                    document.getElementById('st-rate').textContent = rate.toFixed(1) + '/분';
+                }
+
+                // 타임라인
+                if (d.log && d.log.length > 0) {
+                    const tl = document.getElementById('timeline');
+                    tl.innerHTML = d.log.slice().reverse().map((item, i) =>
+                        '<div class="tl-item"><span class="tl-num">' + (d.log.length - i) + '</span>' +
+                        '<span class="tl-time">' + item.time + '</span>' +
+                        '<span class="tl-elapsed">+' + item.sec + '초</span></div>'
+                    ).join('');
+                }
+
+                // 빈도 차트 (30초 구간별)
+                if (d.log && d.log.length > 0) {
+                    const maxSec = d.elapsed || 1;
+                    const binSize = 30;
+                    const bins = Math.ceil(maxSec / binSize);
+                    const counts = new Array(bins).fill(0);
+                    d.log.forEach(item => {
+                        const bin = Math.floor(item.sec / binSize);
+                        if (bin < bins) counts[bin]++;
+                    });
+                    drawBars(counts, binSize);
+                }
+
+            } catch(e) {}
+        }
+
+        function drawBars(counts, binSize) {
+            const W = canvas.width, H = canvas.height;
+            const pad = {t:10,r:10,b:30,l:30};
+            const cw = W-pad.l-pad.r, ch = H-pad.t-pad.b;
+            ctx.clearRect(0,0,W,H);
+
+            const maxC = Math.max(...counts, 1);
+            const barW = cw / counts.length - 4;
+
+            counts.forEach((c, i) => {
+                const x = pad.l + (cw / counts.length) * i + 2;
+                const h = ch * c / maxC;
+                const y = pad.t + ch - h;
+
+                ctx.fillStyle = '#20c997';
+                ctx.fillRect(x, y, barW, h);
+
+                if (c > 0) {
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '16px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(c, x + barW/2, y - 4);
+                }
+
+                ctx.fillStyle = '#666';
+                ctx.font = '14px sans-serif';
+                ctx.textAlign = 'center';
+                const label = Math.floor(i * binSize / 60) + ':' + String((i * binSize) % 60).padStart(2,'0');
+                ctx.fillText(label, x + barW/2, H - pad.b + 18);
+            });
+        }
+
+        async function startRec() {
+            await fetch('/start');
+            document.getElementById('btn-start').disabled = true;
+            document.getElementById('btn-stop').disabled = false;
+            document.getElementById('status').innerHTML = '<span class="rec">● 기록 중</span> — 센서 앞을 지나가면 감지됩니다';
+        }
+
+        async function stopRec() {
+            await fetch('/stop');
+            document.getElementById('btn-start').disabled = false;
+            document.getElementById('btn-stop').disabled = true;
+            document.getElementById('status').textContent = '기록 정지 — 데이터를 분석하세요';
+        }
+
+        async function resetData() {
+            if (confirm('데이터를 지울까요?')) {
+                await fetch('/reset');
+                document.getElementById('count').textContent = '0';
+                document.getElementById('timeline').innerHTML = '<div style="color:#555;text-align:center;padding:12px;">초기화됨</div>';
+            }
+        }
+
+        fetchData();
+        setInterval(fetchData, 1000);
+    </script>
+</body>
+</html>"""
+
+# ── 웹서버 ──────────────────────────────────
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.bind(('0.0.0.0', 80))
+server.listen(3)
+
+print(f"\n{'='*45}\n  출입 탐구 대시보드!\n  http://{my_ip}\n{'='*45}")
+
+while True:
+    try:
+        # PIR 감지 체크
+        if recording and pir.value() == 1:
+            now_tick = time.ticks_ms()
+            if time.ticks_diff(now_tick, last_detect) > 3000:  # 3초 간격
+                elapsed = time.ticks_diff(now_tick, start_time) // 1000
+                detect_log.append({"time": kst_str(), "sec": elapsed})
+                total_count += 1
+                last_detect = now_tick
+                print(f"  감지 #{total_count} ({kst_str()}, +{elapsed}초)")
+
+        server.settimeout(0.3)
+        try:
+            client, addr = server.accept()
+        except OSError:
+            continue
+
+        request = client.recv(1024).decode()
+
+        if 'GET /status' in request:
+            elapsed = 0
+            if recording and start_time > 0:
+                elapsed = time.ticks_diff(time.ticks_ms(), start_time) // 1000
+            body = json.dumps({
+                "count": total_count,
+                "pir": pir.value(),
+                "recording": recording,
+                "elapsed": elapsed,
+                "log": detect_log[-50:],  # 최근 50개만
+            })
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+
+        elif 'GET /start' in request:
+            recording = True
+            start_time = time.ticks_ms()
+            last_detect = 0
+            body = json.dumps({"status": "recording"})
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+            print("▶ 기록 시작")
+
+        elif 'GET /stop' in request:
+            recording = False
+            body = json.dumps({"status": "stopped"})
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+            print("⏹ 기록 정지")
+
+        elif 'GET /reset' in request:
+            detect_log.clear(); total_count = 0; recording = False
+            body = json.dumps({"status": "reset"})
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+            gc.collect()
+
+        elif 'favicon' in request:
+            client.close(); continue
+
+        else:
+            gc.collect(); page = make_page()
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: {len(page.encode())}\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(page.encode())
+
+        client.close(); gc.collect()
+    except Exception as e:
+        if "ETIMEDOUT" not in str(e): print(f"에러: {e}")
+        try: client.close()
+        except: pass
+```
+
+### 코드 구조 설명
+
+<div class="teacher-script">
+  <p>"코드를 한 줄씩 설명하진 않을게요. 큰 구조만 알려드릴게요."</p>
+</div>
+
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">①</div>
+    <div class="map-content">
+      <div class="map-title">PIR 센서 설정</div>
+      <div class="map-desc"><code>Pin(16, Pin.IN, Pin.PULL_DOWN)</code> — GP16에서 디지털 신호 읽기</div>
+    </div>
+    <div class="map-note">감지=1, 미감지=0</div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n2">②</div>
+    <div class="map-content">
+      <div class="map-title">감지 루프 <span class="map-tag">핵심 로직</span></div>
+      <div class="map-desc">PIR 값 체크 → 3초 간격 필터 → 시각 + 경과시간 기록</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n3">③</div>
+    <div class="map-content">
+      <div class="map-title">웹 대시보드</div>
+      <div class="map-desc">실시간 감지 횟수 + 타임라인 + 30초 구간 빈도 그래프</div>
+    </div>
+  </div>
+</div>
+
+---
+
+## 실험 수행 (20-40분)
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">실험 설계 & 센서 설치</span>
+  <span class="step-time">20-25분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이제 실험을 설계할 거예요. PIR 센서를 교실 문 옆에 설치하고, 쉬는 시간 10분 동안 움직임을 기록합니다."</p>
+  <p>"설치할 때 센서가 출입 동선을 향하도록 놓으세요."</p>
+</div>
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">📍</div>
+    <div class="flow-label">설치</div>
+    <div class="flow-desc">문 옆에 센서 배치</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">▶️</div>
+    <div class="flow-label">기록 시작</div>
+    <div class="flow-desc">쉬는 시간 시작</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">⏱️</div>
+    <div class="flow-label">10분 대기</div>
+    <div class="flow-desc">자동 기록 진행</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-icon">⏹️</div>
+    <div class="flow-label">정지</div>
+    <div class="flow-desc">데이터 분석</div>
+  </div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">5</span>
+  <span class="step-title">데이터 수집 (쉬는 시간)</span>
+  <span class="step-time">25-35분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"쉬는 시간이 시작되면 '기록 시작' 버튼을 누르세요. 10분이 지나면 '정지'를 누르고요."</p>
+  <p>"센서 앞을 지나가면 대시보드에서 숫자가 올라가는 걸 확인할 수 있어요."</p>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>관찰 포인트를 미리 안내하세요:</strong></p>
+  <ol>
+    <li>쉬는 시간 시작 직후 1-2분: 화장실 러시?</li>
+    <li>중반 3-7분: 안정기?</li>
+    <li>마지막 1-2분: 복귀 러시?</li>
+  </ol>
+</div>
+
+<Aside type="note" title="쉬는 시간이 아닐 때는?">
+쉬는 시간과 딱 맞지 않아도 괜찮습니다. 수업 중 5분간 테스트로 기록하거나, 복도 통행이 있는 시간에 측정해도 패턴을 관찰할 수 있습니다.
+</Aside>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "벌써 15번이나 감지됐어요! 1분도 안 됐는데."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "그래프를 보세요. 초반 30초에 몰려있죠? 이게 '러시' 패턴이에요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">수아:</span> "근데 두 명이 같이 지나가면 1번으로 세는 거 아니에요?"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "좋은 질문! 맞아요. PIR은 '움직임 횟수'를 세는 거지 '사람 수'를 세는 게 아니에요. 이런 한계를 인식하는 것도 과학적 사고예요."</div>
+</div>
+
+---
+
+## 분석 & 정리 (40-50분)
+
+<div class="step-header">
+  <span class="step-num">6</span>
+  <span class="step-title">데이터 분석 & 토론</span>
+  <span class="step-time">40-45분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"자, 데이터를 봅시다. 총 감지 횟수가 몇 번이었나요?"</p>
+  <p>"시간대별 그래프를 보면 어떤 패턴이 보이나요? 초반에 많은지, 후반에 많은지?"</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">분석 포인트</span>
+    <span class="mission-difficulty">모둠 토론</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">아래 질문을 모둠별로 토론하세요.</div>
+    <div class="prompt-box prompt-full">
+      <p>1. 총 감지 횟수 — "의외로 많다? 적다?"</p>
+      <p>2. 시간대별 빈도 — "초반 러시 vs 후반 러시" 패턴이 보이나?</p>
+      <p>3. 분당 감지율 — "평균 1분에 몇 번?"</p>
+      <p>4. 비는 시간 — "아무도 안 다니는 시간대가 있나?"</p>
+      <p>5. 수업 시간에도 측정하면? — 쉬는 시간과 어떻게 다를까?</p>
+    </div>
+  </div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">7</span>
+  <span class="step-title">PIR 센서의 한계 토론 & 정리</span>
+  <span class="step-time">45-50분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"PIR 센서에는 한계가 있어요. 중요한 질문을 던져볼게요."</p>
+  <p>"2명이 동시에 지나가면 몇 번으로 기록될까요? 한 명이 왔다 갔다 하면? 이런 한계를 인식하는 것도 과학적 사고의 핵심이에요."</p>
+</div>
+
+<div class="key-terms">
+  <dl>
+    <dt>PIR (Passive InfraRed)</dt>
+    <dd>적외선 변화로 움직임을 감지하는 센서. 자동문, 현관 조명에 사용</dd>
+    <dt>디지털 신호</dt>
+    <dd>0 또는 1만 출력하는 신호 (아날로그와 달리 중간값 없음)</dd>
+    <dt>중복 방지 (디바운싱)</dt>
+    <dd>짧은 시간에 여러 번 감지되는 것을 1회로 처리하는 기법</dd>
+    <dt>빈도 분석</dt>
+    <dd>시간대별로 사건 발생 횟수를 세어 패턴을 찾는 방법</dd>
+  </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"다음 시간에는 CO&#8322; 센서로 '밀폐 교실에서 30명이 수업하면 CO&#8322;가 얼마나 오를까?'를 탐구합니다. 호흡이 공기 질에 미치는 영향을 실시간 데이터로 확인해볼 거예요!"</p>
+</div>
+
+---
+
+## 교사용 참고사항
+
+### 바이브 코딩 미션
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">확장 미션: AI와 대시보드 개선</span>
+    <span class="mission-difficulty">빠른 모둠용</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-light">
+      <p>"감지 횟수에 따라 이모지가 바뀌게 해줘 (1-5: 🚶, 6-15: 🚶‍♂️🚶‍♀️, 16+: 🏃‍♂️🏃‍♀️)"</p>
+      <p>"시간대별 빈도를 원형 차트로도 보여줘"</p>
+      <p>"감지될 때 효과음 알림을 추가해줘"</p>
+      <p>"수업 시간 vs 쉬는 시간 데이터를 나란히 비교하는 화면 만들어줘"</p>
+    </div>
+  </div>
+</div>
+
+### PIR 센서 특성
+
+<Aside type="caution">
+- PIR 센서는 **움직임**을 감지하지, **사람 수**를 세지 않습니다
+- 2명이 동시에 지나가면 1회로 감지될 수 있습니다
+- 한 명이 왔다 갔다 하면 여러 번 감지될 수 있습니다
+- 센서 뒷면 **가변저항**으로 민감도와 유지 시간을 조절할 수 있습니다
+- 전원 연결 후 **30초-1분** 안정화 시간이 필요합니다
+</Aside>
+
+### 흔한 문제 & 해결
+
+| 증상 | 원인 | 해결 |
+|------|------|------|
+| PIR이 계속 1 출력 | 워밍업 미완료 / 민감도 과다 | 1분 대기, 가변저항 조절 |
+| 감지가 안 됨 | 배선 오류 / 3.3V 연결 | VBUS(5V) 확인, OUT→GP16 확인 |
+| 웹 대시보드 접속 불가 | Wi-Fi / IP 문제 | http:// 확인, 같은 네트워크 확인 |
+| 감지 간격이 너무 김 | PIR 유지 시간 설정 | 센서 뒷면 가변저항(시간) 조절 |

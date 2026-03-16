@@ -70,6 +70,45 @@ export default defineConfig({
           ],
         },
         {
+          label: '바이브 코딩 프로젝트',
+          items: [
+            { label: '프로젝트 소개', slug: 'projects' },
+            {
+              label: 'Wi-Fi 품질 모니터 (6차시)',
+              items: [
+                { label: '1차시: 첫 웹서버', slug: 'projects/wifi-monitor/w01' },
+                { label: '2차시: 실시간 대시보드', slug: 'projects/wifi-monitor/w02' },
+                { label: '3차시: 차트와 시각화', slug: 'projects/wifi-monitor/w03' },
+                { label: '4차시: 신호 지도', slug: 'projects/wifi-monitor/w04' },
+                { label: '5차시: 나만의 기능', slug: 'projects/wifi-monitor/w05' },
+                { label: '6차시: 완성과 발표', slug: 'projects/wifi-monitor/w06' },
+              ],
+            },
+            {
+              label: '공공데이터 전광판 (6차시)',
+              items: [
+                { label: '1차시: 급식 전광판', slug: 'projects/public-data/p01' },
+                { label: '2차시: 날씨와 미세먼지', slug: 'projects/public-data/p02' },
+                { label: '3차시: 버스 도착정보', slug: 'projects/public-data/p03' },
+                { label: '4차시: 디자인 완성', slug: 'projects/public-data/p04' },
+                { label: '5차시: 나만의 API', slug: 'projects/public-data/p05' },
+                { label: '6차시: 완성과 발표', slug: 'projects/public-data/p06' },
+              ],
+            },
+            {
+              label: '센서 실험실 (6차시)',
+              items: [
+                { label: '1차시: 온습도 센서', slug: 'projects/sensor-lab/s01' },
+                { label: '2차시: 조도 센서', slug: 'projects/sensor-lab/s02' },
+                { label: '3차시: 소리 센서', slug: 'projects/sensor-lab/s03' },
+                { label: '4차시: 동작 감지', slug: 'projects/sensor-lab/s04' },
+                { label: '5차시: CO₂ 센서', slug: 'projects/sensor-lab/s05' },
+                { label: '6차시: 기압 센서', slug: 'projects/sensor-lab/s06' },
+              ],
+            },
+          ],
+        },
+        {
           label: '부록',
           items: [
             { label: '평가 루브릭', slug: 'appendix/rubric' },

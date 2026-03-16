@@ -1,0 +1,476 @@
+---
+title: "6차시: 완성과 발표"
+description: "프로젝트 최종 발표 + 프로젝트 회고 + Best 프롬프트 공유"
+next: false
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+{/* 프로젝트 진행 바 */}
+<div class="project-progress">
+  <div class="prog-item prog-1 done">1. 급식 전광판</div>
+  <div class="prog-item prog-2 done">2. 날씨+미세먼지</div>
+  <div class="prog-item prog-3 done">3. 버스 도착</div>
+  <div class="prog-item prog-4 done">4. 디자인 완성</div>
+  <div class="prog-item prog-5 done">5. 나만의 API</div>
+  <div class="prog-item prog-6 current">6. 완성과 발표</div>
+</div>
+
+{/* 결과물 미리보기 */}
+<div class="outcome-preview">
+  <div class="outcome-badge">이 차시가 끝나면</div>
+  <h4>프로젝트가 완성됩니다</h4>
+  <p>6차시 동안 만든 <strong>학교 맞춤형 공공데이터 전광판</strong>을 청중 앞에서 시연하고, 바이브 코딩 과정에서의 학습 경험을 성찰합니다. 효과적이었던 프롬프트를 공유하고, "진짜 학교에 설치한다면?"을 함께 토론합니다.</p>
+  <div class="outcome-items">
+    <div class="outcome-item">
+      <div class="item-icon">🎤</div>
+      <div class="item-label">발표</div>
+      전광판 시연 + 과정 설명
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">💬</div>
+      <div class="item-label">Best 프롬프트</div>
+      가장 잘 먹힌 프롬프트 공유
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🔄</div>
+      <div class="item-label">회고</div>
+      프로젝트 여정 돌아보기
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🏫</div>
+      <div class="item-label">토론</div>
+      "진짜 설치한다면?"
+    </div>
+  </div>
+</div>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">프로젝트</div>
+      공공데이터 전광판 (6/6차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">형태</div>
+      개인 발표 + 전체 토론
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">선수학습</div>
+      5차시 — 전광판 최종 완성
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">학습목표</div>
+      프로젝트 결과물을 시연·설명하고, 바이브 코딩 과정의 학습 경험을 성찰
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">발표·소통</span> <span class="badge badge-emerald">성찰 능력</span> <span class="badge badge-blue">비판적 사고</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH</li>
+    <li>Micro USB **데이터** 케이블</li>
+    <li>스마트폰 (전광판 시연용)</li>
+  </ul>
+  <h5>발표 준비</h5>
+  <ul>
+    <li>완성된 전광판 코드 (Pico에 저장된 상태)</li>
+    <li>발표 내용 정리 (2분 분량)</li>
+    <li>Best 프롬프트 1개 준비</li>
+  </ul>
+  <h5>수업 전 확인 (교사)</h5>
+  <ul>
+    <li>교실 Wi-Fi 정상 동작 확인</li>
+    <li>타이머 준비 (발표 시간 관리용)</li>
+    <li>포스트잇 또는 메모지 준비 (Best 프롬프트 Wall 활동용)</li>
+    <li>평가 루브릭 인쇄 (선택)</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 8">마무리 준비 8분</div>
+  <div class="main" style="flex: 30">발표 30분</div>
+  <div class="wrap-up" style="flex: 10; background: var(--teacher-emerald);">회고 10분</div>
+  <div class="wrap-up" style="flex: 2">마무리 2분</div>
+</div>
+
+---
+
+## 마무리 준비 (00-08분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">최종 점검 + 발표 준비</span>
+  <span class="step-time">00-08분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"마지막 시간이에요! 8분 동안 전광판을 최종 점검하세요. Pico를 실행하고, 스마트폰에서 잘 뜨는지 확인하세요."</p>
+  <p>"발표할 때 보여줄 내용을 정리하세요. 발표 순서는 칠판에 적어놓을게요."</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">발표 순서 안내 (1인 2분)</span>
+    <span class="mission-difficulty">참고</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">
+      <ol>
+        <li><strong>시연 (30초)</strong> — 스마트폰 화면을 보여주면서 핵심 기능 소개</li>
+        <li><strong>나만의 특별한 점 (30초)</strong> — 기본 코드에서 무엇을 추가/변경했는지</li>
+        <li><strong>Best 프롬프트 (30초)</strong> — 가장 잘 먹혔던 프롬프트 1개 소개</li>
+        <li><strong>배운 점 (30초)</strong> — 바이브 코딩을 하면서 깨달은 것</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<Aside type="tip" title="점검 시간 활용">
+발표 순서가 뒤인 학생에게는 이 시간에 마지막 수정을 할 수 있도록 합니다. 코드 저장 → 실행 → 스마트폰 확인까지 한 사이클을 돌릴 수 있는 시간입니다.
+</Aside>
+
+---
+
+## 발표 (08-38분)
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">개인 발표</span>
+  <span class="step-time">08-38분</span>
+</div>
+
+<Tabs>
+  <TabItem label="운영 방법 A: 전원 발표 (소규모)">
+    <div class="mission-card">
+      <div class="mission-header">
+        <span class="mission-title">1인 2분 x 15명 = 30분</span>
+        <span class="mission-difficulty">15명 이하</span>
+      </div>
+      <div class="mission-body">
+        <div class="mission-desc">
+          <ul>
+            <li>타이머 사용, 시간 엄수 (2분 알림)</li>
+            <li>발표 후 박수 + 간단 질문 1개</li>
+            <li>교사는 피드백 기준에 따라 메모</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </TabItem>
+  <TabItem label="운영 방법 B: 대표 발표 + 순회 감상 (대규모)">
+    <div class="mission-card">
+      <div class="mission-header">
+        <span class="mission-title">대표 5명 x 4분 + 순회 10분</span>
+        <span class="mission-difficulty">16명 이상</span>
+      </div>
+      <div class="mission-body">
+        <div class="mission-desc">
+          <ul>
+            <li><strong>대표 발표 (20분):</strong> 5명 선정 — 완성도 높은 학생, 독창적 확장, 실패 경험 공유 등 다양한 유형</li>
+            <li><strong>순회 감상 (10분):</strong> 전체 학생이 Pico를 실행해놓고, 자리를 돌아다니며 서로의 전광판을 스마트폰으로 접속</li>
+            <li>감상 시 "가장 마음에 드는 전광판" 1개를 메모</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </TabItem>
+</Tabs>
+
+### 발표 피드백 기준
+
+<div class="key-terms">
+  <dl>
+    <dt>기능 완성도</dt>
+    <dd>4종 API가 모두 작동하는가? 에러 없이 안정적인가?</dd>
+    <dt>디자인</dt>
+    <dd>가독성, 정보 계층, 색상 조화, 모바일 최적화</dd>
+    <dt>창의적 확장</dt>
+    <dd>자기만의 API 추가, 독창적 기능 구현</dd>
+    <dt>프롬프트 역량</dt>
+    <dd>AI를 효과적으로 활용했는가? 프롬프트 품질</dd>
+    <dt>발표력</dt>
+    <dd>핵심을 간결하게 전달했는가? 경험을 공유했는가?</dd>
+  </dl>
+</div>
+
+### 수업 장면: 발표
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "저는 학사일정 API로 '중간고사 D-23' 카운트다운을 추가했어요. 매일 아침 전광판을 보면 공부 자극이 될 것 같아서요."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "학사일정 API까지 연동했네요. Best 프롬프트는 뭐였어요?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "'나이스 학사일정 API에서 시험 일정만 추출해서 D-day로 표시해줘'였어요. 한 줄이었는데 코드를 같이 붙여서 보냈더니 바로 됐어요."</div>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">수아:</span> "저는 전광판 자동 슬라이드를 만들었어요. 5초마다 급식→날씨→버스로 전환되고, 아래에 인디케이터 점이 있어요."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "라이트 프롬프트로 된 거죠?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">수아:</span> "네! '5초마다 자동 전환되는 슬라이드 + 하단 인디케이터'만 쓰고 코드를 붙였어요."</div>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">민수:</span> "저는 지하철 API를 추가하려고 했는데 실패했어요. API 응답이 너무 커서 Pico 메모리가 터졌거든요. 그래서 대신 명언 API를 넣었어요."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "실패 경험을 공유해준 게 좋아요. 메모리 한계를 발견한 것도 중요한 학습이에요. API 응답이 크면 필요한 필드만 파싱하거나 페이징 처리를 해야 해요."</div>
+</div>
+
+<div class="student-response">
+  <p><strong>발표에서 자주 나오는 패턴:</strong></p>
+  <ul>
+    <li>디자인 변경 (테마, 색상, 레이아웃) — 가장 많이 도전</li>
+    <li>자동 슬라이드/탭 전환 — 실용적 확장</li>
+    <li>추가 API (학사일정, 명언, 환율 등) — 5차시 성과</li>
+    <li>실패 → 대안 찾기 — 가장 의미 있는 학습 경험</li>
+  </ul>
+</div>
+
+---
+
+## 프로젝트 회고 (38-48분)
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">Best 프롬프트 공유 (포스트잇 활동)</span>
+  <span class="step-time">38-44분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이제 6차시 동안 사용한 프롬프트 중에서 가장 기억에 남는 것들을 공유해볼게요."</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">활동: 프롬프트 Wall</span>
+    <span class="mission-difficulty">전체 활동 · 6분</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">
+      각자 포스트잇(또는 메모지)에 작성합니다.
+      <ul>
+        <li><strong>앞면 (초록):</strong> 가장 잘 먹힌 프롬프트 1개</li>
+        <li><strong>앞면 (분홍):</strong> 가장 안 먹힌 프롬프트 1개</li>
+        <li><strong>뒷면:</strong> 왜 잘/안 먹혔다고 생각하는지</li>
+      </ul>
+      칠판에 "잘 먹힌 프롬프트" / "안 먹힌 프롬프트" 영역을 나누고 붙입니다.
+    </div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"패턴이 보이죠? 잘 먹힌 프롬프트들의 공통점이 뭘까요?"</p>
+</div>
+
+<div class="key-terms">
+  <dl>
+    <dt>잘 먹힌 프롬프트 패턴</dt>
+    <dd>코드를 함께 붙여넣었다 / 원하는 결과를 구체적으로 말했다 / 제약 조건을 명시했다 ("MicroPython", "외부 라이브러리 없이") / 짧아도 핵심이 담겨 있었다</dd>
+    <dt>안 먹힌 프롬프트 패턴</dt>
+    <dd>코드 없이 요청만 보냈다 / "대충 바꿔줘" 식으로 모호했다 / MicroPython이라고 안 말해서 일반 Python 코드가 왔다 / 한 번에 너무 많은 것을 요청했다</dd>
+  </dl>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">수아:</span> "저는 '예쁘게 해줘'라고 했을 때 안 먹혔고, '카드 배경을 그라디언트로, 둥근 모서리 16px, 그림자 효과'라고 했을 때 바로 됐어요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "저는 에러 메시지를 통째로 복사해서 보내니까 AI가 바로 고쳐줬어요."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "좋은 포인트예요. 구체적일수록, 맥락을 많이 줄수록 AI가 정확하게 응답해요."</div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">전체 토론: "진짜 설치한다면?"</span>
+  <span class="step-time">44-48분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"만약 이 전광판을 <strong>진짜 학교 복도에 설치</strong>한다면 뭘 더 고려해야 할까요? 자유롭게 이야기해보세요."</p>
+</div>
+
+<div class="key-terms">
+  <dl>
+    <dt>전원</dt>
+    <dd>USB로 24시간 연결? 배터리? → 안정적 전원 관리 필요</dd>
+    <dt>화면</dt>
+    <dd>스마트폰 대신 모니터 연결? → HDMI 출력 가능한 Raspberry Pi 4로 업그레이드</dd>
+    <dt>안정성</dt>
+    <dd>에러 나면 자동 재시작? → 워치독 타이머, 예외 처리 강화</dd>
+    <dt>보안</dt>
+    <dd>아무나 접속 가능한데? → 비밀번호 인증, 관리자 페이지 분리</dd>
+    <dt>다중 접속</dt>
+    <dd>30명이 동시에 보면? → Pico 한계, 서버 분리 필요</dd>
+    <dt>API 키</dt>
+    <dd>코드에 키가 노출되는 문제 → 환경변수 관리, 서버 프록시</dd>
+    <dt>유지보수</dt>
+    <dd>방학 동안 관리는? 졸업 후에는? → 자동화, 문서화, 인수인계</dd>
+  </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"이런 고민들이 바로 <strong>실제 서비스를 만드는 과정</strong>이에요. 코딩은 10%이고, 나머지 90%는 이런 문제들을 해결하는 거예요."</p>
+</div>
+
+---
+
+## 마무리 (48-50분)
+
+<div class="step-header">
+  <span class="step-num">5</span>
+  <span class="step-title">6차시 여정 정리</span>
+  <span class="step-time">48-50분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"6시간 동안 여러분이 한 걸 한눈에 보면:"</p>
+</div>
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">🍱</div>
+    <div class="flow-label">1차시</div>
+    <div class="flow-desc">API 개념 + 급식</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">🌤️</div>
+    <div class="flow-label">2차시</div>
+    <div class="flow-desc">날씨 + 미세먼지</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">🚌</div>
+    <div class="flow-label">3차시</div>
+    <div class="flow-desc">버스 + 4종 통합</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-icon">🎨</div>
+    <div class="flow-label">4차시</div>
+    <div class="flow-desc">디자인 완성</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">5</div>
+    <div class="flow-icon">🔍</div>
+    <div class="flow-label">5차시</div>
+    <div class="flow-desc">나만의 API</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">6</div>
+    <div class="flow-icon">🎤</div>
+    <div class="flow-label">6차시</div>
+    <div class="flow-desc">발표 & 회고</div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"Pico 2 WH 1대로 만든 학교 맞춤형 공공데이터 전광판을 완성했어요!"</p>
+</div>
+
+<div class="key-terms">
+  <dl>
+    <dt>API = 데이터 자판기</dt>
+    <dd>요청을 보내면 데이터를 돌려주는 서비스</dd>
+    <dt>여러 API를 하나로 통합하는 패턴</dt>
+    <dd>급식, 날씨, 미세먼지, 버스를 하나의 전광판에</dd>
+    <dt>바이브 코딩 = AI와 대화하며 만드는 코딩</dt>
+    <dd>AI가 제안하고, 사람이 판단한다</dd>
+    <dt>문제 정의 > 코딩 능력</dt>
+    <dd>"어떤 데이터가 필요한가?"를 정의하는 게 더 중요</dd>
+    <dt>프롬프트 = 새로운 시대의 문해력</dt>
+    <dd>AI에게 원하는 것을 정확하게 요청하는 능력</dd>
+  </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"가장 중요한 건 이거예요. 여러분은 코드를 한 줄씩 외운 게 아니라, <strong>AI에게 원하는 것을 요청하는 방법</strong>을 배운 거예요."</p>
+  <p>"<strong>프롬프트는 새로운 시대의 문해력</strong>이에요. 이 능력은 코딩뿐 아니라 글쓰기, 디자인, 데이터 분석 등 모든 분야에서 쓸 수 있어요."</p>
+  <p>"수고했어요!"</p>
+</div>
+
+---
+
+## 교사용 참고사항
+
+### 평가 방법 제안
+
+| 평가 항목 | 비중 | 기준 |
+|----------|------|------|
+| 전광판 완성도 | 30% | 4종 API 작동 여부, 에러 처리, 안정성 |
+| 디자인 | 15% | 가독성, 정보 계층, 색상 조화, 모바일 최적화 |
+| 창의적 확장 | 20% | 자기만의 API 추가, 독창적 기능, 문제 해결 |
+| 바이브 코딩 역량 | 20% | 프롬프트 품질, AI 활용 과정, 디버깅 능력 |
+| 발표 & 소통 | 15% | 핵심 전달, 경험 공유, 질의응답 |
+
+<Aside type="tip" title="평가 팁">
+바이브 코딩 역량(20%)은 결과물만이 아니라 **과정**을 봅니다. Best 프롬프트 3개를 제출받으면 학생이 AI를 어떻게 활용했는지 파악할 수 있습니다. 실패 후 대안을 찾은 학생에게도 높은 점수를 줄 수 있습니다.
+</Aside>
+
+### 포트폴리오 정리 안내
+
+<div class="patrol-point">
+  <p><strong>학생들에게 다음을 저장하도록 안내:</strong></p>
+  <ol>
+    <li>최종 <code>main.py</code> 코드 파일</li>
+    <li>전광판 스크린샷 (스마트폰에서 캡처)</li>
+    <li>Best 프롬프트 3개 모음 (잘 먹힌 프롬프트 + 이유)</li>
+    <li>프로젝트 회고문 — "무엇을 만들었고, 무엇을 배웠고, 다음에는 무엇을 해보고 싶은지" (선택)</li>
+  </ol>
+</div>
+
+### 후속 활동 제안
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">Raspberry Pi 4 업그레이드</div>
+    <span class="label">내용</span>
+    <span class="value">HDMI 모니터 연결 → 학교 복도 실제 설치. Linux + Python + 웹 브라우저 키오스크 모드</span>
+    <span class="label">난이도</span>
+    <span class="value">★★★★☆ (방과후/동아리 프로젝트 추천)</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">MQTT 연동 (IoT 확장)</div>
+    <span class="label">내용</span>
+    <span class="value">Pico에서 센서 데이터 수집 → MQTT 브로커 → 클라우드 대시보드. 교실 온습도 + 전광판 결합</span>
+    <span class="label">난이도</span>
+    <span class="value">★★★★★ (확장 프로젝트)</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">다른 학교 적용</div>
+    <span class="label">내용</span>
+    <span class="value">학교코드(<code>SD_SCHUL_CODE</code>)만 바꾸면 다른 학교 전광판으로 전환 가능. 교육청 코드도 확인 필요</span>
+    <span class="label">난이도</span>
+    <span class="value">★☆☆☆☆ (설정값만 변경)</span>
+  </div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"발표 시간이 부족해요"</div>
+  <div class="qa-a">운영 방법 B(대표 발표 + 순회 감상)를 사용하면 30분 안에 모든 학생의 작품을 볼 수 있습니다. 순회 감상 시 스마트폰으로 서로의 Pico에 접속하면 됩니다.</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"전광판이 발표 중에 안 돼요"</div>
+  <div class="qa-a">Wi-Fi 동시 접속 문제일 수 있습니다. 발표자의 Pico만 실행하고, 나머지 학생들은 Pico를 중지하면 네트워크 부하가 줄어듭니다. 백업으로 스크린샷을 미리 찍어두도록 안내하세요.</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"학생마다 완성도 차이가 너무 커요"</div>
+  <div class="qa-a">바이브 코딩 역량(20%)에서 과정을 평가합니다. 결과물이 단순해도 프롬프트를 적극적으로 시도한 학생, 실패 후 대안을 찾은 학생에게 높은 점수를 줄 수 있습니다.</div>
+</div>

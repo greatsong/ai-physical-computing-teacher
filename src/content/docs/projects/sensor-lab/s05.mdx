@@ -1,0 +1,1008 @@
+---
+title: "탐구 5: 30명이 1시간 수업하면 CO₂가 얼마나 오를까?"
+description: "SCD30 센서(I2C)로 밀폐 교실에서 CO₂를 연속 측정하여 환기 필요 시점 분석"
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+{/* 프로젝트 진행 바 */}
+<div class="project-progress">
+  <div class="prog-item prog-1 done">1. 온습도</div>
+  <div class="prog-item prog-2 done">2. 조도</div>
+  <div class="prog-item prog-3 done">3. 소리</div>
+  <div class="prog-item prog-4 done">4. 동작 감지</div>
+  <div class="prog-item prog-5 current">5. CO&#8322;</div>
+  <div class="prog-item prog-6">6. 기압</div>
+</div>
+
+{/* 결과물 미리보기 */}
+<div class="outcome-preview">
+  <div class="outcome-badge">이 차시가 끝나면</div>
+  <h4>밀폐 교실의 CO&#8322; 상승 패턴을 데이터로 확인합니다</h4>
+  <p>SCD30 센서로 밀폐 교실의 CO&#8322; 농도를 30초 간격으로 연속 측정합니다. <strong>"30명이 1시간 수업하면 CO&#8322;가 얼마나 오를까?"</strong>라는 질문에 실시간 그래프로 답하고, 환기 필요 시점(1000ppm)을 데이터로 확인합니다.</p>
+  <div class="outcome-items">
+    <div class="outcome-item">
+      <div class="item-icon">🌿</div>
+      <div class="item-label">CO&#8322; 실시간 표시</div>
+      농도 + 등급 + 색상 바
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">📈</div>
+      <div class="item-label">변화 그래프</div>
+      시간-CO&#8322; 연속 그래프
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">⚠️</div>
+      <div class="item-label">환기 경고</div>
+      1000ppm 초과 시 알림
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">📊</div>
+      <div class="item-label">상승률 분석</div>
+      분당 CO&#8322; 상승량 계산
+    </div>
+  </div>
+</div>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">프로젝트</div>
+      센서 과학 탐구 (5/6차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">형태</div>
+      전체 실험
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">선수학습</div>
+      웹서버 프로젝트 완료 (Wi-Fi, 웹 대시보드, 바이브 코딩)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">학습목표</div>
+      SCD30 센서로 밀폐 교실의 CO&#8322; 변화를 연속 측정하고, 환기 필요 시점을 데이터로 판단
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">데이터 리터러시</span> <span class="badge badge-emerald">과학적 탐구</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (교사 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH</li>
+    <li>브레드보드</li>
+    <li>점퍼선 4개 (빨강, 검정, 노랑, 초록)</li>
+    <li>SCD30 CO&#8322; 센서</li>
+    <li>Micro USB **데이터** 케이블</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE 설치 완료</li>
+    <li>MicroPython 펌웨어 설치 완료</li>
+    <li>AI 접근 환경 — Claude, ChatGPT 등</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>교실 Wi-Fi **2.4GHz** 대역 확인 (SSID/비밀번호 칠판 게시)</li>
+    <li>SCD30 I2C 연결 사전 테스트 — I2C 스캔 → 0x61 확인</li>
+    <li>수업 시작 전 교실 환기하여 시작 CO&#8322;를 낮추기 (~500ppm)</li>
+    <li>wifi_config.py가 이미 Pico에 저장되어 있는지 확인</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 2">도입 10분</div>
+  <div class="main" style="flex: 2">배선+코드 10분</div>
+  <div class="wrap-up" style="flex: 4; background: var(--teacher-emerald);">측정+수업 20분</div>
+  <div class="wrap-up" style="flex: 2">분석+정리 10분</div>
+</div>
+
+---
+
+## 도입 (00-10분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">탐구 질문 제시 & CO&#8322; 기초</span>
+  <span class="step-time">00-05분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"사람이 숨 쉬면 CO&#8322;가 나오잖아요. 그러면 30명이 밀폐된 교실에서 1시간 수업하면 CO&#8322;가 실제로 얼마나 올라갈까요?"</p>
+  <p>"오늘은 이 질문에 <strong>센서 데이터</strong>로 답해볼 거예요."</p>
+  <p>"환기 없이 견딜 수 있는 시간은 얼마나 될까요? 먼저 각자 예측을 적어보세요."</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">개인 활동: 예측하기</span>
+    <span class="mission-difficulty">1분</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">각자 예측을 적어보세요.</div>
+    <div class="prompt-box prompt-light">
+      <p>"50분 수업 후 CO&#8322;는 약 ___ppm이 될 것이다"</p>
+      <p>"1000ppm(환기 필요)에 도달하는 데 약 ___분 걸릴 것이다"</p>
+    </div>
+  </div>
+</div>
+
+### 실내 CO&#8322; 농도 기준
+
+<div class="key-terms">
+  <dl>
+    <dt>약 400 ppm</dt>
+    <dd>실외 수준 — 맑은 공기</dd>
+    <dt>600-800 ppm</dt>
+    <dd>양호 — 환기가 잘 된 실내</dd>
+    <dt>1000 ppm 이상</dt>
+    <dd>환기 필요 — 졸음, 집중력 저하 시작</dd>
+    <dt>2000 ppm 이상</dt>
+    <dd>위험 — 두통, 어지러움 발생 가능</dd>
+  </dl>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"CO&#8322; 1000ppm이면 어떤 느낌이에요?"</div>
+  <div class="qa-a">직접적으로 느끼기 어렵지만, 졸음이 오거나 집중력이 떨어지기 시작해요. 그래서 '환기 필요' 기준이 1000ppm인 거예요.</div>
+</div>
+
+---
+
+## 센서 연결 (05-15분)
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">SCD30 배선 + 연결 확인</span>
+  <span class="step-time">05-10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"SCD30은 I2C 통신을 사용해요. 이전 차시에서 했던 것과 같은 방식입니다. 선 4개만 연결하면 돼요."</p>
+  <p>"배선도를 보고 연결하세요. 다 했으면 연결 확인 스크립트를 먼저 돌려보세요."</p>
+</div>
+
+### SCD30 배선도
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">🔴</div>
+    <div class="flow-label">VCC</div>
+    <div class="flow-desc">3V3 (36번 핀) 또는 VBUS(5V)</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">⚫</div>
+    <div class="flow-label">GND</div>
+    <div class="flow-desc">GND (38번 핀)</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">🟡</div>
+    <div class="flow-label">SDA</div>
+    <div class="flow-desc">GP4 (6번 핀) — I2C0 SDA</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-icon">🟢</div>
+    <div class="flow-label">SCL</div>
+    <div class="flow-desc">GP5 (7번 핀) — I2C0 SCL</div>
+  </div>
+</div>
+
+<Aside type="caution" title="I2C 주파수 설정 주의!">
+SCD30은 **I2C 50kHz**에서 안정적으로 동작합니다. 100kHz에서 불안정할 수 있으니 코드의 `freq=50000` 설정을 유지하세요. I2C 주소는 **0x61**입니다.
+</Aside>
+
+### 연결 확인 스크립트
+
+<div class="teacher-script">
+  <p>"main.py를 실행하기 전에, 센서가 잘 연결됐는지 먼저 확인합니다."</p>
+</div>
+
+<div class="code-file-label">연결 확인 스크립트 — Thonny에서 실행</div>
+
+```python
+# === SCD30 연결 확인 ===
+from machine import Pin, I2C
+import time
+
+# SCD30은 50kHz에서 안정적
+i2c = I2C(0, sda=Pin(4), scl=Pin(5), freq=50000)
+
+devices = i2c.scan()
+print(f"발견된 I2C 장치: &#123;devices&#125;")
+
+if 0x61 in devices:
+    print("✅ SCD30 연결 성공! (주소: 0x61)")
+else:
+    print("❌ SCD30이 감지되지 않습니다.")
+    print("   → 배선을 확인하세요 (SDA↔GP4, SCL↔GP5)")
+    print("   → freq=50000 확인")
+```
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">I2C 스캔에서 0x61이 안 잡혀요</div>
+    <span class="label">원인</span>
+    <span class="value">배선 오류 또는 I2C 주파수 문제</span>
+    <span class="label">대응</span>
+    <span class="value">SDA/SCL 배선 확인, freq=50000 확인, 센서 전원 재연결</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">CO&#8322; 값이 400ppm 미만으로 나와요</div>
+    <span class="label">원인</span>
+    <span class="value">캘리브레이션 필요</span>
+    <span class="label">대응</span>
+    <span class="value">야외에서 5분간 측정하면 자동 보정됨</span>
+  </div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">기본 코드 실행 + 대시보드 접속</span>
+  <span class="step-time">10-15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"연결 확인이 됐으면 main.py를 Pico에 저장하고 실행하세요. Shell에 현재 CO&#8322; 값이 나오면 스마트폰으로 접속!"</p>
+</div>
+
+<Aside type="caution" title="Micro USB 데이터 케이블 확인">
+Pico 2 WH는 **Micro USB** 포트를 사용합니다 (USB-C가 아닙니다!). 반드시 **데이터 전송이 가능한** Micro USB 케이블을 사용하세요.
+</Aside>
+
+### 코드 구조 설명
+
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">①</div>
+    <div class="map-content">
+      <div class="map-title">SCD30 드라이버 클래스</div>
+      <div class="map-desc">I2C 통신, CRC 검증, IEEE 754 float 변환으로 CO&#8322;/온도/습도 읽기</div>
+    </div>
+    <div class="map-note">I2C 주소 0x61, 50kHz</div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n2">②</div>
+    <div class="map-content">
+      <div class="map-title">30초 간격 자동 기록 <span class="map-tag">핵심 로직</span></div>
+      <div class="map-desc">측정 시작/정지/리셋 컨트롤, 최대 120개 (60분) 보관</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n3">③</div>
+    <div class="map-content">
+      <div class="map-title">make_page() <span class="map-tag">바이브 코딩 영역</span></div>
+      <div class="map-desc">CO&#8322; 등급 표시 + 시간-CO&#8322; 그래프 + 1000ppm 기준선 + 통계</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n4">④</div>
+    <div class="map-content">
+      <div class="map-title">웹서버 + API</div>
+      <div class="map-desc">/now (현재값), /log (기록), /start, /stop, /reset</div>
+    </div>
+  </div>
+</div>
+
+### main.py (5차시 기본 코드)
+
+<Aside type="tip" title="복사 & 붙여넣기">
+코드 블록 오른쪽 위의 복사 버튼을 클릭하면 전체 코드가 복사됩니다. Thonny에 붙여넣고 Pico에 저장하세요.
+</Aside>
+
+<div class="code-file-label">main.py — Pico에 저장</div>
+
+```python
+# ============================================
+# 과학 탐구 5: 교실 CO2와 환기
+# SCD30 센서로 CO2를 연속 측정하여
+# 밀폐 교실에서의 CO2 상승 패턴 분석
+# ============================================
+
+import network
+import socket
+import time
+import json
+import struct
+import gc
+from machine import Pin, I2C
+from wifi_config import WIFI_SSID, WIFI_PASSWORD
+
+# ── Wi-Fi 연결 ──────────────────────────────
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+wlan.connect(WIFI_SSID, WIFI_PASSWORD)
+while not wlan.isconnected():
+    time.sleep(1)
+my_ip = wlan.ifconfig()[0]
+print(f"IP: &#123;my_ip&#125;")
+
+# ── SCD30 드라이버 (I2C) ────────────────────
+class SCD30:
+    """SCD30 CO2/온습도 센서 (I2C 주소: 0x61)"""
+    def __init__(self, i2c, addr=0x61):
+        self.i2c = i2c
+        self.addr = addr
+        time.sleep_ms(100)
+        # 연속 측정 시작 (기압 보정 0 = 비활성)
+        self._send_command(0x0010, 0)
+        time.sleep_ms(20)
+
+    def _send_command(self, cmd, arg=None):
+        """명령 전송 (CRC 포함)"""
+        data = bytearray([cmd >> 8, cmd & 0xFF])
+        if arg is not None:
+            data += bytearray([arg >> 8, arg & 0xFF])
+            data += bytearray([self._crc(data[-2:])])
+        self.i2c.writeto(self.addr, data)
+
+    def _crc(self, data):
+        """CRC-8 계산 (Sensirion 프로토콜)"""
+        crc = 0xFF
+        for byte in data:
+            crc ^= byte
+            for _ in range(8):
+                if crc & 0x80:
+                    crc = (crc << 1) ^ 0x31
+                else:
+                    crc <<= 1
+                crc &= 0xFF
+        return crc
+
+    def _bytes_to_float(self, b):
+        """4바이트 → float (IEEE 754 빅엔디안)"""
+        return struct.unpack('>f', bytes(b))[0]
+
+    def data_ready(self):
+        """측정 데이터 준비 여부 확인"""
+        self._send_command(0x0202)
+        time.sleep_ms(3)
+        data = self.i2c.readfrom(self.addr, 3)
+        return data[1] == 1
+
+    def read(self):
+        """CO2(ppm), 온도(°C), 습도(%) 반환"""
+        if not self.data_ready():
+            return None, None, None
+
+        self._send_command(0x0300)
+        time.sleep_ms(3)
+        data = self.i2c.readfrom(self.addr, 18)
+
+        # 6바이트씩: [MSB, LSB, CRC, MSB, LSB, CRC]
+        co2_bytes = [data[0], data[1], data[3], data[4]]
+        temp_bytes = [data[6], data[7], data[9], data[10]]
+        hum_bytes = [data[12], data[13], data[15], data[16]]
+
+        co2 = round(self._bytes_to_float(co2_bytes), 0)
+        temp = round(self._bytes_to_float(temp_bytes), 1)
+        hum = round(self._bytes_to_float(hum_bytes), 1)
+
+        return int(co2), temp, hum
+
+# ── 센서 초기화 ─────────────────────────────
+# SCD30은 50kHz에서 안정적 (100kHz 불안정)
+i2c = I2C(0, sda=Pin(4), scl=Pin(5), freq=50000)
+
+# I2C 스캔
+devices = i2c.scan()
+print(f"I2C 장치: &#123;devices&#125;")
+if 0x61 not in devices:
+    print("❌ SCD30 미감지! 배선 확인")
+else:
+    print("✅ SCD30 연결됨 (주소: 0x61)")
+
+sensor = SCD30(i2c)
+time.sleep(3)  # 첫 측정 대기 (2~5초 워밍업)
+
+# 테스트 읽기
+for _ in range(5):
+    co2, temp, hum = sensor.read()
+    if co2 is not None:
+        print(f"현재: CO2=&#123;co2&#125;ppm, &#123;temp&#125;°C, &#123;hum&#125;%")
+        break
+    time.sleep(2)
+
+# ── 데이터 저장소 ───────────────────────────
+MAX_DATA = 120  # 최대 120개 (60분 @ 30초 간격)
+data_log = []   # [&#123;"t": 초, "co2": ppm, "temp": °C, "hum": %&#125;, ...]
+recording = False
+start_time = 0
+
+def add_data():
+    """현재 센서값을 기록"""
+    try:
+        co2, temp, hum = sensor.read()
+        if co2 is None:
+            return None
+        elapsed = time.ticks_diff(time.ticks_ms(), start_time) // 1000
+        data_log.append(&#123;
+            "t": elapsed,
+            "co2": co2,
+            "temp": temp,
+            "hum": hum,
+        &#125;)
+        if len(data_log) > MAX_DATA:
+            data_log.pop(0)
+        return co2
+    except Exception as e:
+        print(f"센서 에러: &#123;e&#125;")
+        return None
+
+# ── HTML 페이지 ─────────────────────────────
+def make_page():
+    return """<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CO2 탐구</title>
+    <style>
+        *&#123;margin:0;padding:0;box-sizing:border-box;&#125;
+        body&#123;font-family:-apple-system,sans-serif;background:#0a0a1a;color:#ddd;padding:14px;min-height:100vh;&#125;
+        .hd&#123;text-align:center;padding:8px 0 12px;&#125;
+        .hd h1&#123;color:#69db7c;font-size:1.2em;&#125;
+        .hd .q&#123;color:#aaa;font-size:0.8em;margin-top:4px;font-style:italic;&#125;
+
+        .sc&#123;background:#141428;border-radius:12px;padding:14px;margin:8px auto;max-width:500px;border:1px solid #252550;&#125;
+        .sc-title&#123;color:#69db7c;font-size:0.85em;font-weight:bold;margin-bottom:8px;&#125;
+
+        .co2-display&#123;text-align:center;padding:8px 0;&#125;
+        .co2-big&#123;font-size:3em;font-weight:bold;&#125;
+        .co2-unit&#123;font-size:0.9em;color:#888;&#125;
+        .co2-grade&#123;font-size:1em;font-weight:bold;margin-top:4px;&#125;
+        .co2-bar-bg&#123;width:90%;height:14px;background:#252550;border-radius:7px;margin:10px auto;overflow:hidden;position:relative;&#125;
+        .co2-bar&#123;height:100%;border-radius:7px;transition:width 0.5s;&#125;
+        .co2-markers&#123;width:90%;margin:0 auto;display:flex;justify-content:space-between;font-size:0.55em;color:#666;&#125;
+
+        .sub-data&#123;display:flex;justify-content:center;gap:24px;margin-top:6px;&#125;
+        .sub-data span&#123;color:#888;font-size:0.8em;&#125;
+
+        .controls&#123;display:flex;gap:8px;justify-content:center;margin:10px 0;&#125;
+        .btn&#123;padding:10px 20px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:0.85em;&#125;
+        .btn-start&#123;background:#69db7c;color:#000;&#125;
+        .btn-stop&#123;background:#ff6b6b;color:#fff;&#125;
+        .btn-reset&#123;background:#495057;color:#fff;&#125;
+        .btn:disabled&#123;opacity:0.4;&#125;
+        .status&#123;text-align:center;color:#888;font-size:0.75em;margin:4px 0;&#125;
+        .status .rec&#123;color:#ff6b6b;animation:blink 1s infinite;&#125;
+        @keyframes blink&#123;50%&#123;opacity:0.3;&#125;&#125;
+
+        canvas&#123;width:100%;height:220px;&#125;
+
+        .warn-banner&#123;background:#ff6b6b22;border:1px solid #ff6b6b;border-radius:8px;padding:10px;text-align:center;margin:8px auto;max-width:500px;color:#ff6b6b;font-weight:bold;font-size:0.85em;display:none;&#125;
+        .warn-banner.show&#123;display:block;&#125;
+
+        .stats&#123;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;&#125;
+        .st&#123;background:#1a1a3a;border-radius:8px;padding:8px;text-align:center;&#125;
+        .st .sv&#123;color:#69db7c;font-size:1em;font-weight:bold;&#125;
+        .st .sl&#123;color:#888;font-size:0.6em;margin-top:2px;&#125;
+
+        .ft&#123;text-align:center;margin-top:14px;color:#333;font-size:0.6em;&#125;
+    </style>
+</head>
+<body>
+    <div class="hd">
+        <h1>🌿 교실 CO2 탐구</h1>
+        <div class="q">"30명이 1시간 수업하면 CO2가 얼마나 오를까?"</div>
+    </div>
+
+    <div class="warn-banner" id="warn">⚠️ CO2 1000ppm 초과! 환기가 필요합니다</div>
+
+    <div class="sc">
+        <div class="co2-display">
+            <div class="co2-big" id="co2">--</div>
+            <div class="co2-unit">ppm</div>
+            <div class="co2-grade" id="grade">--</div>
+        </div>
+        <div class="co2-bar-bg">
+            <div class="co2-bar" id="co2-bar" style="width:0%;"></div>
+        </div>
+        <div class="co2-markers">
+            <span>400<br>실외</span>
+            <span>600<br>양호</span>
+            <span>1000<br>환기필요</span>
+            <span>2000<br>두통</span>
+            <span>3000+</span>
+        </div>
+        <div class="sub-data">
+            <span>🌡️ <span id="temp">--</span>°C</span>
+            <span>💧 <span id="hum">--</span>%</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-start" id="btn-start" onclick="startRec()">▶ 측정 시작</button>
+        <button class="btn btn-stop" id="btn-stop" onclick="stopRec()" disabled>⏹ 정지</button>
+        <button class="btn btn-reset" onclick="resetData()">↺ 초기화</button>
+    </div>
+    <div class="status" id="status">창문을 닫고 '측정 시작'을 누르세요</div>
+
+    <div class="sc">
+        <div class="sc-title">📈 CO2 변화 그래프</div>
+        <canvas id="chart"></canvas>
+    </div>
+
+    <div class="stats">
+        <div class="st"><div class="sv" id="st-start">--</div><div class="sl">시작 CO2</div></div>
+        <div class="st"><div class="sv" id="st-now">--</div><div class="sl">현재 CO2</div></div>
+        <div class="st"><div class="sv" id="st-rise">--</div><div class="sl">상승량</div></div>
+        <div class="st"><div class="sv" id="st-rate">--</div><div class="sl">분당 상승</div></div>
+        <div class="st"><div class="sv" id="st-time1k">--</div><div class="sl">1000ppm 도달</div></div>
+        <div class="st"><div class="sv" id="st-cnt">0</div><div class="sl">측정 횟수</div></div>
+    </div>
+
+    <div class="ft">SCD30 센서 · Pico 2 WH · 30초 간격 측정</div>
+
+    <script>
+        const canvas = document.getElementById('chart');
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth * 2;
+        canvas.height = 440;
+        let chartData = [];
+        let intervalId = null;
+
+        async function fetchNow() &#123;
+            try &#123;
+                const r = await fetch('/now');
+                const d = await r.json();
+                if (d.co2 === null) return;
+
+                document.getElementById('co2').textContent = d.co2;
+                document.getElementById('temp').textContent = d.temp;
+                document.getElementById('hum').textContent = d.hum;
+
+                const gradeEl = document.getElementById('grade');
+                const co2 = d.co2;
+                if (co2 < 600) &#123; gradeEl.textContent = '😊 쾌적'; gradeEl.style.color = '#69db7c'; &#125;
+                else if (co2 < 1000) &#123; gradeEl.textContent = '🙂 양호'; gradeEl.style.color = '#ffd43b'; &#125;
+                else if (co2 < 2000) &#123; gradeEl.textContent = '😷 환기 필요'; gradeEl.style.color = '#ff922b'; &#125;
+                else &#123; gradeEl.textContent = '🤢 위험!'; gradeEl.style.color = '#ff6b6b'; &#125;
+
+                const pct = Math.min(100, (co2 - 400) / 2600 * 100);
+                const bar = document.getElementById('co2-bar');
+                bar.style.width = pct + '%';
+                bar.style.background = co2 < 600 ? '#69db7c' : co2 < 1000 ? '#ffd43b' : co2 < 2000 ? '#ff922b' : '#ff6b6b';
+
+                document.getElementById('warn').className = co2 >= 1000 ? 'warn-banner show' : 'warn-banner';
+                document.getElementById('co2').style.color = bar.style.background;
+            &#125; catch(e) &#123;&#125;
+        &#125;
+
+        async function fetchLog() &#123;
+            try &#123;
+                const r = await fetch('/log');
+                chartData = await r.json();
+                drawChart();
+                updateStats();
+            &#125; catch(e) &#123;&#125;
+        &#125;
+
+        function drawChart() &#123;
+            const W = canvas.width, H = canvas.height;
+            const pad = &#123;t:20,r:20,b:40,l:55&#125;;
+            const cw = W-pad.l-pad.r, ch = H-pad.t-pad.b;
+            ctx.clearRect(0,0,W,H);
+
+            if (chartData.length < 2) &#123;
+                ctx.fillStyle='#555';ctx.font='24px sans-serif';ctx.textAlign='center';
+                ctx.fillText('측정을 시작하면 그래프가 나타납니다',W/2,H/2);
+                return;
+            &#125;
+
+            const co2s = chartData.map(d=>d.co2);
+            let minC = Math.min(...co2s) - 50;
+            let maxC = Math.max(...co2s) + 100;
+            minC = Math.max(300, minC);
+            const maxT = chartData[chartData.length-1].t;
+            const minT = chartData[0].t;
+
+            // 1000ppm 기준선
+            if (maxC > 900) &#123;
+                const y1k = pad.t + ch * (1 - (1000 - minC) / (maxC - minC));
+                ctx.strokeStyle = '#ff6b6b44';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([8,4]);
+                ctx.beginPath(); ctx.moveTo(pad.l, y1k); ctx.lineTo(W-pad.r, y1k); ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#ff6b6b66';
+                ctx.font = '16px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText('1000ppm (환기 필요)', pad.l + 4, y1k - 6);
+            &#125;
+
+            // 격자
+            ctx.strokeStyle='#1e1e3e';ctx.lineWidth=1;
+            for(let i=0;i<=5;i++)&#123;
+                const y=pad.t+ch*i/5;
+                ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+                ctx.fillStyle='#666';ctx.font='18px sans-serif';ctx.textAlign='right';
+                ctx.fillText(Math.round(maxC-(maxC-minC)*i/5),pad.l-8,y+6);
+            &#125;
+
+            // 시간 축
+            ctx.textAlign='center';
+            const tRange = maxT-minT||1;
+            for(let i=0;i<=4;i++)&#123;
+                const t=minT+tRange*i/4;
+                const x=pad.l+cw*i/4;
+                ctx.fillText(Math.floor(t/60)+'분',x,H-pad.b+25);
+            &#125;
+
+            // CO2 선
+            ctx.beginPath();ctx.strokeStyle='#69db7c';ctx.lineWidth=3;
+            chartData.forEach((d,i)=>&#123;
+                const x=pad.l+cw*(d.t-minT)/tRange;
+                const y=pad.t+ch*(1-(d.co2-minC)/(maxC-minC));
+                if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+            &#125;);
+            ctx.stroke();
+        &#125;
+
+        function updateStats() &#123;
+            if (chartData.length === 0) return;
+            const first = chartData[0].co2;
+            const last = chartData[chartData.length-1].co2;
+            const rise = last - first;
+            const elapsed = chartData[chartData.length-1].t;
+            const ratePerMin = elapsed > 0 ? (rise / (elapsed / 60)).toFixed(1) : '--';
+
+            document.getElementById('st-start').textContent = first + 'ppm';
+            document.getElementById('st-now').textContent = last + 'ppm';
+            document.getElementById('st-rise').textContent = (rise > 0 ? '+' : '') + rise + 'ppm';
+            document.getElementById('st-rise').style.color = rise > 0 ? '#ff922b' : '#69db7c';
+            document.getElementById('st-rate').textContent = ratePerMin + 'ppm/분';
+            document.getElementById('st-cnt').textContent = chartData.length;
+
+            // 1000ppm 도달 시점
+            const t1k = chartData.find(d => d.co2 >= 1000);
+            document.getElementById('st-time1k').textContent = t1k ? Math.floor(t1k.t/60) + '분' : '미도달';
+        &#125;
+
+        async function startRec() &#123;
+            await fetch('/start');
+            document.getElementById('btn-start').disabled = true;
+            document.getElementById('btn-stop').disabled = false;
+            document.getElementById('status').innerHTML = '<span class="rec">● 측정 중</span> — 창문을 닫은 상태로 수업을 진행하세요';
+            if (!intervalId) intervalId = setInterval(fetchLog, 10000);
+        &#125;
+
+        async function stopRec() &#123;
+            await fetch('/stop');
+            document.getElementById('btn-start').disabled = false;
+            document.getElementById('btn-stop').disabled = true;
+            document.getElementById('status').textContent = '측정 정지 — 데이터를 분석하세요';
+            if (intervalId) &#123; clearInterval(intervalId); intervalId = null; &#125;
+        &#125;
+
+        async function resetData() &#123;
+            if (confirm('데이터를 지울까요?')) &#123;
+                await fetch('/reset');
+                chartData = [];
+                drawChart();
+            &#125;
+        &#125;
+
+        fetchNow();
+        setInterval(fetchNow, 3000);
+    </script>
+</body>
+</html>"""
+
+# ── 웹서버 ──────────────────────────────────
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.bind(('0.0.0.0', 80))
+server.listen(3)
+
+print(f"\n&#123;'='*45&#125;\n  CO2 탐구 대시보드!\n  http://&#123;my_ip&#125;\n&#123;'='*45&#125;")
+
+last_sample = time.ticks_ms()
+SAMPLE_INTERVAL = 30000  # 30초
+
+while True:
+    try:
+        if recording and time.ticks_diff(time.ticks_ms(), last_sample) > SAMPLE_INTERVAL:
+            co2 = add_data()
+            if co2:
+                print(f"  [&#123;len(data_log)&#125;] CO2=&#123;co2&#125;ppm")
+            last_sample = time.ticks_ms()
+            gc.collect()
+
+        server.settimeout(0.5)
+        try:
+            client, addr = server.accept()
+        except OSError:
+            continue
+
+        request = client.recv(1024).decode()
+
+        if 'GET /now' in request:
+            co2, temp, hum = sensor.read()
+            body = json.dumps(&#123;"co2": co2, "temp": temp, "hum": hum&#125;)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+
+        elif 'GET /log' in request:
+            body = json.dumps(data_log)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+
+        elif 'GET /start' in request:
+            recording = True
+            start_time = time.ticks_ms()
+            last_sample = time.ticks_ms()
+            body = json.dumps(&#123;"status": "recording"&#125;)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+            print("▶ CO2 측정 시작")
+
+        elif 'GET /stop' in request:
+            recording = False
+            body = json.dumps(&#123;"status": "stopped"&#125;)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+            print("⏹ 측정 정지")
+
+        elif 'GET /reset' in request:
+            data_log.clear()
+            recording = False
+            body = json.dumps(&#123;"status": "reset"&#125;)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+            gc.collect()
+
+        elif 'favicon' in request:
+            client.close(); continue
+
+        else:
+            gc.collect()
+            page = make_page()
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: &#123;len(page.encode())&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(page.encode())
+
+        client.close(); gc.collect()
+    except Exception as e:
+        if "ETIMEDOUT" not in str(e):
+            print(f"에러: &#123;e&#125;")
+        try: client.close()
+        except: pass
+```
+
+---
+
+## 데이터 수집 (15-40분)
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">환기 후 밀폐 실험 시작</span>
+  <span class="step-time">15-20분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"실험 시작하기 전에 교실을 환기해서 시작 CO&#8322;를 확인합시다. 500ppm 정도면 좋아요."</p>
+  <p>"자, 이제 <strong>창문과 문을 모두 닫겠습니다</strong>. '측정 시작' 버튼을 누르고, 정상적으로 수업을 진행합니다."</p>
+  <p>"스마트폰으로 접속하면 수업 중에도 그래프가 올라가는 걸 확인할 수 있어요."</p>
+</div>
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">🪟</div>
+    <div class="flow-label">환기</div>
+    <div class="flow-desc">시작 CO&#8322; 확인 (~500ppm)</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">🔒</div>
+    <div class="flow-label">밀폐</div>
+    <div class="flow-desc">창문/문 닫기</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">▶️</div>
+    <div class="flow-label">측정 시작</div>
+    <div class="flow-desc">30초 간격 자동 기록</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-icon">📊</div>
+    <div class="flow-label">50분 후 분석</div>
+    <div class="flow-desc">그래프 + 통계 확인</div>
+  </div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">5</span>
+  <span class="step-title">수업 진행 중 관찰</span>
+  <span class="step-time">20-40분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"수업을 하면서 가끔 대시보드를 확인해보세요. CO&#8322;가 올라가고 있을 거예요."</p>
+  <p>"1000ppm을 넘으면 빨간색 경고 배너가 나타납니다."</p>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">수아:</span> "벌써 700ppm이에요! 시작할 때 480이었는데."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "10분 만에 200 넘게 올랐네요. 이 속도면 몇 분 후에 1000ppm에 도달할까요?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "분당 20ppm씩 오르니까... 15분 정도요?"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "좋아요! 예측을 해봤네요. 실제로 그렇게 되는지 확인해봅시다."</div>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">민수:</span> "1000ppm 넘었어요! 경고 뜨는데 진짜 환기해야 해요?"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "잠깐 더 참아볼게요. 데이터를 더 모아야 분석이 의미 있으니까요. 하지만 2000ppm이 넘으면 진짜 환기합시다."</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"CO&#8322; 숫자가 갑자기 확 올라가는데요?"</div>
+  <div class="qa-a">센서 근처에서 크게 숨을 쉬거나, 센서 바로 위에서 말하면 순간적으로 높게 나올 수 있어요. 안정적인 데이터를 위해 센서 주변에서 직접 입김을 불지 마세요.</div>
+</div>
+
+<Aside type="note" title="보너스 실험: 환기 효과">
+데이터 분석 후 창문을 열고 추가로 5~10분 측정하면, CO&#8322;가 떨어지는 속도를 관찰할 수 있습니다. "상승 vs 하강" 속도를 비교하면 흥미로운 발견이 됩니다!
+</Aside>
+
+---
+
+## 분석 & 결론 (40-50분)
+
+<div class="step-header">
+  <span class="step-num">6</span>
+  <span class="step-title">데이터 해석 + 전체 토론</span>
+  <span class="step-time">40-46분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"측정을 정지하고 데이터를 분석합시다."</p>
+  <p>"그래프를 보면 CO&#8322;가 시간에 따라 어떻게 변했나요? 직선에 가까운가요, 곡선인가요?"</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">분석 과제</span>
+    <span class="mission-difficulty">전체 토론</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">대시보드의 통계 데이터를 보며 아래 항목을 분석하세요.</div>
+    <div class="prompt-box prompt-full">
+      <p>1. 시작 CO&#8322; vs 50분 후 CO&#8322; — 차이는 얼마인가?</p>
+      <p>2. 1000ppm 도달 시점은? (환기 필요 기준)</p>
+      <p>3. 분당 상승률 — "30명이 분당 ~ppm씩 CO&#8322;를 올린다"</p>
+      <p>4. 이 추세대로면 2시간 밀폐하면 어떻게 될까? (예측)</p>
+      <p>5. 창문 열면 회복 속도는? (보너스 실험)</p>
+    </div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"처음에 적었던 예측과 실제 결과를 비교해보세요. 맞았나요, 틀렸나요?"</p>
+  <p>"틀렸어도 괜찮아요. <strong>데이터로 확인했다는 것 자체</strong>가 과학이에요."</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">7</span>
+  <span class="step-title">바이브 코딩 미션 (시간 여유 시)</span>
+  <span class="step-time">46-50분</span>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">바이브 코딩: 대시보드 확장</span>
+    <span class="mission-difficulty">난이도 ★★★☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">시간이 남으면 AI에게 아래 프롬프트로 기능을 추가해보세요.</div>
+    <div class="prompt-box prompt-light">
+      <p>"CO&#8322; 예측선 추가해줘 — 현재 상승 속도로 1시간 후 예측값"</p>
+      <p>"온도와 습도도 같은 그래프에 겹쳐서 보여줘"</p>
+      <p>"환기 전후 비교 화면 만들어줘"</p>
+      <p>"CO&#8322; 농도에 따라 배경색이 서서히 변하게 해줘"</p>
+    </div>
+  </div>
+</div>
+
+---
+
+## 정리
+
+<div class="key-terms">
+  <dl>
+    <dt>CO&#8322; (이산화탄소)</dt>
+    <dd>사람이 호흡할 때 내뱉는 기체. 농도가 높으면 졸음, 두통 유발</dd>
+    <dt>ppm (parts per million)</dt>
+    <dd>백만 분의 1. 공기 중 CO&#8322; 비율을 나타내는 단위</dd>
+    <dt>SCD30</dt>
+    <dd>CO&#8322;, 온도, 습도를 동시에 측정하는 I2C 센서 (주소: 0x61)</dd>
+    <dt>I2C 통신</dt>
+    <dd>SDA(데이터)와 SCL(클록) 2개 선으로 여러 센서를 연결하는 방식</dd>
+    <dt>환기 기준</dt>
+    <dd>실내 CO&#8322; 1000ppm 이상이면 환기 권장 (한국 실내공기질 관리법)</dd>
+  </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"오늘의 핵심은 '밀폐 교실의 CO&#8322; 상승 속도'를 데이터로 확인한 거예요."</p>
+  <p>"다음 시간에는 기압 센서로 '1층에서 4층까지 기압 차이가 진짜 측정될까?'를 탐구합니다. Pico를 들고 교실 밖으로 나가볼 거예요!"</p>
+</div>
+
+---
+
+## 교사용 참고사항
+
+### 실험 성공을 위한 팁
+
+<div class="patrol-point">
+  <ol>
+    <li><strong>시작 CO&#8322; 낮추기:</strong> 수업 시작 전 5분 환기하면 ~500ppm에서 출발 가능</li>
+    <li><strong>밀폐가 핵심:</strong> 창문과 문을 확실히 닫아야 상승 효과가 뚜렷함</li>
+    <li><strong>재미있는 데모:</strong> 센서 위에 직접 입김을 불면 5000ppm 이상으로 치솟음!</li>
+    <li><strong>2000ppm 넘으면:</strong> 학생 안전을 위해 실험을 중단하고 환기하세요</li>
+  </ol>
+</div>
+
+### SCD30 센서 특성
+
+| 항목 | 값 |
+|------|------|
+| I2C 주소 | 0x61 |
+| I2C 주파수 | 50kHz (100kHz 불안정) |
+| CO&#8322; 범위 | 400~10000 ppm |
+| 측정 주기 | 약 2초 (코드에서 30초 간격 기록) |
+| 워밍업 | 첫 측정까지 2~5초 |
+| 주의 | 센서가 비싸므로 취급 주의 안내 필수 |
+
+### 흔한 문제 & 해결
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">I2C 스캔에서 0x61 없음</div>
+    <span class="label">원인</span>
+    <span class="value">배선 오류 / I2C 주파수</span>
+    <span class="label">대응</span>
+    <span class="value">SDA/SCL 확인, freq=50000으로 설정</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">CO&#8322; 값이 None으로 나와요</div>
+    <span class="label">원인</span>
+    <span class="value">센서 워밍업 미완료</span>
+    <span class="label">대응</span>
+    <span class="value">2~5초 대기 후 재시도</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">400ppm 미만 출력</div>
+    <span class="label">원인</span>
+    <span class="value">캘리브레이션 필요</span>
+    <span class="label">대응</span>
+    <span class="value">야외에서 5분간 측정하면 자동 보정</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">ENOMEM 에러</div>
+    <span class="label">원인</span>
+    <span class="value">데이터 누적으로 메모리 부족</span>
+    <span class="label">대응</span>
+    <span class="value">MAX_DATA를 80으로 줄이기</span>
+  </div>
+</div>

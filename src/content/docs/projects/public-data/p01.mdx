@@ -1,0 +1,1146 @@
+---
+title: "1차시: API가 뭐야? — 우리 학교 급식 전광판"
+description: "나이스 급식 API를 호출하여 Pico에서 급식 전광판을 만들고, 바이브 코딩으로 확장"
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+{/* 프로젝트 진행 바 */}
+<div class="project-progress">
+  <div class="prog-item prog-1 current">1. 급식 전광판</div>
+  <div class="prog-item prog-2">2. 날씨+미세먼지</div>
+  <div class="prog-item prog-3">3. 버스 도착</div>
+  <div class="prog-item prog-4">4. 디자인 완성</div>
+  <div class="prog-item prog-5">5. 나만의 API</div>
+  <div class="prog-item prog-6">6. 발표</div>
+</div>
+
+{/* 결과물 미리보기 */}
+<div class="outcome-preview">
+  <div class="outcome-badge">이 차시가 끝나면</div>
+  <h4>우리 학교 급식 전광판이 완성됩니다</h4>
+  <p>Pico가 인터넷에서 <strong>나이스 급식 API</strong>를 호출하여 오늘의 급식 메뉴를 가져오고, 스마트폰 브라우저에서 확인할 수 있는 <strong>급식 전광판</strong>을 만듭니다. 월간 급식 달력까지 포함된 완성도 높은 전광판을 바이브 코딩으로 꾸밉니다.</p>
+  <div class="outcome-items">
+    <div class="outcome-item">
+      <div class="item-icon">🏧</div>
+      <div class="item-label">API 개념</div>
+      API = 데이터 자판기 이해
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🍚</div>
+      <div class="item-label">급식 전광판</div>
+      오늘의 급식 + 월간 달력
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🔑</div>
+      <div class="item-label">API 키</div>
+      인증 카드로 데이터 요청
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🤖</div>
+      <div class="item-label">바이브 코딩</div>
+      AI로 전광판 커스터마이징
+    </div>
+  </div>
+</div>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">프로젝트</div>
+      공공데이터 전광판 (1/6차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">형태</div>
+      개인 실습
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">선수학습</div>
+      Wi-Fi 모니터 프로젝트 완료 (웹서버, JSON API, fetch 경험)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">학습목표</div>
+      API 개념을 이해하고, Pico에서 나이스 급식 API를 호출하여 급식 전광판을 만들기
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">컴퓨팅 사고력</span> <span class="badge badge-emerald">AI 활용 능력</span> <span class="badge badge-blue">데이터 활용</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (1인 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH</li>
+    <li>Micro USB **데이터** 케이블 (충전 전용 불가!)</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE 설치 완료</li>
+    <li>MicroPython 펌웨어 설치 완료</li>
+    <li>AI 접근 환경 — Claude, ChatGPT 등 (학생 PC 또는 스마트폰)</li>
+  </ul>
+  <h5>수업 전 확인 (교사)</h5>
+  <ul>
+    <li>**나이스 API 키** 발급 완료 (https://open.neis.go.kr → 인증키 신청)</li>
+    <li>당곡고 학교코드(7011536) 확인</li>
+    <li>코드에 API 키 넣어서 사전 테스트 완료</li>
+    <li>**평일 수업**인지 확인 (주말은 급식 데이터 없음)</li>
+    <li>`api_config.py` 배포 준비 (칠판에 API 키 게시)</li>
+  </ul>
+</div>
+
+## 교사 사전 준비: API 키 발급
+
+<Aside type="caution" title="이 프로젝트는 API 키가 필요합니다">
+수업 전에 교사가 발급받아 학생에게 공유합니다. 나이스 API는 즉시 발급되지만, 기상청/에어코리아는 승인에 1~2일 걸릴 수 있으니 미리 준비하세요.
+</Aside>
+
+### 필요한 API 키 (총 4개, 1~3차시에 순차 사용)
+
+| API | 발급처 | 용도 | 차시 |
+|-----|--------|------|------|
+| 나이스 급식 | https://open.neis.go.kr | 급식 식단 | 1차시 |
+| 기상청 단기예보 | https://www.data.go.kr | 날씨/강수확률 | 2차시 |
+| 에어코리아 대기질 | https://www.data.go.kr | 미세먼지 | 2차시 |
+| 서울시 버스도착정보 | https://www.data.go.kr | 관악11 버스 | 3차시 |
+
+### 당곡고등학교 API 호출에 필요한 고정값
+
+| 항목 | 값 |
+|------|-----|
+| 교육청 코드 (`ATPT_OFCDC_SC_CODE`) | `B10` (서울특별시교육청) |
+| 학교 코드 (`SD_SCHUL_CODE`) | `7011536` (당곡고등학교) |
+| 나이스 엔드포인트 | `https://open.neis.go.kr/hub/mealServiceDietInfo` |
+| 기상청 격자 좌표 | `nx=59, ny=125` (당곡고 인근) |
+| 버스 정류장 | 당곡중.고등학교 (정류장 ID: 20522) |
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 7">도입 7분</div>
+  <div class="main" style="flex: 13">기본 코드 13분</div>
+  <div class="wrap-up" style="flex: 25; background: var(--teacher-emerald);">바이브 코딩 25분</div>
+  <div class="wrap-up" style="flex: 5">정리 5분</div>
+</div>
+
+---
+
+## 도입 (00-07분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">6차시 로드맵 + 완성 데모</span>
+  <span class="step-time">00-04분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"Wi-Fi 모니터에서는 Pico 자체의 데이터를 보여줬죠? 이번 프로젝트는 **인터넷에 있는 데이터**를 가져와서 보여주는 거예요."</p>
+  <p>(완성된 전광판 데모를 스마트폰으로 보여주며)</p>
+  <p>"이게 6차시 후에 완성될 전광판이에요. 오늘 급식, 지금 날씨, 강수 확률, 미세먼지, 관악11번 버스 도착 시간까지. 전부 Pico 하나가 실시간으로 가져와서 보여주는 거예요."</p>
+  <p>"오늘은 첫 번째 — 우리 학교 급식 전광판을 만들 거예요."</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">API = 데이터 자판기</span>
+  <span class="step-time">04-07분</span>
+</div>
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">📟</div>
+    <div class="flow-label">Pico (손님)</div>
+    <div class="flow-desc">"급식 알려줘" + API 키 제시</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">🏧</div>
+    <div class="flow-label">나이스 서버 (자판기)</div>
+    <div class="flow-desc">인증 확인 후 데이터 준비</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">📋</div>
+    <div class="flow-label">JSON 응답</div>
+    <div class="flow-desc">"오늘 메뉴는..." 데이터 반환</div>
+  </div>
+</div>
+
+<div class="key-terms">
+  <dl>
+    <dt>API 키</dt>
+    <dd>자판기 사용 카드 (인증) — 이게 있어야 데이터를 줍니다</dd>
+    <dt>URL</dt>
+    <dd>무엇을 요청할지 (자판기 버튼)</dd>
+    <dt>JSON</dt>
+    <dd>나온 결과물 (구조화된 데이터)</dd>
+  </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"API 키는 자판기 사용 카드 같은 거예요. 이게 있어야 데이터를 줘요. 선생님이 미리 발급받았으니까 여러분은 코드에 넣기만 하면 돼요."</p>
+</div>
+
+---
+
+## 기본 코드 실행 (07-20분)
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">코드 배포 → Pico 저장 → 실행</span>
+  <span class="step-time">07-17분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"오늘은 파일이 3개예요. <code>wifi_config.py</code>는 이미 있고, <code>api_config.py</code>를 새로 만들고, <code>main.py</code>를 교체하세요."</p>
+  <p>"<code>api_config.py</code>에 API 키를 넣어야 해요. 칠판에 적어놓을 테니까 정확하게 입력하세요."</p>
+  <p>(API 키를 칠판에 게시)</p>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>Thonny에서 Pico에 파일 저장하는 방법:</strong></p>
+  <ol>
+    <li>Thonny 메뉴 → 파일 → 다른 이름으로 저장</li>
+    <li>"어디에 저장할까요?" → <strong>"Raspberry Pi Pico"</strong> 선택</li>
+    <li>파일 이름 입력 (<code>api_config.py</code> 또는 <code>main.py</code>)</li>
+    <li>저장</li>
+  </ol>
+</div>
+
+### 파일 1: api_config.py (API 키 모음)
+
+<Aside type="tip" title="wifi_config.py와 같은 원리">
+wifi_config.py처럼 Pico에 저장하면 다른 코드에서 import해서 쓸 수 있습니다.
+</Aside>
+
+<div class="code-file-label">api_config.py — Pico에 저장</div>
+
+```python
+# api_config.py
+# API 키를 한 곳에서 관리합니다
+# 수업 전에 선생님이 발급받은 키를 여기에 넣으세요
+
+NEIS_KEY = "여기에_나이스_API_키"
+WEATHER_KEY = "여기에_기상청_API_키"
+AIR_KEY = "여기에_에어코리아_API_키"
+BUS_KEY = "여기에_서울시버스_API_키"
+
+# 당곡고등학교 정보
+SCHOOL_CODE = "7011536"        # 표준학교코드
+ATPT_CODE = "B10"              # 서울특별시교육청
+SCHOOL_NAME = "당곡고등학교"
+```
+
+### 파일 2: main.py (1차시 기본 코드)
+
+<Aside type="tip" title="복사 & 붙여넣기">
+코드 블록 오른쪽 위의 복사 버튼을 클릭하면 전체 코드가 복사됩니다. Thonny에 붙여넣고 Pico에 저장하세요.
+</Aside>
+
+<div class="code-file-label">main.py — Pico에 저장</div>
+
+```python
+# ============================================
+# 공공데이터 전광판 - 1차시 기본 코드
+# 우리 학교 급식 전광판 (나이스 API)
+# ============================================
+
+import network
+import socket
+import time
+import json
+import gc
+import ssl
+from wifi_config import WIFI_SSID, WIFI_PASSWORD
+from api_config import NEIS_KEY, SCHOOL_CODE, ATPT_CODE, SCHOOL_NAME
+
+# ── Wi-Fi 연결 ──────────────────────────────
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+
+print("Wi-Fi 연결 중...")
+wlan.connect(WIFI_SSID, WIFI_PASSWORD)
+
+wait = 0
+while not wlan.isconnected():
+    time.sleep(1)
+    wait += 1
+    if wait > 15:
+        print("연결 실패!")
+        raise SystemExit
+
+my_ip = wlan.ifconfig()[0]
+print(f"연결 완료! IP: {my_ip}")
+
+# ── NTP 시간 동기화 ─────────────────────────
+def sync_time():
+    """인터넷에서 현재 시간을 가져옵니다"""
+    try:
+        import ntptime
+        ntptime.settime()
+        print("시간 동기화 완료")
+    except:
+        print("시간 동기화 실패 (오프라인 시간 사용)")
+
+sync_time()
+
+def get_today():
+    """오늘 날짜를 YYYYMMDD 형식으로 반환 (KST = UTC+9)"""
+    t = time.localtime(time.time() + 9 * 3600)
+    return f"{t[0]}{t[1]:02d}{t[2]:02d}"
+
+def get_month_range():
+    """이번 달 1일~말일을 반환"""
+    t = time.localtime(time.time() + 9 * 3600)
+    year, month = t[0], t[1]
+    first = f"{year}{month:02d}01"
+    last = f"{year}{month:02d}31"
+    return first, last
+
+# ── 급식 API 호출 ───────────────────────────
+def fetch_url(url):
+    """HTTPS GET 요청을 보내고 응답 텍스트를 반환"""
+    import socket as _socket
+
+    # URL 파싱
+    proto, _, host_path = url.split("/", 2)
+    host, path = host_path.split("/", 1)
+    path = "/" + path
+    port = 443
+
+    # 소켓 + SSL 연결
+    addr = _socket.getaddrinfo(host, port)[0][-1]
+    s = _socket.socket()
+    s.settimeout(10)
+    s.connect(addr)
+
+    ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    ctx.verify_mode = ssl.CERT_NONE
+    ss = ctx.wrap_socket(s, server_hostname=host)
+
+    # HTTP 요청
+    req = f"GET {path} HTTP/1.0\r\nHost: {host}\r\nConnection: close\r\n\r\n"
+    ss.write(req.encode())
+
+    # 응답 읽기
+    data = b""
+    while True:
+        try:
+            chunk = ss.read(1024)
+            if not chunk:
+                break
+            data += chunk
+        except:
+            break
+    ss.close()
+    s.close()
+
+    # 헤더와 본문 분리
+    text = data.decode('utf-8', 'ignore')
+    if "\r\n\r\n" in text:
+        return text.split("\r\n\r\n", 1)[1]
+    return text
+
+def get_meal(date=None):
+    """나이스 API에서 급식 정보를 가져옵니다"""
+    if date is None:
+        date = get_today()
+
+    url = (
+        f"https://open.neis.go.kr/hub/mealServiceDietInfo"
+        f"?KEY={NEIS_KEY}"
+        f"&Type=json&pIndex=1&pSize=5"
+        f"&ATPT_OFCDC_SC_CODE={ATPT_CODE}"
+        f"&SD_SCHUL_CODE={SCHOOL_CODE}"
+        f"&MLSV_YMD={date}"
+    )
+
+    try:
+        gc.collect()
+        text = fetch_url(url)
+        data = json.loads(text)
+
+        meals = data.get("mealServiceDietInfo", [{}])
+        if len(meals) < 2:
+            return {"date": date, "menu": "급식 정보 없음", "cal": "", "type": ""}
+
+        rows = meals[1].get("row", [])
+
+        # 중식(2) 우선, 없으면 첫 번째
+        meal = None
+        for row in rows:
+            if row.get("MMEAL_SC_CODE") == "2":
+                meal = row
+                break
+        if meal is None and rows:
+            meal = rows[0]
+
+        if meal is None:
+            return {"date": date, "menu": "급식 정보 없음", "cal": "", "type": ""}
+
+        # 메뉴 파싱: <br/> 제거, 알레르기 번호 제거
+        raw_menu = meal.get("DDISH_NM", "")
+        menu_items = []
+        for item in raw_menu.split("<br/>"):
+            item = item.strip()
+            if item:
+                clean = ""
+                i = 0
+                while i < len(item):
+                    if item[i].isdigit() or item[i] == '.':
+                        j = i
+                        while j < len(item) and (item[j].isdigit() or item[j] == '.'):
+                            j += 1
+                        if j == len(item) or item[j] in (' ', '\n', '\r'):
+                            i = j
+                            continue
+                    clean += item[i]
+                    i += 1
+                clean = clean.strip()
+                if clean:
+                    menu_items.append(clean)
+
+        cal = meal.get("CAL_INFO", "")
+        meal_type = meal.get("MMEAL_SC_NM", "")
+
+        return {
+            "date": date,
+            "menu": menu_items,
+            "cal": cal,
+            "type": meal_type,
+        }
+    except Exception as e:
+        print(f"급식 API 에러: {e}")
+        return {"date": date, "menu": "데이터를 가져올 수 없습니다", "cal": "", "type": ""}
+
+def get_month_meals():
+    """이번 달 전체 급식을 가져옵니다"""
+    first, last = get_month_range()
+
+    url = (
+        f"https://open.neis.go.kr/hub/mealServiceDietInfo"
+        f"?KEY={NEIS_KEY}"
+        f"&Type=json&pIndex=1&pSize=100"
+        f"&ATPT_OFCDC_SC_CODE={ATPT_CODE}"
+        f"&SD_SCHUL_CODE={SCHOOL_CODE}"
+        f"&MLSV_FROM_YMD={first}"
+        f"&MLSV_TO_YMD={last}"
+    )
+
+    try:
+        gc.collect()
+        text = fetch_url(url)
+        data = json.loads(text)
+
+        meals = data.get("mealServiceDietInfo", [{}])
+        if len(meals) < 2:
+            return {}
+
+        rows = meals[1].get("row", [])
+
+        result = {}
+        for row in rows:
+            if row.get("MMEAL_SC_CODE") == "2":
+                day = row.get("MLSV_YMD", "")
+                raw = row.get("DDISH_NM", "")
+                menu = raw.replace("<br/>", "\n").strip()
+                result[day] = menu
+
+        return result
+    except Exception as e:
+        print(f"월간 급식 에러: {e}")
+        return {}
+
+# ── 캐시 (API 호출 최소화) ──────────────────
+today_meal = None
+month_meals = None
+
+def refresh_meal():
+    global today_meal, month_meals
+    print("급식 데이터 로딩 중...")
+    today_meal = get_meal()
+    print(f"  오늘 급식: {today_meal.get('type', '')} 로드 완료")
+    gc.collect()
+    month_meals = get_month_meals()
+    print(f"  월간 급식: {len(month_meals)}일분 로드 완료")
+    gc.collect()
+
+# 시작 시 한 번 로드
+refresh_meal()
+
+# ── HTML 페이지 ─────────────────────────────
+def make_page():
+    today = get_today()
+    t = time.localtime(time.time() + 9 * 3600)
+    date_str = f"{t[0]}년 {t[1]}월 {t[2]}일"
+    weekdays = ["월", "화", "수", "목", "금", "토", "일"]
+    weekday = weekdays[t[6]]
+
+    # 오늘 메뉴를 HTML 리스트로
+    menu_html = ""
+    if today_meal and isinstance(today_meal.get("menu"), list):
+        for item in today_meal["menu"]:
+            menu_html += f'<div class="menu-item">{item}</div>\n'
+        cal = today_meal.get("cal", "")
+        meal_type = today_meal.get("type", "중식")
+    else:
+        menu_html = '<div class="menu-item">급식 정보를 불러오는 중...</div>'
+        cal = ""
+        meal_type = ""
+
+    return """<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>""" + SCHOOL_NAME + """ 전광판</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, 'Segoe UI', sans-serif;
+            background: #0a0a1a;
+            color: #ddd;
+            padding: 16px;
+            min-height: 100vh;
+        }
+        .header {
+            text-align: center;
+            padding: 10px 0 14px;
+        }
+        .header h1 {
+            color: #ffd43b;
+            font-size: 1.3em;
+        }
+        .header .date {
+            color: #888;
+            font-size: 0.85em;
+            margin-top: 4px;
+        }
+        .section {
+            background: #141428;
+            border-radius: 14px;
+            padding: 16px;
+            margin: 10px auto;
+            max-width: 500px;
+            border: 1px solid #252550;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .section-title .icon { font-size: 1.3em; }
+        .section-title .text {
+            color: #ffd43b;
+            font-size: 1em;
+            font-weight: bold;
+        }
+        .section-title .badge {
+            background: #2a2a50;
+            color: #888;
+            font-size: 0.7em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+        .menu-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #1e1e3e;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+        .menu-item:last-child { border-bottom: none; }
+        .cal-info {
+            text-align: right;
+            color: #666;
+            font-size: 0.8em;
+            margin-top: 8px;
+        }
+        .calendar-toggle {
+            text-align: center;
+            margin: 12px auto;
+            max-width: 500px;
+        }
+        .calendar-toggle button {
+            background: #252550;
+            color: #aaa;
+            border: 1px solid #353570;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            cursor: pointer;
+        }
+        .calendar-wrap {
+            display: none;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .calendar-wrap.show { display: block; }
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+            margin-top: 8px;
+        }
+        .cal-header {
+            text-align: center;
+            font-size: 0.7em;
+            color: #666;
+            padding: 4px 0;
+        }
+        .cal-day {
+            text-align: center;
+            padding: 8px 2px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            cursor: pointer;
+            background: #141428;
+            border: 1px solid transparent;
+            min-height: 36px;
+        }
+        .cal-day:hover { border-color: #ffd43b; }
+        .cal-day.today {
+            background: #2a2a50;
+            color: #ffd43b;
+            font-weight: bold;
+        }
+        .cal-day.has-meal { color: #8ce99a; }
+        .cal-day.empty { background: transparent; cursor: default; }
+        .cal-day.selected {
+            border-color: #ffd43b;
+            background: #2a2a50;
+        }
+        .selected-meal {
+            display: none;
+            margin-top: 8px;
+            padding: 12px;
+            background: #1a1a3a;
+            border-radius: 10px;
+            font-size: 0.85em;
+            line-height: 1.6;
+            color: #bbb;
+            white-space: pre-line;
+        }
+        .selected-meal.show { display: block; }
+        .selected-meal .sel-date {
+            color: #ffd43b;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+            font-size: 0.7em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🍚 """ + SCHOOL_NAME + """ 전광판</h1>
+        <div class="date">""" + date_str + """ (""" + weekday + """)</div>
+    </div>
+    <div class="section">
+        <div class="section-title">
+            <span class="icon">🍽️</span>
+            <span class="text">오늘의 """ + meal_type + """</span>
+            <span class="badge">""" + cal + """</span>
+        </div>
+        """ + menu_html + """
+    </div>
+    <div class="calendar-toggle">
+        <button onclick="toggleCalendar()">📅 이번 달 급식 보기</button>
+    </div>
+    <div class="calendar-wrap" id="calendar-wrap">
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">📅</span>
+                <span class="text">""" + str(t[1]) + """월 급식 달력</span>
+            </div>
+            <div class="cal-grid">
+                <div class="cal-header">월</div>
+                <div class="cal-header">화</div>
+                <div class="cal-header">수</div>
+                <div class="cal-header">목</div>
+                <div class="cal-header">금</div>
+                <div class="cal-header" style="color:#ff6b6b;">토</div>
+                <div class="cal-header" style="color:#ff6b6b;">일</div>
+            </div>
+            <div class="cal-grid" id="cal-days"></div>
+            <div class="selected-meal" id="selected-meal">
+                <div class="sel-date" id="sel-date"></div>
+                <div id="sel-menu"></div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        Powered by MicroPython on Pico 2 WH · 나이스 Open API
+    </div>
+    <script>
+        function toggleCalendar() {
+            const wrap = document.getElementById('calendar-wrap');
+            wrap.classList.toggle('show');
+            if (wrap.classList.contains('show') && !window._calLoaded) {
+                loadCalendar();
+            }
+        }
+        async function loadCalendar() {
+            window._calLoaded = true;
+            try {
+                const res = await fetch('/month');
+                const meals = await res.json();
+                renderCalendar(meals);
+            } catch(e) {
+                console.log('달력 에러:', e);
+            }
+        }
+        function renderCalendar(meals) {
+            const year = """ + str(t[0]) + """;
+            const month = """ + str(t[1]) + """;
+            const todayStr = '""" + today + """';
+            const firstDay = new Date(year, month - 1, 1).getDay();
+            const startOffset = (firstDay + 6) % 7;
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const container = document.getElementById('cal-days');
+            let html = '';
+            for (let i = 0; i < startOffset; i++) {
+                html += '<div class="cal-day empty"></div>';
+            }
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = year + String(month).padStart(2,'0') + String(d).padStart(2,'0');
+                const isToday = dateStr === todayStr;
+                const hasMeal = meals[dateStr] ? true : false;
+                let cls = 'cal-day';
+                if (isToday) cls += ' today';
+                if (hasMeal) cls += ' has-meal';
+                html += '<div class="' + cls + '" data-date="' + dateStr + '" onclick="selectDay(this, ' + JSON.stringify(JSON.stringify(meals)) + ')">' + d + '</div>';
+            }
+            container.innerHTML = html;
+        }
+        function selectDay(el, mealsStr) {
+            const meals = JSON.parse(mealsStr);
+            const date = el.dataset.date;
+            const menu = meals[date];
+            document.querySelectorAll('.cal-day.selected').forEach(e => e.classList.remove('selected'));
+            el.classList.add('selected');
+            const panel = document.getElementById('selected-meal');
+            const dateEl = document.getElementById('sel-date');
+            const menuEl = document.getElementById('sel-menu');
+            if (menu) {
+                const clean = menu.replace(/[0-9.]+/g, '').replace(/\\n/g, '<br>');
+                dateEl.textContent = date.slice(0,4) + '년 ' + parseInt(date.slice(4,6)) + '월 ' + parseInt(date.slice(6,8)) + '일';
+                menuEl.innerHTML = clean || '메뉴 정보 없음';
+                panel.classList.add('show');
+            } else {
+                dateEl.textContent = parseInt(date.slice(6,8)) + '일';
+                menuEl.innerHTML = '급식 정보 없음';
+                panel.classList.add('show');
+            }
+        }
+    </script>
+</body>
+</html>"""
+
+# ── 웹서버 시작 ─────────────────────────────
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.bind(('0.0.0.0', 80))
+server.listen(3)
+
+print()
+print("=" * 45)
+print(f"  급식 전광판 시작!")
+print(f"  http://{my_ip}")
+print("=" * 45)
+
+while True:
+    try:
+        client, addr = server.accept()
+        request = client.recv(1024).decode()
+
+        if 'GET /month' in request:
+            data = json.dumps(month_meals if month_meals else {})
+            header = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(data)}\r\nConnection: close\r\n\r\n"
+            client.send(header.encode())
+            client.send(data.encode())
+
+        elif 'GET /refresh' in request:
+            refresh_meal()
+            data = json.dumps({"status": "ok"})
+            header = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(data)}\r\nConnection: close\r\n\r\n"
+            client.send(header.encode())
+            client.send(data.encode())
+
+        elif 'favicon' in request:
+            client.close()
+            continue
+
+        else:
+            gc.collect()
+            page = make_page()
+            header = f"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: {len(page.encode())}\r\nConnection: close\r\n\r\n"
+            client.send(header.encode())
+            client.send(page.encode())
+            print(f"페이지: {addr[0]}")
+
+        client.close()
+        gc.collect()
+
+    except Exception as e:
+        print(f"에러: {e}")
+        try:
+            client.close()
+        except:
+            pass
+```
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">스마트폰 접속 + 오늘 급식 확인</span>
+  <span class="step-time">12-17분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"저장하고 실행하면 Shell에 '급식 데이터 로딩 중...'이 뜨고, 잠시 후 '급식 전광판 시작!'이 나와요. 좀 시간이 걸릴 수 있어요. API에서 데이터를 가져오는 중이니까요."</p>
+</div>
+
+<Aside type="note" title="스마트폰에서 접속하기">
+같은 Wi-Fi에 연결된 스마트폰 브라우저에서 `http://` + Pico IP 주소를 입력하면 급식 전광판이 표시됩니다. 모바일 데이터로는 접속이 안 됩니다.
+</Aside>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">수아:</span> "오! 오늘 급식이 진짜 나와요! 김치찌개, 돈까스..."</div>
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "칼로리도 나오네요. 650 Kcal?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">민수:</span> "'이번 달 급식 보기' 누르니까 달력이 나와요! 다음 주 수요일 뭐 나오는지 볼 수 있어요!"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "맞아요. 달력에서 초록색 날짜가 급식이 있는 날이에요. 클릭하면 메뉴가 나오죠."</div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">5</span>
+  <span class="step-title">코드 구조 설명</span>
+  <span class="step-time">17-20분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"코드를 한 줄씩 설명하진 않을 거예요. 대신 큰 구조만 알려줄게요."</p>
+</div>
+
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">①</div>
+    <div class="map-content">
+      <div class="map-title">Wi-Fi 연결 + NTP 시간 동기화</div>
+      <div class="map-desc">시간이 맞아야 "오늘" 급식을 가져옴</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n2">②</div>
+    <div class="map-content">
+      <div class="map-title">fetch_url() → get_meal()</div>
+      <div class="map-desc">HTTPS로 나이스 API 호출 + JSON 파싱</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n3">③</div>
+    <div class="map-content">
+      <div class="map-title">make_page() 함수 <span class="map-tag">바이브 코딩 주 작업 영역</span></div>
+      <div class="map-desc">HTML (오늘 급식 + 달력 UI) — 여기를 수정하면 페이지가 바뀜!</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n4">④</div>
+    <div class="map-content">
+      <div class="map-title">웹서버 (URL 라우팅)</div>
+      <div class="map-desc"><code>/</code> → HTML, <code>/month</code> → 월간 JSON, <code>/refresh</code> → 데이터 갱신</div>
+    </div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"재미있는 점은, Pico가 <strong>두 가지 역할</strong>을 동시에 한다는 거예요. 여러분 스마트폰에게는 '서버'이고, 나이스 API에게는 '클라이언트'예요."</p>
+</div>
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">API 호출 실패 / 급식이 안 나와요</div>
+    <span class="label">원인</span>
+    <span class="value">API 키 오류 또는 네트워크 문제</span>
+    <span class="label">대응</span>
+    <span class="value">Shell 에러 메시지 확인 — 'ssl' 에러면 인터넷, 'KeyError'면 API 키 확인</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">오늘 급식이 없다고 나와요</div>
+    <span class="label">원인</span>
+    <span class="value">주말/공휴일은 실제로 급식이 없음</span>
+    <span class="label">대응</span>
+    <span class="value">평일에 테스트하거나, 코드에서 다른 날짜를 지정하여 확인</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">데이터 로딩이 너무 느려요</div>
+    <span class="label">원인</span>
+    <span class="value">HTTPS 호출에 TLS 핸드셰이크 소요</span>
+    <span class="label">대응</span>
+    <span class="value">처음 5~10초 소요는 정상. 이후에는 캐시에서 바로 응답</span>
+  </div>
+</div>
+
+---
+
+## 바이브 코딩 미션 (20-45분)
+
+<div class="step-header">
+  <span class="step-num">6</span>
+  <span class="step-title">AI와 함께 급식 전광판 확장하기</span>
+  <span class="step-time">20-45분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이제 바이브 코딩으로 전광판을 꾸밀 거예요. 미션 카드를 보고 순서대로 도전하세요."</p>
+  <p>"코드가 길어졌으니까 팁 하나 — AI에게 <strong>바꾸고 싶은 함수만 잘라서</strong> 보내도 돼요. 'make_page() 함수인데 MicroPython Pico 웹서버용이야'라고 한 줄만 추가하면 충분해요."</p>
+</div>
+
+### 미션 카드
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">미션 1: 전광판 테마 꾸미기</span>
+    <span class="mission-difficulty">난이도 ★★☆☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-full">
+      <p>"이 급식 전광판의 CSS를 학교 급식실 느낌으로 바꿔줘. 배경은 따뜻한 크림색, 메뉴 항목에 음식 관련 이모지 자동 추가, 카드에 부드러운 그림자 효과."</p>
+      <p>[make_page() 붙여넣기]</p>
+    </div>
+    <div class="prompt-box prompt-light">
+      <p>"따뜻한 급식실 느낌 테마로 바꿔줘"</p>
+      <p>[make_page() 붙여넣기]</p>
+    </div>
+  </div>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">미션 2: 알레르기 정보 표시</span>
+    <span class="mission-difficulty">난이도 ★★★☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">
+      원래 API 데이터에는 "김치찌개5.6.9.13." 처럼 알레르기 번호가 있어요. 기본 코드에서는 제거했는데, 다시 살려서 알레르기 정보를 예쁘게 표시해보세요!
+    </div>
+    <div class="prompt-box prompt-full">
+      <p>"get_meal()에서 알레르기 번호를 제거하지 말고 보존해줘. HTML에서 메뉴 이름 옆에 알레르기 번호를 작은 뱃지로 표시하고, 번호에 마우스를 올리면 '난류, 우유...' 같은 설명이 나오게 해줘."</p>
+      <p>[전체 코드 붙여넣기]</p>
+    </div>
+    <div class="prompt-box prompt-light">
+      <p>"알레르기 번호를 뱃지로 예쁘게 표시해줘"</p>
+      <p>[전체 코드 붙여넣기]</p>
+    </div>
+    <div class="prompt-tip">알레르기 번호: 1.난류 2.우유 3.메밀 4.땅콩 5.대두 6.밀 7.고등어 8.게 9.새우 10.돼지고기 11.복숭아 12.토마토 13.아황산류 14.호두 15.닭고기 16.쇠고기 17.오징어 18.조개류 19.잣</div>
+  </div>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">미션 3: 달력 UI 개선</span>
+    <span class="mission-difficulty">난이도 ★★★☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-full">
+      <p>"달력에서 오늘 날짜를 더 눈에 띄게 강조하고, 급식 있는 날에는 작은 밥그릇 이모지를 표시해줘. 날짜를 클릭하면 메뉴가 슬라이드 애니메이션으로 나타나게."</p>
+      <p>[make_page() 붙여넣기]</p>
+    </div>
+    <div class="prompt-box prompt-light">
+      <p>"달력 디자인 더 예쁘게 개선해줘"</p>
+      <p>[make_page() 붙여넣기]</p>
+    </div>
+  </div>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">미션 4: 급식 평점 시스템</span>
+    <span class="mission-difficulty">난이도 ★★★★☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-full">
+      <p>"각 메뉴 항목 옆에 좋아요 버튼을 만들어줘. 클릭하면 숫자가 올라가고, 데이터가 Pico 서버에 저장되게 해줘. /like?item=김치 같은 API를 추가하면 될 것 같아."</p>
+      <p>[전체 코드 붙여넣기]</p>
+    </div>
+    <div class="prompt-box prompt-light">
+      <p>"메뉴에 좋아요 버튼 추가하고 Pico에 카운트 저장되게 해줘"</p>
+      <p>[전체 코드 붙여넣기]</p>
+    </div>
+  </div>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">보너스: 자유 확장</span>
+    <span class="mission-difficulty">난이도 ★★★★★</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">아래 라이트 프롬프트 중 골라서 도전! 자기만의 아이디어도 한 줄로 요청해보세요.</div>
+    <div class="prompt-box prompt-light">
+      <p>"내일 급식도 함께 보여줘"</p>
+      <p>"메뉴에 랜덤 한줄평 추가해줘 (맛있겠다! 등)"</p>
+      <p>"급식 없는 주말/공휴일에 D-day 카운트다운"</p>
+      <p>"메뉴를 카테고리별로 분류해줘 (밥/국/반찬)"</p>
+      <p>"급식 사진 자리(placeholder) 영역 만들어줘"</p>
+    </div>
+  </div>
+</div>
+
+### 바이브 코딩 사이클
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">💬</div>
+    <div class="flow-label">요청</div>
+    <div class="flow-desc">프롬프트 작성</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">🤖</div>
+    <div class="flow-label">받기</div>
+    <div class="flow-desc">AI 응답 코드</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">▶️</div>
+    <div class="flow-label">실행</div>
+    <div class="flow-desc">Thonny 실행</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-icon">🤔</div>
+    <div class="flow-label">판단</div>
+    <div class="flow-desc">원하는 결과?</div>
+  </div>
+  <div class="flow-arrow flow-return">↩️</div>
+</div>
+
+<div class="compare-summary">YES → 다음 미션! &nbsp;|&nbsp; NO → 프롬프트 수정해서 다시 요청!</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">수연:</span> "알레르기 뱃지 했는데 '알레르기 번호를 뱃지로 예쁘게 표시해줘'만으로 다 해줬어요. 번호에 터치하면 설명까지 나와요!"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "코드를 같이 넣었죠? AI가 코드에서 알레르기 번호가 제거되는 부분을 찾아서 살려준 거예요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "좋아요 시스템 했는데, 김치에 좋아요가 3개, 돈까스에 12개예요!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">민수:</span> "돈까스가 압도적이네요ㅋㅋ"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "재미있죠? 그런데 Pico를 재시작하면 데이터가 사라져요. 어떻게 하면 유지할 수 있을까요?"</div>
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "파일로 저장?"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "맞아요! AI에게 '좋아요 데이터를 파일로 저장하고 불러오게 해줘'라고 요청해보세요."</div>
+</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>코드 수정 후 <strong>Ctrl+C → 다시 실행</strong> 하고 있는지</li>
+    <li>AI에게 코드를 붙여넣고 있는지 (프롬프트만 보내면 효과 없음)</li>
+    <li>에러가 나면 에러 메시지를 AI에게 보내고 있는지</li>
+  </ol>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"API 호출이 실패해요 / 급식이 안 나와요"</div>
+  <div class="qa-a">Shell에 에러 메시지가 뭐라고 나오는지 확인하세요. 'ssl' 에러면 인터넷 연결 문제, 'KeyError'면 API 키가 잘못된 거예요. api_config.py의 키를 다시 확인하세요.</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"월간 급식에서 일부 날짜가 빠져요"</div>
+  <div class="qa-a">급식이 없는 날(주말, 공휴일, 시험기간 등)은 API가 데이터를 안 줘요. 정상입니다.</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"AI가 MicroPython에서 안 되는 코드를 줬어요"</div>
+  <div class="qa-a">프롬프트에 "이건 MicroPython이고 Pico 2 WH에서 실행돼. MicroPython 문법으로 써줘"라고 명시하세요.</div>
+</div>
+
+---
+
+## 정리 (45-50분)
+
+<div class="step-header">
+  <span class="step-num">7</span>
+  <span class="step-title">오늘 배운 것 & 다음 시간 예고</span>
+  <span class="step-time">45-50분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"오늘 핵심을 정리하면요."</p>
+  <p>"첫째, **API**를 배웠어요. 인터넷의 데이터 자판기. URL로 요청하고, JSON으로 응답받는 구조."</p>
+  <p>"둘째, Pico가 **서버이면서 동시에 클라이언트**가 될 수 있다는 걸 봤어요. 스마트폰한테는 웹페이지를 주고, 나이스한테는 급식 데이터를 요청하는 이중 역할."</p>
+  <p>"셋째, 오늘의 프롬프트 팁 — 코드가 길 때는 **바꾸고 싶은 함수만 잘라서** AI에게 보내도 돼요. 'make_page() 함수인데 MicroPython Pico 웹서버용이야'라고 한 줄만 추가하면 충분해요."</p>
+</div>
+
+<div class="key-terms">
+  <dl>
+    <dt>API</dt>
+    <dd>프로그램이 데이터를 요청하는 창구</dd>
+    <dt>API 키</dt>
+    <dd>인증 카드 (누가 요청하는지 확인)</dd>
+    <dt>HTTPS</dt>
+    <dd>암호화된 통신 (API 호출에 필수)</dd>
+    <dt>JSON 파싱</dt>
+    <dd>받은 데이터에서 원하는 값 추출</dd>
+    <dt>캐시</dt>
+    <dd>한 번 받은 데이터를 저장해두기</dd>
+    <dt>NTP</dt>
+    <dd>인터넷에서 정확한 시간 가져오기</dd>
+  </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"다음 시간에는 날씨와 미세먼지 데이터를 추가할 거예요. 지금 바깥 날씨, 하교 시간 강수확률, 내일 아침 날씨까지. 전광판이 점점 쓸모 있어질 거예요!"</p>
+</div>
+
+---
+
+## 교사용 참고사항
+
+### HTTPS 호출 관련
+
+<Aside type="caution">
+- Pico 2 WH의 최신 MicroPython(v1.24+)에서 `ssl` 모듈로 HTTPS 직접 호출 가능
+- `ssl.CERT_NONE`으로 인증서 검증 생략 (교육 환경 한정)
+- 첫 HTTPS 호출에 5~10초 소요 (TLS 핸드셰이크)
+- 연속 호출 시 메모리 부족 가능 → `gc.collect()` 필수
+- HTTPS가 불안정하면 교사 PC에 Flask 프록시를 띄우는 방법도 백업으로 준비
+</Aside>
+
+### 나이스 API 참고
+
+| 항목 | 내용 |
+|------|------|
+| 엔드포인트 | `https://open.neis.go.kr/hub/mealServiceDietInfo` |
+| 필수 파라미터 | `KEY`, `Type=json`, `ATPT_OFCDC_SC_CODE=B10`, `SD_SCHUL_CODE=7011536`, `MLSV_YMD=날짜` |
+| 응답에서 급식 배열 | `mealServiceDietInfo[1].row[]` |
+| 식사 코드 | `MMEAL_SC_CODE` — "1"(조식), "2"(중식), "3"(석식) |
+| 메뉴 필드 | `DDISH_NM` — 알레르기번호 포함, `<br/>` 구분 |
+
+### 흔한 문제 & 해결
+
+| 증상 | 원인 | 해결 |
+|------|------|------|
+| `ssl` import 에러 | 펌웨어 버전 낮음 | MicroPython 1.24+ 업데이트 |
+| API 응답 없음 / 타임아웃 | 네트워크 문제 | Wi-Fi 재연결, Pico 재시작 |
+| JSON 파싱 에러 | 응답이 HTML(에러페이지) | API 키 확인, URL 파라미터 확인 |
+| "급식 정보 없음" | 해당 날짜 급식 없음 | 주말/공휴일 확인, 날짜 변경 테스트 |
+| ENOMEM | HTML + API 데이터 메모리 초과 | gc.collect() 추가, HTML 간소화 |
+| 시간이 맞지 않음 | NTP 동기화 실패 | 수동으로 날짜 지정하여 테스트 |

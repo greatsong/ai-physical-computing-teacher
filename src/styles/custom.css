@@ -697,3 +697,710 @@
     font-size: 0.8rem;
   }
 }
+
+/* ============================================
+   프로젝트 수업 전용 스타일
+   (바이브 코딩 프로젝트: Wi-Fi 모니터, 공공 데이터 등)
+   ============================================ */
+
+/* === 결과물 미리보기 === */
+.outcome-preview {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.06) 0%, rgba(59, 130, 246, 0.06) 100%);
+  border: 2px solid rgba(124, 58, 237, 0.2);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+:root[data-theme='dark'] .outcome-preview {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.12) 0%, rgba(59, 130, 246, 0.12) 100%);
+}
+
+.outcome-preview .outcome-badge {
+  display: inline-block;
+  background: linear-gradient(90deg, #7C3AED, #3b82f6);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.75rem;
+  border-radius: 9999px;
+  margin-bottom: 1rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.outcome-preview h4 {
+  color: var(--teacher-purple);
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.outcome-preview p {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 0.25rem 0;
+}
+
+.outcome-preview .outcome-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.outcome-preview .outcome-item {
+  background: white;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.8rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+:root[data-theme='dark'] .outcome-preview .outcome-item {
+  background: rgba(255,255,255,0.05);
+}
+
+.outcome-preview .outcome-item .item-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.outcome-preview .outcome-item .item-label {
+  color: var(--teacher-purple);
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+/* === 시각적 다이어그램 === */
+
+/* 코드 구조 맵 */
+.code-map {
+  margin: 1rem 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+}
+
+.code-map .map-row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+}
+
+.code-map .map-row:last-child {
+  border-bottom: none;
+}
+
+.code-map .map-num {
+  width: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.code-map .map-num.n1 { background: #7C3AED; }
+.code-map .map-num.n2 { background: #F43F5E; }
+.code-map .map-num.n3 { background: #3b82f6; }
+
+.code-map .map-content {
+  flex: 1;
+  padding: 0.75rem 1rem;
+}
+
+.code-map .map-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 0.15rem;
+}
+
+.code-map .map-desc {
+  font-size: 0.8rem;
+  color: var(--teacher-slate);
+}
+
+.code-map .map-tag {
+  display: inline-block;
+  background: rgba(244, 63, 94, 0.1);
+  color: var(--teacher-rose);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  margin-left: 0.5rem;
+}
+
+.code-map .map-note {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  font-size: 0.75rem;
+  color: var(--teacher-slate);
+  background: rgba(124, 58, 237, 0.03);
+}
+
+/* 플로우 다이어그램 (바이브 코딩 사이클 등) */
+.flow-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.flow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.75rem 1rem;
+  background: white;
+  border: 2px solid rgba(124, 58, 237, 0.2);
+  border-radius: 0.75rem;
+  min-width: 90px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+:root[data-theme='dark'] .flow-step {
+  background: rgba(255,255,255,0.05);
+}
+
+.flow-step .flow-num {
+  width: 1.5rem;
+  height: 1.5rem;
+  background: var(--teacher-purple);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flow-step .flow-icon {
+  font-size: 1.3rem;
+}
+
+.flow-step .flow-label {
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--teacher-purple);
+}
+
+.flow-step .flow-desc {
+  font-size: 0.7rem;
+  color: var(--teacher-slate);
+}
+
+.flow-arrow {
+  font-size: 1.2rem;
+  color: var(--teacher-purple);
+  padding: 0 0.25rem;
+  flex-shrink: 0;
+}
+
+.flow-arrow.flow-return {
+  color: var(--teacher-rose);
+}
+
+/* 비교 카드 */
+.compare-cards {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.75rem;
+  align-items: stretch;
+  margin: 1rem 0;
+}
+
+.compare-card {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  border: 1px solid rgba(100, 116, 139, 0.15);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+:root[data-theme='dark'] .compare-card {
+  background: rgba(255,255,255,0.05);
+}
+
+.compare-card.old {
+  opacity: 0.7;
+}
+
+.compare-card.new {
+  border-color: var(--teacher-purple);
+  border-width: 2px;
+}
+
+.compare-card .compare-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: var(--teacher-purple);
+}
+
+.compare-card .compare-item {
+  font-size: 0.8rem;
+  padding: 0.15rem 0;
+  color: var(--teacher-slate);
+}
+
+.compare-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--teacher-purple);
+  font-weight: 700;
+}
+
+.compare-summary {
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--teacher-purple);
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(124, 58, 237, 0.06);
+  border-radius: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .compare-cards {
+    grid-template-columns: 1fr;
+  }
+  .compare-arrow {
+    transform: rotate(90deg);
+  }
+  .flow-diagram {
+    gap: 0.25rem;
+  }
+  .flow-step {
+    min-width: 70px;
+    padding: 0.5rem;
+  }
+}
+
+/* 라우팅 테이블 */
+.route-table {
+  margin: 1rem 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+}
+
+.route-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.08);
+  font-size: 0.85rem;
+}
+
+.route-row:last-child {
+  border-bottom: none;
+}
+
+.route-row.route-header {
+  background: var(--teacher-purple);
+  color: white;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.route-req, .route-arrow, .route-res {
+  padding: 0.5rem 0.75rem;
+}
+
+.route-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--teacher-purple);
+  font-weight: 700;
+}
+
+.route-row.route-header .route-arrow {
+  color: white;
+}
+
+.route-req code, .route-res code {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* === 미션 카드 === */
+.mission-card {
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  border-radius: 0.75rem;
+  margin: 1rem 0;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.mission-card:hover {
+  border-color: rgba(124, 58, 237, 0.5);
+}
+
+.mission-card .mission-header {
+  background: linear-gradient(90deg, var(--teacher-purple-bg), rgba(124, 58, 237, 0.04));
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.12);
+}
+
+.mission-card .mission-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--teacher-purple);
+  flex: 1;
+}
+
+.mission-card .mission-difficulty {
+  font-size: 0.8rem;
+  color: var(--teacher-amber);
+  letter-spacing: 0.05em;
+}
+
+.mission-card .mission-body {
+  padding: 1rem;
+}
+
+.mission-card .mission-desc {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+  color: #475569;
+}
+
+:root[data-theme='dark'] .mission-card .mission-desc {
+  color: #94a3b8;
+}
+
+/* 프롬프트 예시 박스 */
+.prompt-box {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.prompt-full {
+  background: rgba(124, 58, 237, 0.06);
+  border-left: 3px solid var(--teacher-purple);
+}
+
+.prompt-full::before {
+  content: 'FULL';
+  display: inline-block;
+  background: var(--teacher-purple);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  margin-bottom: 0.35rem;
+  letter-spacing: 0.05em;
+}
+
+.prompt-light {
+  background: rgba(16, 185, 129, 0.06);
+  border-left: 3px solid var(--teacher-emerald);
+}
+
+.prompt-light::before {
+  content: 'LIGHT';
+  display: inline-block;
+  background: var(--teacher-emerald);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  margin-bottom: 0.35rem;
+  letter-spacing: 0.05em;
+}
+
+.prompt-box p {
+  margin: 0.25rem 0;
+}
+
+.prompt-tip {
+  font-size: 0.8rem;
+  color: var(--teacher-slate);
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* === 수업 장면 === */
+.class-scene {
+  background: rgba(245, 158, 11, 0.04);
+  border: 1px solid rgba(245, 158, 11, 0.15);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.class-scene::before {
+  content: '수업 장면';
+  display: inline-block;
+  background: var(--teacher-amber);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.class-scene .scene-line {
+  margin: 0.35rem 0;
+}
+
+.class-scene .speaker {
+  font-weight: 600;
+}
+
+.class-scene .speaker-teacher {
+  color: var(--teacher-purple);
+}
+
+.class-scene .speaker-student {
+  color: var(--teacher-emerald);
+}
+
+/* === 핵심 용어 === */
+.key-terms {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.04), rgba(124, 58, 237, 0.04));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  margin: 1rem 0;
+}
+
+.key-terms::before {
+  content: 'KEY TERMS';
+  display: inline-block;
+  background: linear-gradient(90deg, #00d4ff, var(--teacher-purple));
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.15rem 0.6rem;
+  border-radius: 9999px;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+.key-terms dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.75rem;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.key-terms dt {
+  font-weight: 700;
+  color: var(--teacher-purple);
+  padding: 0.2rem 0;
+}
+
+.key-terms dd {
+  margin: 0;
+  padding: 0.2rem 0;
+  color: #475569;
+  line-height: 1.5;
+}
+
+:root[data-theme='dark'] .key-terms dd {
+  color: #94a3b8;
+}
+
+/* === Q&A 섹션 === */
+.qa-pair {
+  margin: 0.75rem 0;
+  font-size: 0.9rem;
+}
+
+.qa-pair .qa-q {
+  font-weight: 600;
+  color: var(--teacher-rose);
+  margin-bottom: 0.25rem;
+}
+
+.qa-pair .qa-q::before {
+  content: 'Q.';
+  display: inline-block;
+  background: var(--teacher-rose);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  width: 1.2rem;
+  height: 1.2rem;
+  line-height: 1.2rem;
+  text-align: center;
+  border-radius: 50%;
+  margin-right: 0.4rem;
+  vertical-align: middle;
+}
+
+.qa-pair .qa-a {
+  padding-left: 1.6rem;
+  color: #475569;
+  line-height: 1.6;
+}
+
+:root[data-theme='dark'] .qa-pair .qa-a {
+  color: #94a3b8;
+}
+
+/* === 코드 파일 라벨 === */
+.code-file-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--teacher-purple);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 0.4rem 0.4rem 0 0;
+  margin-bottom: -0.25rem;
+  font-family: var(--sl-font-mono);
+}
+
+/* === 바이브 코딩 설명 박스 === */
+.vibe-explain {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.06), rgba(244, 63, 94, 0.06));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  margin: 1rem 0;
+}
+
+.vibe-explain h4 {
+  color: var(--teacher-purple);
+  margin: 0 0 0.75rem;
+}
+
+.vibe-explain .vibe-compare {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.vibe-explain .vibe-old,
+.vibe-explain .vibe-new {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+:root[data-theme='dark'] .vibe-explain .vibe-old,
+:root[data-theme='dark'] .vibe-explain .vibe-new {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.vibe-explain .vibe-old {
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  opacity: 0.7;
+}
+
+.vibe-explain .vibe-new {
+  border: 1px solid rgba(124, 58, 237, 0.3);
+}
+
+.vibe-explain .vibe-arrow {
+  color: var(--teacher-purple);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.vibe-explain .vibe-principle {
+  text-align: center;
+  font-weight: 700;
+  color: var(--teacher-purple);
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .vibe-explain .vibe-compare {
+    grid-template-columns: 1fr;
+  }
+  .vibe-explain .vibe-arrow {
+    text-align: center;
+    transform: rotate(90deg);
+  }
+  .outcome-preview .outcome-items {
+    grid-template-columns: 1fr 1fr;
+  }
+  .key-terms dl {
+    grid-template-columns: 1fr;
+  }
+  .key-terms dt {
+    padding-bottom: 0;
+  }
+  .key-terms dd {
+    padding-top: 0;
+    padding-bottom: 0.5rem;
+    padding-left: 0.75rem;
+    border-left: 2px solid rgba(124, 58, 237, 0.15);
+  }
+}
+
+/* === 프로젝트 프로그레스 바 === */
+.project-progress {
+  display: flex;
+  gap: 0;
+  margin: 1rem 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.project-progress .prog-item {
+  flex: 1;
+  padding: 0.4rem 0.25rem;
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: white;
+  opacity: 0.4;
+}
+
+.project-progress .prog-item.current {
+  opacity: 1;
+}
+
+.project-progress .prog-item.done {
+  opacity: 0.7;
+}
+
+.project-progress .prog-1 { background: #7C3AED; }
+.project-progress .prog-2 { background: #F43F5E; }
+.project-progress .prog-3 { background: #F59E0B; }
+.project-progress .prog-4 { background: #10b981; }
+.project-progress .prog-5 { background: #3b82f6; }
+.project-progress .prog-6 { background: #6366f1; }

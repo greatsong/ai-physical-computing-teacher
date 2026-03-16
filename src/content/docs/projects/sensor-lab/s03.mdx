@@ -1,0 +1,816 @@
+---
+title: "탐구 3: 선생님 목소리는 교실 뒤까지 전달될까?"
+description: "소리 센서(ADC)로 거리별 소리 크기를 측정하여 소리 감쇠 그래프 완성"
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+{/* 프로젝트 진행 바 */}
+<div class="project-progress">
+  <div class="prog-item prog-1 done">1. 온습도</div>
+  <div class="prog-item prog-2 done">2. 조도</div>
+  <div class="prog-item prog-3 current">3. 소리</div>
+  <div class="prog-item prog-4">4. 동작 감지</div>
+  <div class="prog-item prog-5">5. CO&#8322;</div>
+  <div class="prog-item prog-6">6. 기압</div>
+</div>
+
+{/* 결과물 미리보기 */}
+<div class="outcome-preview">
+  <div class="outcome-badge">이 차시가 끝나면</div>
+  <h4>거리별 소리 감쇠 그래프가 완성됩니다</h4>
+  <p>소리 센서를 Pico에 연결하고, 칠판 앞 소리가 교실 뒤까지 얼마나 줄어드는지 거리별로 측정합니다. 웹 대시보드에서 <strong>거리-소리크기 그래프</strong>가 그려지며, <strong>역제곱 법칙</strong>이 실제로 성립하는지 데이터로 확인합니다.</p>
+  <div class="outcome-items">
+    <div class="outcome-item">
+      <div class="item-icon">🔊</div>
+      <div class="item-label">소리 센서 연결</div>
+      아날로그(ADC) 피크 샘플링
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">📏</div>
+      <div class="item-label">거리별 측정</div>
+      1m, 2m, 3m, 5m, 7m 비교
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">📉</div>
+      <div class="item-label">감쇠 그래프</div>
+      거리-소리크기 시각화
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🤖</div>
+      <div class="item-label">바이브 코딩</div>
+      이론선 겹치기, 통계 추가
+    </div>
+  </div>
+</div>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">프로젝트</div>
+      센서 과학 탐구 (3/6차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">형태</div>
+      모둠 실험 (2~4인)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">선수학습</div>
+      2차시 (조도 센서, ADC 개념) 완료
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">학습목표</div>
+      소리 센서로 거리별 소리 크기를 측정하고, 감쇠 그래프를 그려 역제곱 법칙 확인
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">과학 탐구력</span> <span class="badge badge-emerald">물리 법칙 검증</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (모둠당 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH</li>
+    <li>브레드보드</li>
+    <li>점퍼선 3개 (빨강, 검정, 노랑)</li>
+    <li>소리 센서 (아날로그)</li>
+    <li>Micro USB **데이터** 케이블</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE + MicroPython 펌웨어</li>
+    <li>AI 접근 환경 — Claude, ChatGPT 등</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>소리 발생 도구 준비 (블루투스 스피커 또는 교사 목소리)</li>
+    <li>교실 바닥에 1m 간격 표시 (테이프 또는 줄자)</li>
+    <li>소리 센서 1개로 사전 테스트 — 박수 소리에 레벨 변화 확인</li>
+    <li>wifi_config.py가 Pico에 저장되어 있는지 확인</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 1">도입 5분</div>
+  <div class="main" style="flex: 1.6">센서 연결 8분</div>
+  <div class="wrap-up" style="flex: 5; background: var(--teacher-emerald);">데이터 수집 25분</div>
+  <div class="wrap-up" style="flex: 2.4">분석 12분</div>
+</div>
+
+---
+
+## 도입 (00-05분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">탐구 질문 제시 & 가설 세우기</span>
+  <span class="step-time">00-05분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"뒷자리 친구들, 선생님 목소리 잘 들려요? 앞자리보다 작게 들리죠?"</p>
+  <p>"소리는 거리가 멀어질수록 작아집니다. 그런데 <strong>얼마나</strong> 작아질까요? 거리가 2배면 소리도 딱 반으로 줄까요?"</p>
+  <p>"물리학에서는 '소리는 거리의 제곱에 반비례한다'는 법칙이 있어요. 정말 그런지 데이터로 확인해봅시다."</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">모둠 활동: 가설 세우기</span>
+    <span class="mission-difficulty">1분 토론</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-light">
+      <p>"거리가 2배면 소리 크기가 반으로 줄 것이다"</p>
+      <p>"거리가 2배면 소리 크기가 1/4로 줄 것이다 (역제곱 법칙)"</p>
+      <p>"교실 벽 반사 때문에 이론만큼 줄지 않을 것이다"</p>
+    </div>
+  </div>
+</div>
+
+---
+
+## 센서 연결 (05-13분)
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">소리 센서 배선 + 코드 실행</span>
+  <span class="step-time">05-13분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"소리 센서도 2차시 조도 센서와 같은 방식이에요. 아날로그 센서니까 선 3개, GP26(ADC0)에 연결합니다."</p>
+  <p>"차이가 있다면, 소리 센서는 <strong>빠르게 여러 번 읽어서 피크값(최댓값)</strong>을 추출한다는 거예요. 소리는 순간적이니까요."</p>
+</div>
+
+### 소리 센서 배선도
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">🔴</div>
+    <div class="flow-label">VCC</div>
+    <div class="flow-desc">3V3 (36번 핀)</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">⚫</div>
+    <div class="flow-label">GND</div>
+    <div class="flow-desc">GND (38번 핀)</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">🟡</div>
+    <div class="flow-label">SIG</div>
+    <div class="flow-desc">GP26 (31번 핀) — ADC0</div>
+  </div>
+</div>
+
+<Aside type="tip" title="소리 센서의 특징">
+소리 센서는 소리가 클수록 높은 전압을 출력합니다. 코드에서 0.5초간 연속으로 빠르게 읽어서 **피크값(가장 큰 순간값)**을 추출합니다. 소리는 순간적이라 한 번만 읽으면 정확도가 떨어지기 때문입니다.
+</Aside>
+
+<Aside type="caution" title="Micro USB 데이터 케이블 확인">
+Pico 2 WH는 **Micro USB** 포트를 사용합니다 (USB-C가 아닙니다!). 반드시 **데이터 전송이 가능한** Micro USB 케이블을 사용하세요.
+</Aside>
+
+### 코드 구조 설명
+
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">①</div>
+    <div class="map-content">
+      <div class="map-title">Wi-Fi 연결 + 소리 센서</div>
+      <div class="map-desc">0.5초간 피크 샘플링 → 0~100 스케일로 변환</div>
+    </div>
+    <div class="map-note">read_sound_level() 함수</div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n2">②</div>
+    <div class="map-content">
+      <div class="map-title">거리별 측정 데이터 <span class="map-tag">최대 20개</span></div>
+      <div class="map-desc">거리(m) 입력 → 현재 소리 레벨 기록</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n3">③</div>
+    <div class="map-content">
+      <div class="map-title">make_page() <span class="map-tag">바이브 코딩 영역</span></div>
+      <div class="map-desc">실시간 레벨 미터 + 거리별 그래프 + 데이터 테이블</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n4">④</div>
+    <div class="map-content">
+      <div class="map-title">웹서버 + API</div>
+      <div class="map-desc">/level (실시간), /measure (거리 기록), /data (전체), /reset</div>
+    </div>
+  </div>
+</div>
+
+### main.py (3차시 기본 코드)
+
+<Aside type="tip" title="복사 & 붙여넣기">
+코드 블록 오른쪽 위의 복사 버튼을 클릭하면 전체 코드가 복사됩니다. Thonny에 붙여넣고 Pico에 저장하세요.
+</Aside>
+
+<div class="code-file-label">main.py — Pico에 저장</div>
+
+```python
+# ============================================
+# 과학 탐구 3: 소리 전달과 거리
+# 소리 센서로 거리별 소리 크기를 측정하여
+# 소리 감쇠를 확인
+# ============================================
+
+import network
+import socket
+import time
+import json
+import gc
+from machine import Pin, ADC
+from wifi_config import WIFI_SSID, WIFI_PASSWORD
+
+# ── Wi-Fi ────────────────────────────────────
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+wlan.connect(WIFI_SSID, WIFI_PASSWORD)
+while not wlan.isconnected():
+    time.sleep(1)
+my_ip = wlan.ifconfig()[0]
+print(f"IP: &#123;my_ip&#125;")
+
+# ── 소리 센서 ───────────────────────────────
+adc = ADC(Pin(26))
+
+def read_sound_level():
+    """0.5초간 소리 샘플링 → 피크값 반환"""
+    peak = 0
+    samples = 0
+    start = time.ticks_ms()
+    while time.ticks_diff(time.ticks_ms(), start) < 500:
+        val = adc.read_u16()
+        # 중간값(32768) 기준 절대 편차
+        deviation = abs(val - 32768)
+        if deviation > peak:
+            peak = deviation
+        samples += 1
+    # 0~100 스케일로 변환
+    level = min(100, int(peak / 32768 * 100))
+    return level, peak, samples
+
+level, peak, samples = read_sound_level()
+print(f"소리 레벨: &#123;level&#125;/100 (peak: &#123;peak&#125;, &#123;samples&#125; samples)")
+
+# ── 거리별 측정 데이터 ──────────────────────
+# [&#123;"dist": 1, "level": 85, "peak": 28000&#125;, ...]
+distance_data = []
+MAX_MEASUREMENTS = 20
+
+def add_measurement(distance):
+    """현재 소리 레벨을 지정 거리에 기록"""
+    level, peak, _ = read_sound_level()
+    distance_data.append(&#123;
+        "dist": distance,
+        "level": level,
+        "peak": peak,
+    &#125;)
+    if len(distance_data) > MAX_MEASUREMENTS:
+        distance_data.pop(0)
+    return level, peak
+
+# ── 실시간 소리 모니터 데이터 ────────────────
+sound_history = []  # 최근 60개 (30초간)
+MAX_HISTORY = 60
+
+# ── HTML ────────────────────────────────────
+def make_page():
+    return """<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>소리 전달 탐구</title>
+    <style>
+        *&#123;margin:0;padding:0;box-sizing:border-box;&#125;
+        body&#123;font-family:-apple-system,sans-serif;background:#0a0a1a;color:#ddd;padding:14px;min-height:100vh;&#125;
+        .hd&#123;text-align:center;padding:8px 0 12px;&#125;
+        .hd h1&#123;color:#cc5de8;font-size:1.2em;&#125;
+        .hd .q&#123;color:#aaa;font-size:0.8em;margin-top:4px;font-style:italic;&#125;
+
+        .sc&#123;background:#141428;border-radius:12px;padding:14px;margin:8px auto;max-width:500px;border:1px solid #252550;&#125;
+        .sc-title&#123;color:#cc5de8;font-size:0.85em;font-weight:bold;margin-bottom:8px;&#125;
+
+        .meter&#123;text-align:center;padding:8px 0;&#125;
+        .meter .val&#123;font-size:3em;font-weight:bold;color:#cc5de8;&#125;
+        .meter .lbl&#123;color:#888;font-size:0.75em;&#125;
+        .meter-bar-bg&#123;width:90%;height:20px;background:#252550;border-radius:10px;margin:10px auto;overflow:hidden;&#125;
+        .meter-bar&#123;height:100%;border-radius:10px;transition:width 0.3s,background 0.3s;&#125;
+
+        .measure-controls&#123;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin:8px 0;&#125;
+        .measure-controls select,.measure-controls input&#123;background:#1a1a3a;color:#ddd;border:1px solid #353570;border-radius:6px;padding:6px 10px;font-size:0.85em;width:80px;&#125;
+        .btn&#123;padding:10px 18px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:0.85em;&#125;
+        .btn-measure&#123;background:#cc5de8;color:#fff;&#125;
+        .btn-clear&#123;background:#495057;color:#fff;&#125;
+
+        .result-msg&#123;text-align:center;color:#cc5de8;font-size:0.8em;margin:6px 0;min-height:1.2em;&#125;
+
+        canvas&#123;width:100%;height:180px;&#125;
+
+        .data-table&#123;width:100%;border-collapse:collapse;font-size:0.8em;margin-top:8px;&#125;
+        .data-table th&#123;color:#888;font-weight:normal;text-align:center;padding:6px;border-bottom:1px solid #252550;&#125;
+        .data-table td&#123;text-align:center;padding:5px;border-bottom:1px solid #1a1a3a;&#125;
+
+        .ft&#123;text-align:center;margin-top:14px;color:#333;font-size:0.6em;&#125;
+    </style>
+</head>
+<body>
+    <div class="hd">
+        <h1>🔊 소리 전달 탐구</h1>
+        <div class="q">"선생님 목소리는 교실 뒤까지 얼마나 줄어들까?"</div>
+    </div>
+
+    <!-- 실시간 소리 레벨 -->
+    <div class="sc">
+        <div class="sc-title">🎤 실시간 소리 크기</div>
+        <div class="meter">
+            <div class="val" id="level">--</div>
+            <div class="lbl">소리 레벨 (0~100)</div>
+        </div>
+        <div class="meter-bar-bg"><div class="meter-bar" id="level-bar" style="width:0%;"></div></div>
+    </div>
+
+    <!-- 거리별 측정 -->
+    <div class="sc">
+        <div class="sc-title">📏 거리별 측정</div>
+        <div class="measure-controls">
+            <label style="color:#888;font-size:0.8em;">거리(m):</label>
+            <input type="number" id="dist-input" value="1" min="0.5" max="20" step="0.5">
+            <button class="btn btn-measure" onclick="measure()">🔴 측정</button>
+            <button class="btn btn-clear" onclick="clearData()">↺ 초기화</button>
+        </div>
+        <div class="result-msg" id="result-msg"></div>
+    </div>
+
+    <!-- 거리-소리 그래프 -->
+    <div class="sc">
+        <div class="sc-title">📈 거리별 소리 크기 그래프</div>
+        <canvas id="chart"></canvas>
+    </div>
+
+    <!-- 측정 데이터 테이블 -->
+    <div class="sc">
+        <div class="sc-title">📋 측정 기록</div>
+        <table class="data-table">
+            <thead><tr><th>#</th><th>거리(m)</th><th>소리 레벨</th><th>피크값</th></tr></thead>
+            <tbody id="data-body"><tr><td colspan="4" style="color:#555;">측정 데이터 없음</td></tr></tbody>
+        </table>
+    </div>
+
+    <div class="ft">소리 센서 · Pico 2 WH · 0.5초 피크 샘플링</div>
+
+    <script>
+        const canvas = document.getElementById('chart');
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth * 2;
+        canvas.height = 360;
+
+        let measurements = [];
+
+        async function fetchLevel() &#123;
+            try &#123;
+                const r = await fetch('/level');
+                const d = await r.json();
+                document.getElementById('level').textContent = d.level;
+                const bar = document.getElementById('level-bar');
+                bar.style.width = d.level + '%';
+                bar.style.background = d.level > 70 ? '#ff6b6b' : d.level > 40 ? '#ffd43b' : '#51cf66';
+            &#125; catch(e) &#123;&#125;
+        &#125;
+
+        async function measure() &#123;
+            const dist = parseFloat(document.getElementById('dist-input').value);
+            if (isNaN(dist) || dist <= 0) &#123; alert('거리를 입력하세요'); return; &#125;
+            try &#123;
+                const r = await fetch('/measure?d=' + dist);
+                const d = await r.json();
+                document.getElementById('result-msg').textContent =
+                    '✅ ' + dist + 'm → 레벨 ' + d.level + ' (피크 ' + d.peak + ')';
+                fetchMeasurements();
+            &#125; catch(e) &#123;
+                document.getElementById('result-msg').textContent = '❌ 측정 실패';
+            &#125;
+        &#125;
+
+        async function fetchMeasurements() &#123;
+            try &#123;
+                const r = await fetch('/data');
+                measurements = await r.json();
+                renderTable();
+                drawChart();
+            &#125; catch(e) &#123;&#125;
+        &#125;
+
+        async function clearData() &#123;
+            if (confirm('데이터를 지울까요?')) &#123;
+                await fetch('/reset');
+                measurements = [];
+                renderTable();
+                drawChart();
+            &#125;
+        &#125;
+
+        function renderTable() &#123;
+            const tbody = document.getElementById('data-body');
+            if (measurements.length === 0) &#123;
+                tbody.innerHTML = '<tr><td colspan="4" style="color:#555;">측정 데이터 없음</td></tr>';
+                return;
+            &#125;
+            tbody.innerHTML = measurements.map((d, i) =>
+                '<tr><td>' + (i+1) + '</td><td>' + d.dist + 'm</td><td>' + d.level + '</td><td>' + d.peak + '</td></tr>'
+            ).join('');
+        &#125;
+
+        function drawChart() &#123;
+            const W = canvas.width, H = canvas.height;
+            const pad = &#123;t:20,r:20,b:40,l:50&#125;;
+            const cw = W-pad.l-pad.r, ch = H-pad.t-pad.b;
+            ctx.clearRect(0,0,W,H);
+
+            if (measurements.length < 1) &#123;
+                ctx.fillStyle='#555';ctx.font='24px sans-serif';ctx.textAlign='center';
+                ctx.fillText('거리별 측정을 시작하세요',W/2,H/2);
+                return;
+            &#125;
+
+            const maxD = Math.max(...measurements.map(d=>d.dist)) * 1.1 || 10;
+            const maxL = 100;
+
+            ctx.strokeStyle='#1e1e3e';ctx.lineWidth=1;
+            for(let i=0;i<=5;i++)&#123;
+                const y=pad.t+ch*i/5;
+                ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+                ctx.fillStyle='#666';ctx.font='18px sans-serif';ctx.textAlign='right';
+                ctx.fillText(Math.round(maxL-maxL*i/5),pad.l-8,y+6);
+            &#125;
+
+            ctx.textAlign='center';
+            for(let i=0;i<=4;i++)&#123;
+                const x=pad.l+cw*i/4;
+                ctx.fillText((maxD*i/4).toFixed(1)+'m',x,H-pad.b+25);
+            &#125;
+
+            const sorted = [...measurements].sort((a,b)=>a.dist-b.dist);
+            ctx.beginPath();ctx.strokeStyle='#cc5de8';ctx.lineWidth=2;
+            sorted.forEach((d,i)=>&#123;
+                const x=pad.l+cw*(d.dist/maxD);
+                const y=pad.t+ch*(1-d.level/maxL);
+                if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+            &#125;);
+            ctx.stroke();
+
+            sorted.forEach(d=>&#123;
+                const x=pad.l+cw*(d.dist/maxD);
+                const y=pad.t+ch*(1-d.level/maxL);
+                ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);
+                ctx.fillStyle='#cc5de8';ctx.fill();
+                ctx.fillStyle='#fff';ctx.font='16px sans-serif';ctx.textAlign='center';
+                ctx.fillText(d.level,x,y-14);
+            &#125;);
+        &#125;
+
+        fetchLevel();
+        fetchMeasurements();
+        setInterval(fetchLevel, 1000);
+    </script>
+</body>
+</html>"""
+
+# ── 웹서버 ──────────────────────────────────
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.bind(('0.0.0.0', 80))
+server.listen(3)
+
+print(f"\n&#123;'='*45&#125;\n  소리 탐구 대시보드!\n  http://&#123;my_ip&#125;\n&#123;'='*45&#125;")
+
+while True:
+    try:
+        server.settimeout(0.5)
+        try:
+            client, addr = server.accept()
+        except OSError:
+            continue
+
+        request = client.recv(1024).decode()
+
+        if 'GET /level' in request:
+            level, peak, _ = read_sound_level()
+            body = json.dumps(&#123;"level": level, "peak": peak&#125;)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+
+        elif 'GET /measure' in request:
+            try:
+                dist = float(request.split('d=')[1].split(' ')[0].split('&')[0])
+                level, peak = add_measurement(dist)
+                body = json.dumps(&#123;"dist": dist, "level": level, "peak": peak&#125;)
+                print(f"  측정: &#123;dist&#125;m → &#123;level&#125;")
+            except:
+                body = json.dumps(&#123;"error": "파라미터 오류"&#125;)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+
+        elif 'GET /data' in request:
+            body = json.dumps(distance_data)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+
+        elif 'GET /reset' in request:
+            distance_data.clear()
+            body = json.dumps(&#123;"status": "ok"&#125;)
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(body.encode())
+            gc.collect()
+
+        elif 'favicon' in request:
+            client.close(); continue
+
+        else:
+            gc.collect(); page = make_page()
+            h = f"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: &#123;len(page.encode())&#125;\r\nConnection: close\r\n\r\n"
+            client.send(h.encode()); client.send(page.encode())
+
+        client.close(); gc.collect()
+    except Exception as e:
+        if "ETIMEDOUT" not in str(e): print(f"에러: &#123;e&#125;")
+        try: client.close()
+        except: pass
+```
+
+---
+
+## 데이터 수집 (13-38분)
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">실험 방법 안내</span>
+  <span class="step-time">13-18분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"칠판 앞에 소리 발생원을 정합니다. 선생님이 일정한 크기로 말하거나 블루투스 스피커를 쓸 수도 있어요."</p>
+  <p>"핵심은 — <strong>매번 같은 세기로</strong> 소리를 내야 한다는 거예요. 그래야 거리에 따른 변화만 비교할 수 있어요."</p>
+</div>
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">🔊</div>
+    <div class="flow-label">소리 발생</div>
+    <div class="flow-desc">칠판 앞, 일정 세기</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">📏</div>
+    <div class="flow-label">거리 이동</div>
+    <div class="flow-desc">1m → 2m → 3m → 5m → 7m</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">🔴</div>
+    <div class="flow-label">측정 버튼</div>
+    <div class="flow-desc">3번 반복 측정</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-icon">📈</div>
+    <div class="flow-label">그래프 확인</div>
+    <div class="flow-desc">감쇠 패턴 관찰</div>
+  </div>
+</div>
+
+<div class="teaching-tip">
+  <p><strong>실험 순서:</strong></p>
+  <ol>
+    <li>칠판 앞에 "소리 발생원" 지정 (선생님 또는 블루투스 스피커)</li>
+    <li>일정한 크기로 소리 재생 (매번 같은 세기로!)</li>
+    <li>센서를 1m, 2m, 3m, 5m, 7m 거리에 놓고 측정 버튼</li>
+    <li>각 거리에서 <strong>3번씩 반복 측정</strong> → 평균 사용</li>
+    <li>그래프에서 감쇠 패턴 확인</li>
+  </ol>
+</div>
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">거리별 측정 실행</span>
+  <span class="step-time">18-35분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"1m 거리부터 시작합니다. 소리를 내는 동안 측정 버튼을 누르세요. 같은 거리에서 3번 측정해서 결과를 비교하세요."</p>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">수아:</span> "1m에서 78이었는데 3m에서 52로 떨어졌어요!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "5m에서 35, 7m에서 22예요. 확 줄어드네요."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "그래프를 보세요. 거리가 멀어질수록 소리가 작아지는 곡선이 보이죠? 직선이 아니에요."</div>
+  <div class="scene-line"><span class="speaker speaker-student">민수:</span> "근데 벽 가까이에서 재면 좀 더 크게 나오는 것 같아요."</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "좋은 관찰이에요! 벽에서 반사된 소리가 더해지는 거예요. 그것도 기록해두세요."</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"측정할 때마다 값이 달라요"</div>
+  <div class="qa-a">소리는 원래 변동이 커요. 그래서 같은 거리에서 3번 측정하는 거예요. 나중에 평균을 구하면 됩니다.</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"소리 레벨이 0~100인데 실제 데시벨(dB)은 아니에요?"</div>
+  <div class="qa-a">맞아요. 이 센서는 정확한 dB을 측정하지 못하고, 상대적인 크기만 비교할 수 있어요. 중요한 건 상대적 비교입니다.</div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">5</span>
+  <span class="step-title">추가 실험: 장애물/방향 테스트</span>
+  <span class="step-time">35-38분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"시간 여유가 있으면 재미있는 실험을 더 해보세요."</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">추가 실험 아이디어</span>
+    <span class="mission-difficulty">선택 활동</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-light">
+      <p>책으로 센서를 가리면 소리가 얼마나 줄어들까?</p>
+      <p>소리 발생원의 방향(앞/옆/뒤)에 따라 차이가 있을까?</p>
+      <p>교실 문을 열었을 때와 닫았을 때 차이는?</p>
+      <p>같은 거리인데 벽 근처 vs 교실 중앙 — 차이가 있을까?</p>
+    </div>
+  </div>
+</div>
+
+---
+
+## 분석 & 결론 (38-50분)
+
+<div class="step-header">
+  <span class="step-num">6</span>
+  <span class="step-title">데이터 분석 + 역제곱 법칙 검증</span>
+  <span class="step-time">38-45분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"그래프를 보세요. 거리가 멀어질수록 소리가 작아지는 패턴이 보이죠?"</p>
+  <p>"물리학에서는 소리의 세기가 '거리의 제곱에 반비례'한다고 해요. 거리가 2배가 되면 소리는 1/4로 줄어야 합니다. 우리 데이터도 그런가요?"</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">분석 과제</span>
+    <span class="mission-difficulty">모둠별 토론</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-full">
+      <p>1. 1m vs 7m — 소리 크기 차이는 몇 %?</p>
+      <p>2. 거리가 2배가 되면 소리가 1/4로 줄어드나? (역제곱 법칙 확인)</p>
+      <p>3. 교실의 벽 반사 때문에 이론과 다른 점이 있나?</p>
+      <p>4. "뒷자리가 안 들린다"는 불만은 데이터로 입증되는가?</p>
+      <p>5. 처음 가설과 비교 — 맞았나? 틀렸나?</p>
+    </div>
+  </div>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">수아:</span> "1m에서 78이고 2m에서 52예요. 1/4이면 약 20이어야 하는데 훨씬 크네요?"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "그게 바로 교실의 특성이에요. 벽, 천장, 바닥에서 소리가 반사되니까 완벽한 역제곱을 따르지 않아요. 야외에서 측정하면 더 비슷할 거예요."</div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">7</span>
+  <span class="step-title">바이브 코딩 미션 (시간 여유 시)</span>
+  <span class="step-time">45-50분</span>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">바이브 코딩: 그래프 확장</span>
+    <span class="mission-difficulty">난이도 ★★★☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-light">
+      <p>"역제곱 법칙 이론선을 그래프에 겹쳐서 보여줘"</p>
+      <p>"같은 거리 여러 번 측정의 평균/표준편차 표시해줘"</p>
+      <p>"측정할 때 3초 카운트다운 타이머 추가해줘"</p>
+    </div>
+    <div class="prompt-box prompt-full">
+      <p>"이 코드의 drawChart() 함수에 역제곱 법칙 이론선을 추가해줘. 1m 지점의 측정값을 기준으로 1/r² 곡선을 점선으로 그려서 실제 데이터와 비교할 수 있게."</p>
+      <p>[코드 붙여넣기]</p>
+    </div>
+  </div>
+</div>
+
+---
+
+## 정리
+
+<div class="key-terms">
+  <dl>
+    <dt>소리 레벨</dt>
+    <dd>소리의 상대적 크기 (0~100). 이 센서는 정확한 dB이 아닌 상대 비교용</dd>
+    <dt>피크 샘플링</dt>
+    <dd>짧은 시간(0.5초) 동안 연속 측정하여 최댓값을 추출하는 방법</dd>
+    <dt>역제곱 법칙</dt>
+    <dd>소리의 세기는 거리의 제곱에 반비례. 거리가 2배 → 세기는 1/4</dd>
+    <dt>반사</dt>
+    <dd>벽, 천장에서 소리가 튕겨 돌아오는 현상. 교실에서 역제곱 법칙이 완벽히 적용되지 않는 이유</dd>
+    <dt>반복 측정</dt>
+    <dd>같은 조건에서 여러 번 측정하여 신뢰도를 높이는 과학적 방법</dd>
+  </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"다음 시간에는 동작 감지 센서를 사용합니다. 교실 출입구에 센서를 설치해서 몇 명이 드나드는지 카운트하는 시스템을 만들어볼 거예요."</p>
+</div>
+
+---
+
+## 교사용 참고사항
+
+### 실험 성공을 위한 팁
+
+<div class="patrol-point">
+  <ol>
+    <li><strong>일정한 소리원:</strong> 블루투스 스피커로 같은 음원을 반복 재생하면 가장 공정. 박수는 세기 통일이 어려움</li>
+    <li><strong>거리 표시:</strong> 교실 바닥에 테이프로 1m 간격 표시해두면 편리</li>
+    <li><strong>반복 측정:</strong> 각 거리에서 최소 3회 측정하도록 안내. 소리는 변동이 크므로 단일 측정은 비신뢰</li>
+    <li><strong>배경 소음:</strong> 가능하면 조용한 환경에서 실험. 창문 닫기, 에어컨 끄기</li>
+    <li><strong>역제곱 법칙과의 차이:</strong> 교실은 밀폐 공간이라 반사파 때문에 이론과 다름. 이 차이 자체가 토론 주제!</li>
+  </ol>
+</div>
+
+### 소리 센서 특성
+
+| 항목 | 값 |
+|------|------|
+| 타입 | 아날로그 (ADC) |
+| 핀 | GP26 (ADC0) |
+| 샘플링 | 0.5초간 피크 추출 |
+| 스케일 | 0~100 (상대적, dB 아님) |
+| 중심값 | 32768 (무음 시 ADC 중간값) |
+
+<Aside type="note">
+Grove 소리 센서는 정밀한 dB 측정기가 아닙니다. ADC 값의 **상대적 차이**를 비교하는 용도로 사용합니다. 절대적인 데시벨 값이 필요하면 스마트폰 앱을 보조로 활용하세요.
+</Aside>
+
+### 흔한 문제 & 해결
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">레벨이 항상 0이에요</div>
+    <span class="label">원인</span>
+    <span class="value">배선 오류 또는 센서 감도 부족</span>
+    <span class="label">대응</span>
+    <span class="value">SIG→GP26 확인. 센서 가까이에서 큰 소리로 테스트</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">값이 측정할 때마다 크게 달라요</div>
+    <span class="label">원인</span>
+    <span class="value">소리의 특성상 변동이 큼</span>
+    <span class="label">대응</span>
+    <span class="value">같은 거리에서 3번 반복 측정 후 평균 사용</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">조용한데 레벨이 높아요</div>
+    <span class="label">원인</span>
+    <span class="value">전기적 노이즈 또는 센서 감도 문제</span>
+    <span class="label">대응</span>
+    <span class="value">배선 길이 줄이기, 브레드보드 접촉 확인</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">거리별 차이가 거의 없어요</div>
+    <span class="label">원인</span>
+    <span class="value">소리 발생원 볼륨 부족 또는 반사음 영향</span>
+    <span class="label">대응</span>
+    <span class="value">볼륨을 높이거나, 더 넓은 공간(체육관, 복도)에서 실험</span>
+  </div>
+</div>

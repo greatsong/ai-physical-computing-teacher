@@ -1,0 +1,942 @@
+---
+title: "탐구 1: 에어컨 틀면 습도가 진짜 떨어질까?"
+description: "DHT20 온습도 센서(I2C)로 에어컨 가동 전후 습도 변화를 연속 측정하여 시간-습도 그래프를 완성"
+prev: false
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+{/* 프로젝트 진행 바 */}
+<div class="project-progress">
+  <div class="prog-item prog-1 current">1. 온습도</div>
+  <div class="prog-item prog-2">2. 조도</div>
+  <div class="prog-item prog-3">3. 소리</div>
+  <div class="prog-item prog-4">4. 동작 감지</div>
+  <div class="prog-item prog-5">5. CO₂</div>
+  <div class="prog-item prog-6">6. 기압</div>
+</div>
+
+{/* 결과물 미리보기 */}
+<div class="outcome-preview">
+  <div class="outcome-badge">이 차시가 끝나면</div>
+  <h4>에어컨이 습도에 미치는 영향을 데이터로 확인합니다</h4>
+  <p>DHT20 온습도 센서를 Pico에 연결하고, 에어컨 가동 전후의 습도를 10초 간격으로 연속 측정합니다. 웹 대시보드에서 <strong>시간-습도 그래프</strong>가 실시간으로 그려지며, 모둠별로 <strong>가설 → 실험 → 결론</strong>의 과학 탐구 과정을 수행합니다.</p>
+  <div class="outcome-items">
+    <div class="outcome-item">
+      <div class="item-icon">🌡️</div>
+      <div class="item-label">DHT20 센서 연결</div>
+      I2C 통신으로 온습도 읽기
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">📈</div>
+      <div class="item-label">실시간 그래프</div>
+      시간-습도 변화 시각화
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🔬</div>
+      <div class="item-label">과학 탐구</div>
+      가설 수립 → 데이터 검증
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🤖</div>
+      <div class="item-label">바이브 코딩</div>
+      대시보드 기능 확장
+    </div>
+  </div>
+</div>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">프로젝트</div>
+      센서 과학 탐구 (1/6차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">형태</div>
+      모둠 실험 (2~4인)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">선수학습</div>
+      웹서버 프로젝트 완료 (Wi-Fi, 웹 대시보드, 바이브 코딩)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">학습목표</div>
+      DHT20 센서로 에어컨 가동 전후 습도 변화를 연속 측정하고, 데이터 기반 결론 도출
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">과학 탐구력</span> <span class="badge badge-emerald">데이터 분석</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (모둠당 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH</li>
+    <li>브레드보드</li>
+    <li>점퍼선 4개 (빨강, 검정, 노랑, 초록)</li>
+    <li>DHT20 온습도 센서</li>
+    <li>Micro USB **데이터** 케이블</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE 설치 완료</li>
+    <li>MicroPython 펌웨어 설치 완료</li>
+    <li>AI 접근 환경 — Claude, ChatGPT 등</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>교실 에어컨 작동 여부 확인</li>
+    <li>Wi-Fi 2.4GHz 대역 확인 (SSID/비밀번호 칠판 게시)</li>
+    <li>DHT20 센서 1개로 사전 테스트 — I2C 스캔 → 0x38 확인</li>
+    <li>wifi_config.py가 이미 Pico에 저장되어 있는지 확인</li>
+  </ul>
+</div>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 1">도입 5분</div>
+  <div class="main" style="flex: 2">센서 연결 10분</div>
+  <div class="wrap-up" style="flex: 5; background: var(--teacher-emerald);">데이터 수집 25분</div>
+  <div class="wrap-up" style="flex: 2">분석 10분</div>
+</div>
+
+---
+
+## 도입 (00-05분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">탐구 질문 제시 & 가설 세우기</span>
+  <span class="step-time">00-05분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"여름에 에어컨 틀면 시원해지죠? 그런데 피부가 건조해진다는 말도 있어요. 에어컨이 습도를 떨어뜨린다는 건데... <strong>정말일까요?</strong>"</p>
+  <p>"오늘 우리가 직접 데이터로 확인할 거예요. 센서를 연결하고, 에어컨 켜기 전과 후의 습도를 측정해서 그래프로 보는 거죠."</p>
+  <p>"먼저 가설을 세워보세요. 에어컨을 켜면 습도가 어떻게 될 것 같아요? 몇 분 만에? 몇 % 정도?"</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">모둠 활동: 가설 세우기</span>
+    <span class="mission-difficulty">1분 토론</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">모둠별로 가설을 세우고 칠판에 적어주세요.</div>
+    <div class="prompt-box prompt-light">
+      <p>"에어컨을 켜면 5분 안에 습도가 10% 이상 떨어질 것이다"</p>
+      <p>"에어컨을 켜도 습도는 크게 변하지 않을 것이다"</p>
+      <p>"습도는 천천히 떨어져서 20분은 지나야 차이가 날 것이다"</p>
+    </div>
+  </div>
+</div>
+
+---
+
+## 센서 연결 (05-15분)
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">DHT20 배선 + 연결 확인</span>
+  <span class="step-time">05-10분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"DHT20 센서를 Pico에 연결할 거예요. 선 4개만 연결하면 됩니다."</p>
+  <p>"배선도를 보고 연결하세요. 다 했으면 연결 확인 스크립트를 먼저 돌려보세요."</p>
+</div>
+
+### DHT20 배선도
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">🔴</div>
+    <div class="flow-label">VCC</div>
+    <div class="flow-desc">3V3 (36번 핀)</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">⚫</div>
+    <div class="flow-label">GND</div>
+    <div class="flow-desc">GND (38번 핀)</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">🟡</div>
+    <div class="flow-label">SDA</div>
+    <div class="flow-desc">GP4 (6번 핀)</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-icon">🟢</div>
+    <div class="flow-label">SCL</div>
+    <div class="flow-desc">GP5 (7번 핀)</div>
+  </div>
+</div>
+
+<Aside type="tip" title="I2C 통신이란?">
+SDA(데이터)와 SCL(클록) 2개의 선으로 통신하는 방식입니다. DHT20은 풀업 저항이 내장되어 있어 별도 저항이 필요 없습니다.
+</Aside>
+
+### 연결 확인 스크립트
+
+<div class="teacher-script">
+  <p>"main.py를 실행하기 전에, 센서가 잘 연결됐는지 먼저 확인합니다."</p>
+</div>
+
+<div class="code-file-label">연결 확인 스크립트 — Thonny에서 실행</div>
+
+```python
+# === DHT20 연결 확인 ===
+from machine import Pin, I2C
+import time
+
+i2c = I2C(0, sda=Pin(4), scl=Pin(5), freq=100000)
+
+devices = i2c.scan()
+print(f"발견된 I2C 장치: {devices}")
+
+if 0x38 in devices:
+    print("✅ DHT20 연결 성공! (주소: 0x38)")
+else:
+    print("❌ DHT20이 감지되지 않습니다.")
+    print("   → 배선을 확인하세요 (SDA↔GP4, SCL↔GP5)")
+```
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">I2C 장치가 감지되지 않아요</div>
+    <span class="label">원인</span>
+    <span class="value">SDA와 SCL 선이 바뀌었거나 접촉 불량</span>
+    <span class="label">대응</span>
+    <span class="value">GP4가 SDA, GP5가 SCL인지 확인. 점퍼선을 다시 꽂아보세요.</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">습도가 0%로 나와요</div>
+    <span class="label">원인</span>
+    <span class="value">센서 초기화 시간 부족</span>
+    <span class="label">대응</span>
+    <span class="value">2~3초 기다렸다가 다시 읽어보세요.</span>
+  </div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">기본 코드 실행 + 대시보드 접속</span>
+  <span class="step-time">10-15분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"연결 확인이 됐으면 main.py를 Pico에 저장하고 실행하세요. Shell에 현재 온도와 습도가 나오면 스마트폰으로 접속!"</p>
+</div>
+
+<Aside type="caution" title="Micro USB 데이터 케이블 확인">
+Pico 2 WH는 **Micro USB** 포트를 사용합니다 (USB-C가 아닙니다!). 반드시 **데이터 전송이 가능한** Micro USB 케이블을 사용하세요.
+</Aside>
+
+### 코드 구조 설명
+
+<div class="code-map">
+  <div class="map-row">
+    <div class="map-num n1">①</div>
+    <div class="map-content">
+      <div class="map-title">Wi-Fi 연결 + DHT20 드라이버</div>
+      <div class="map-desc">I2C 통신으로 센서 초기화, 온도/습도 읽기</div>
+    </div>
+    <div class="map-note">DHT20 클래스가 0xAC 명령으로 측정</div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n2">②</div>
+    <div class="map-content">
+      <div class="map-title">데이터 저장소 <span class="map-tag">10초 간격 기록</span></div>
+      <div class="map-desc">최대 200개 데이터 포인트 저장 (약 33분)</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n3">③</div>
+    <div class="map-content">
+      <div class="map-title">make_page() <span class="map-tag">바이브 코딩 영역</span></div>
+      <div class="map-desc">실시간 그래프 + 측정 시작/정지 버튼 + 통계</div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num n4">④</div>
+    <div class="map-content">
+      <div class="map-title">웹서버 + API</div>
+      <div class="map-desc">/now (현재값), /log (기록), /start, /stop, /reset</div>
+    </div>
+  </div>
+</div>
+
+### main.py (1차시 기본 코드)
+
+<Aside type="tip" title="복사 & 붙여넣기">
+코드 블록 오른쪽 위의 복사 버튼을 클릭하면 전체 코드가 복사됩니다. Thonny에 붙여넣고 Pico에 저장하세요.
+</Aside>
+
+<div class="code-file-label">main.py — Pico에 저장</div>
+
+```python
+# ============================================
+# 과학 탐구 1: 에어컨과 습도
+# DHT20 센서로 온습도를 연속 측정하여
+# 시간-습도 그래프를 웹에서 실시간 확인
+# ============================================
+
+import network
+import socket
+import time
+import json
+import gc
+from machine import Pin, I2C
+from wifi_config import WIFI_SSID, WIFI_PASSWORD
+
+# ── Wi-Fi 연결 ──────────────────────────────
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+wlan.connect(WIFI_SSID, WIFI_PASSWORD)
+while not wlan.isconnected():
+    time.sleep(1)
+my_ip = wlan.ifconfig()[0]
+print(f"IP: {my_ip}")
+
+# ── DHT20 드라이버 (I2C) ────────────────────
+class DHT20:
+    """DHT20 온습도 센서 (I2C 주소: 0x38)"""
+    def __init__(self, i2c, addr=0x38):
+        self.i2c = i2c
+        self.addr = addr
+        time.sleep_ms(100)
+        # 초기화 확인
+        status = self.i2c.readfrom(self.addr, 1)[0]
+        if (status & 0x18) != 0x18:
+            self.i2c.writeto(self.addr, bytes([0x71]))
+            time.sleep_ms(10)
+
+    def read(self):
+        """온도(°C)와 습도(%) 반환"""
+        # 측정 명령
+        self.i2c.writeto(self.addr, bytes([0xAC, 0x33, 0x00]))
+        time.sleep_ms(80)
+
+        # 데이터 읽기
+        data = self.i2c.readfrom(self.addr, 7)
+
+        # 습도 계산
+        hum_raw = ((data[1] << 12) | (data[2] << 4) | (data[3] >> 4))
+        humidity = round(hum_raw / 1048576 * 100, 1)
+
+        # 온도 계산
+        temp_raw = ((data[3] & 0x0F) << 16) | (data[4] << 8) | data[5]
+        temperature = round(temp_raw / 1048576 * 200 - 50, 1)
+
+        return temperature, humidity
+
+# ── 센서 초기화 ─────────────────────────────
+i2c = I2C(0, sda=Pin(4), scl=Pin(5), freq=100000)
+sensor = DHT20(i2c)
+
+# 테스트 읽기
+temp, hum = sensor.read()
+print(f"현재: {temp}°C, {hum}%")
+
+# ── 데이터 저장소 ───────────────────────────
+# 최대 200개 데이터 포인트 (약 33분 @ 10초 간격)
+MAX_DATA = 200
+data_log = []  # [{"t": 초, "temp": 온도, "hum": 습도}, ...]
+start_time = time.ticks_ms()
+recording = False
+
+def add_data():
+    """현재 센서값을 기록"""
+    try:
+        temp, hum = sensor.read()
+        elapsed = time.ticks_diff(time.ticks_ms(), start_time) // 1000
+
+        data_log.append({
+            "t": elapsed,
+            "temp": temp,
+            "hum": hum,
+        })
+
+        # 최대 개수 초과 시 오래된 것 삭제
+        if len(data_log) > MAX_DATA:
+            data_log.pop(0)
+
+        return temp, hum
+    except Exception as e:
+        print(f"센서 에러: {e}")
+        return None, None
+
+# ── HTML 페이지 ─────────────────────────────
+def make_page():
+    return """<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>에어컨과 습도 탐구</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:-apple-system,sans-serif;background:#0a0a1a;color:#ddd;padding:14px;min-height:100vh;}
+        .hd{text-align:center;padding:8px 0 14px;}
+        .hd h1{color:#74c0fc;font-size:1.2em;}
+        .hd .q{color:#ffd43b;font-size:0.85em;margin-top:4px;font-style:italic;}
+
+        .now{display:flex;justify-content:center;gap:30px;margin:12px 0;}
+        .now .box{text-align:center;}
+        .now .val{font-size:2.2em;font-weight:bold;}
+        .now .lbl{color:#888;font-size:0.75em;}
+        .temp-val{color:#ff922b;}
+        .hum-val{color:#74c0fc;}
+
+        .controls{display:flex;justify-content:center;gap:10px;margin:12px 0;}
+        .btn{padding:10px 20px;border:none;border-radius:8px;font-size:0.85em;cursor:pointer;font-weight:bold;}
+        .btn-start{background:#51cf66;color:#000;}
+        .btn-stop{background:#ff6b6b;color:#fff;}
+        .btn-reset{background:#495057;color:#fff;}
+        .btn:disabled{opacity:0.4;cursor:default;}
+
+        .status{text-align:center;color:#888;font-size:0.75em;margin:6px 0;}
+        .status .rec{color:#ff6b6b;animation:blink 1s infinite;}
+        @keyframes blink{50%{opacity:0.3;}}
+
+        .chart-wrap{background:#141428;border-radius:12px;padding:14px;margin:10px auto;max-width:600px;border:1px solid #252550;}
+        .chart-title{color:#74c0fc;font-size:0.85em;font-weight:bold;margin-bottom:8px;}
+        canvas{width:100%;height:200px;}
+
+        .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:600px;margin:10px auto;}
+        .stat{background:#141428;border-radius:10px;padding:10px;text-align:center;border:1px solid #252550;}
+        .stat .sv{color:#74c0fc;font-size:1.2em;font-weight:bold;}
+        .stat .sl{color:#888;font-size:0.65em;margin-top:2px;}
+
+        .ft{text-align:center;margin-top:16px;color:#333;font-size:0.6em;}
+    </style>
+</head>
+<body>
+    <div class="hd">
+        <h1>🌡️ 에어컨과 습도 탐구</h1>
+        <div class="q">"에어컨을 틀면 습도가 진짜 떨어질까?"</div>
+    </div>
+
+    <div class="now">
+        <div class="box">
+            <div class="val temp-val" id="temp">--</div>
+            <div class="lbl">온도 (°C)</div>
+        </div>
+        <div class="box">
+            <div class="val hum-val" id="hum">--</div>
+            <div class="lbl">습도 (%)</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-start" id="btn-start" onclick="startRec()">▶ 측정 시작</button>
+        <button class="btn btn-stop" id="btn-stop" onclick="stopRec()" disabled>⏹ 정지</button>
+        <button class="btn btn-reset" onclick="resetData()">↺ 초기화</button>
+    </div>
+
+    <div class="status" id="status">대기 중 — 에어컨 OFF 상태에서 '측정 시작'을 누르세요</div>
+
+    <div class="chart-wrap">
+        <div class="chart-title">📈 시간-습도 그래프</div>
+        <canvas id="chart"></canvas>
+    </div>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="sv" id="s-start">--</div>
+            <div class="sl">시작 습도</div>
+        </div>
+        <div class="stat">
+            <div class="sv" id="s-now">--</div>
+            <div class="sl">현재 습도</div>
+        </div>
+        <div class="stat">
+            <div class="sv" id="s-diff">--</div>
+            <div class="sl">변화량</div>
+        </div>
+        <div class="stat">
+            <div class="sv" id="s-min">--</div>
+            <div class="sl">최저 습도</div>
+        </div>
+        <div class="stat">
+            <div class="sv" id="s-max">--</div>
+            <div class="sl">최고 습도</div>
+        </div>
+        <div class="stat">
+            <div class="sv" id="s-cnt">0</div>
+            <div class="sl">측정 횟수</div>
+        </div>
+    </div>
+
+    <div class="ft">DHT20 센서 · Pico 2 WH · 10초 간격 측정</div>
+
+    <script>
+        let chartData = [];
+        let isRecording = false;
+        let intervalId = null;
+
+        const canvas = document.getElementById('chart');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth * 2;
+            canvas.height = 400;
+        }
+        resizeCanvas();
+
+        async function fetchNow() {
+            try {
+                const r = await fetch('/now');
+                const d = await r.json();
+                document.getElementById('temp').textContent = d.temp;
+                document.getElementById('hum').textContent = d.hum;
+                return d;
+            } catch(e) { return null; }
+        }
+
+        async function fetchLog() {
+            try {
+                const r = await fetch('/log');
+                const d = await r.json();
+                chartData = d;
+                drawChart();
+                updateStats();
+            } catch(e) {}
+        }
+
+        async function startRec() {
+            await fetch('/start');
+            isRecording = true;
+            document.getElementById('btn-start').disabled = true;
+            document.getElementById('btn-stop').disabled = false;
+            document.getElementById('status').innerHTML = '<span class="rec">● 측정 중</span> — 에어컨을 켜고 변화를 관찰하세요';
+            if (!intervalId) intervalId = setInterval(fetchLog, 5000);
+        }
+
+        async function stopRec() {
+            await fetch('/stop');
+            isRecording = false;
+            document.getElementById('btn-start').disabled = false;
+            document.getElementById('btn-stop').disabled = true;
+            document.getElementById('status').textContent = '측정 정지 — 데이터를 분석하세요';
+            if (intervalId) { clearInterval(intervalId); intervalId = null; }
+        }
+
+        async function resetData() {
+            if (confirm('데이터를 모두 지울까요?')) {
+                await fetch('/reset');
+                chartData = [];
+                drawChart();
+                updateStats();
+                document.getElementById('status').textContent = '초기화 완료';
+            }
+        }
+
+        function drawChart() {
+            const W = canvas.width, H = canvas.height;
+            const pad = {t:20, r:20, b:40, l:50};
+            const cw = W-pad.l-pad.r, ch = H-pad.t-pad.b;
+
+            ctx.clearRect(0,0,W,H);
+
+            if (chartData.length < 2) {
+                ctx.fillStyle = '#555';
+                ctx.font = '24px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('측정을 시작하면 그래프가 나타납니다', W/2, H/2);
+                return;
+            }
+
+            const hums = chartData.map(d => d.hum);
+            let minH = Math.min(...hums) - 2;
+            let maxH = Math.max(...hums) + 2;
+            if (maxH - minH < 5) { minH -= 3; maxH += 3; }
+            const maxT = chartData[chartData.length-1].t;
+            const minT = chartData[0].t;
+
+            ctx.strokeStyle = '#1e1e3e';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = pad.t + ch * i / 5;
+                ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W-pad.r, y); ctx.stroke();
+                const val = (maxH - (maxH-minH)*i/5).toFixed(1);
+                ctx.fillStyle = '#666'; ctx.font = '20px sans-serif'; ctx.textAlign = 'right';
+                ctx.fillText(val+'%', pad.l-8, y+6);
+            }
+
+            ctx.textAlign = 'center';
+            const tRange = maxT - minT || 1;
+            for (let i = 0; i <= 4; i++) {
+                const t = minT + tRange * i / 4;
+                const x = pad.l + cw * i / 4;
+                const min = Math.floor(t/60);
+                const sec = Math.floor(t%60);
+                ctx.fillText(min + ':' + String(sec).padStart(2,'0'), x, H-pad.b+25);
+            }
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#74c0fc';
+            ctx.lineWidth = 3;
+            chartData.forEach((d, i) => {
+                const x = pad.l + cw * (d.t - minT) / tRange;
+                const y = pad.t + ch * (1 - (d.hum - minH) / (maxH - minH));
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            const temps = chartData.map(d => d.temp);
+            const minTe = Math.min(...temps) - 1;
+            const maxTe = Math.max(...temps) + 1;
+            ctx.beginPath();
+            ctx.strokeStyle = '#ff922b44';
+            ctx.lineWidth = 2;
+            chartData.forEach((d, i) => {
+                const x = pad.l + cw * (d.t - minT) / tRange;
+                const y = pad.t + ch * (1 - (d.temp - minTe) / (maxTe - minTe || 1));
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            ctx.font = '18px sans-serif';
+            ctx.fillStyle = '#74c0fc'; ctx.textAlign = 'left';
+            ctx.fillText('━ 습도(%)', pad.l+10, pad.t+16);
+            ctx.fillStyle = '#ff922b66';
+            ctx.fillText('━ 온도(°C)', pad.l+120, pad.t+16);
+        }
+
+        function updateStats() {
+            if (chartData.length === 0) return;
+            const hums = chartData.map(d => d.hum);
+            const first = hums[0];
+            const last = hums[hums.length-1];
+            const diff = (last - first).toFixed(1);
+
+            document.getElementById('s-start').textContent = first + '%';
+            document.getElementById('s-now').textContent = last + '%';
+            document.getElementById('s-diff').textContent = (diff > 0 ? '+' : '') + diff + '%';
+            document.getElementById('s-diff').style.color = diff < 0 ? '#74c0fc' : '#ff922b';
+            document.getElementById('s-min').textContent = Math.min(...hums).toFixed(1) + '%';
+            document.getElementById('s-max').textContent = Math.max(...hums).toFixed(1) + '%';
+            document.getElementById('s-cnt').textContent = chartData.length;
+        }
+
+        fetchNow();
+        setInterval(fetchNow, 3000);
+    </script>
+</body>
+</html>"""
+
+# ── 웹서버 ──────────────────────────────────
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.bind(('0.0.0.0', 80))
+server.listen(3)
+
+print(f"\n{'='*45}\n  탐구 대시보드 시작!\n  http://{my_ip}\n{'='*45}")
+
+last_sample = time.ticks_ms()
+SAMPLE_INTERVAL = 10000  # 10초
+
+while True:
+    try:
+        # 측정 중이면 10초마다 데이터 수집
+        if recording and time.ticks_diff(time.ticks_ms(), last_sample) > SAMPLE_INTERVAL:
+            t, h = add_data()
+            if t is not None:
+                print(f"  [{len(data_log)}] {t}°C, {h}%")
+            last_sample = time.ticks_ms()
+            gc.collect()
+
+        server.settimeout(0.5)
+        try:
+            client, addr = server.accept()
+        except OSError:
+            continue
+
+        request = client.recv(1024).decode()
+
+        if 'GET /now' in request:
+            # 현재값
+            try:
+                t, h = sensor.read()
+                body = json.dumps({"temp": t, "hum": h})
+            except:
+                body = json.dumps({"temp": "--", "hum": "--"})
+            hdr = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
+            client.send(hdr.encode()); client.send(body.encode())
+
+        elif 'GET /log' in request:
+            # 기록된 데이터 전체
+            body = json.dumps(data_log)
+            hdr = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
+            client.send(hdr.encode()); client.send(body.encode())
+
+        elif 'GET /start' in request:
+            recording = True
+            start_time = time.ticks_ms()
+            last_sample = time.ticks_ms()
+            body = json.dumps({"status": "recording"})
+            hdr = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
+            client.send(hdr.encode()); client.send(body.encode())
+            print("▶ 측정 시작!")
+
+        elif 'GET /stop' in request:
+            recording = False
+            body = json.dumps({"status": "stopped"})
+            hdr = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
+            client.send(hdr.encode()); client.send(body.encode())
+            print("⏹ 측정 정지")
+
+        elif 'GET /reset' in request:
+            data_log.clear()
+            recording = False
+            body = json.dumps({"status": "reset"})
+            hdr = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
+            client.send(hdr.encode()); client.send(body.encode())
+            print("↺ 데이터 초기화")
+            gc.collect()
+
+        elif 'favicon' in request:
+            client.close(); continue
+
+        else:
+            gc.collect()
+            page = make_page()
+            hdr = f"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: {len(page.encode())}\r\nConnection: close\r\n\r\n"
+            client.send(hdr.encode()); client.send(page.encode())
+
+        client.close(); gc.collect()
+    except Exception as e:
+        if "ETIMEDOUT" not in str(e):
+            print(f"에러: {e}")
+        try: client.close()
+        except: pass
+```
+
+---
+
+## 데이터 수집 (15-40분)
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">기준값 측정 (에어컨 OFF)</span>
+  <span class="step-time">15-20분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"스마트폰에서 대시보드가 보이죠? 이제 실험 순서대로 합니다."</p>
+  <p>"먼저 에어컨 OFF 상태에서 '측정 시작' 버튼을 누르세요. 5분간 기준값을 수집합니다. 이때 습도가 안정적인지 확인하세요."</p>
+</div>
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">⏸️</div>
+    <div class="flow-label">에어컨 OFF</div>
+    <div class="flow-desc">5분 기준값 측정</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">❄️</div>
+    <div class="flow-label">에어컨 ON</div>
+    <div class="flow-desc">시간 기록!</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">📊</div>
+    <div class="flow-label">연속 측정</div>
+    <div class="flow-desc">15~20분 관찰</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-icon">⏹️</div>
+    <div class="flow-label">정지</div>
+    <div class="flow-desc">데이터 확인</div>
+  </div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">5</span>
+  <span class="step-title">에어컨 ON → 연속 측정</span>
+  <span class="step-time">20-40분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"에어컨을 켭니다! 그래프를 지켜보세요. 습도가 어떻게 변하는지 실시간으로 볼 수 있어요."</p>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">수아:</span> "에어컨 켜고 3분 지났는데 습도가 58%에서 55%로 떨어졌어요!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "우리 조는 아직 안 변해요. 58% 그대로인데?"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "에어컨 바람이 센서까지 도달하는 데 시간이 걸릴 수 있어요. 센서 위치도 중요한 변수예요!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">민수:</span> "10분 지나니까 52%까지 떨어졌어요. 그래프가 확 꺾이는 게 보여요!"</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"습도가 올라가는데요?"</div>
+  <div class="qa-a">에어컨 바람 방향에 따라 다를 수 있어요. 그것도 데이터예요! 왜 그런지 생각해보세요.</div>
+</div>
+
+<div class="qa-pair">
+  <div class="qa-q">"그래프가 안 나와요"</div>
+  <div class="qa-a">데이터가 2개 이상 쌓여야 그래프가 그려져요. 측정 시작 후 20초 이상 기다려보세요.</div>
+</div>
+
+---
+
+## 분석 & 결론 (40-50분)
+
+<div class="step-header">
+  <span class="step-num">6</span>
+  <span class="step-title">데이터 해석 + 모둠 토론</span>
+  <span class="step-time">40-46분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"데이터를 봅시다. 모둠별로 정리해주세요."</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">분석 과제</span>
+    <span class="mission-difficulty">모둠별 토론</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">아래 항목을 대시보드의 통계 데이터를 보며 정리하세요.</div>
+    <div class="prompt-box prompt-full">
+      <p>1. 시작 습도 vs 최종 습도 — 차이는?</p>
+      <p>2. 습도가 떨어지기 시작한 시점 — 에어컨 켠 후 몇 분?</p>
+      <p>3. 습도가 안정된 시점 — 총 몇 분 걸렸나?</p>
+      <p>4. 온도도 같이 떨어졌나? 온도와 습도의 관계는?</p>
+      <p>5. 처음 세운 가설과 비교 — 맞았나? 틀렸나?</p>
+    </div>
+  </div>
+</div>
+
+<div class="teacher-script">
+  <p>"가설과 실제 결과를 비교해보세요. 틀렸어도 괜찮아요. <strong>데이터로 확인했다는 것 자체</strong>가 과학이에요."</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">7</span>
+  <span class="step-title">바이브 코딩 미션 (시간 여유 시)</span>
+  <span class="step-time">46-50분</span>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">바이브 코딩: 대시보드 확장</span>
+    <span class="mission-difficulty">난이도 ★★★☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">시간이 남는 모둠은 AI에게 아래 프롬프트로 기능을 추가해보세요.</div>
+    <div class="prompt-box prompt-light">
+      <p>"그래프에 에어컨 ON 시점을 세로 점선으로 표시해줘"</p>
+      <p>"습도 변화율(기울기)을 실시간 계산해서 표시해줘"</p>
+      <p>"데이터를 CSV로 다운로드할 수 있게 해줘"</p>
+      <p>"모둠별 데이터를 비교하는 화면 만들어줘"</p>
+    </div>
+  </div>
+</div>
+
+---
+
+## 정리
+
+<div class="key-terms">
+  <dl>
+    <dt>DHT20</dt>
+    <dd>I2C 통신 방식의 온습도 센서 (주소: 0x38)</dd>
+    <dt>I2C</dt>
+    <dd>SDA(데이터)와 SCL(클록) 2선으로 통신하는 방식</dd>
+    <dt>습도(%)</dt>
+    <dd>공기 중 수증기의 비율. 에어컨은 냉각 과정에서 수분을 제거</dd>
+    <dt>연속 측정</dt>
+    <dd>일정 간격(10초)으로 반복 측정하여 변화 추이를 관찰</dd>
+    <dt>가설 검증</dt>
+    <dd>예측(가설)을 세우고, 데이터로 확인하는 과학적 방법</dd>
+  </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"다음 시간에는 조도 센서로 교실 자리별 밝기를 측정합니다. 창가 자리와 복도쪽 자리, 밝기가 얼마나 다를까요? 교실 밝기 지도(히트맵)를 만들어볼 거예요."</p>
+</div>
+
+---
+
+## 교사용 참고사항
+
+### 실험 성공을 위한 팁
+
+<div class="patrol-point">
+  <ol>
+    <li><strong>에어컨 효과가 빠르게 나타나려면:</strong> 센서를 에어컨 바람이 직접 닿는 곳에 배치</li>
+    <li><strong>효과가 약하면:</strong> 창문/문을 닫아 밀폐 효과 높이기</li>
+    <li><strong>습도가 안 변하면:</strong> 제습 모드가 아닌 냉방 모드인지 확인. 냉방도 습도를 낮추지만 제습보다는 느림</li>
+    <li><strong>계절 영향:</strong> 겨울에는 실내 습도가 이미 낮아서 효과가 크지 않을 수 있음. 여름이 이상적</li>
+  </ol>
+</div>
+
+### DHT20 센서 특성
+
+| 항목 | 값 |
+|------|------|
+| I2C 주소 | 0x38 |
+| 측정 범위 | 온도 -40~80°C, 습도 0~100% |
+| 정확도 | 온도 ±0.3°C, 습도 ±2% |
+| 측정 주기 | 최소 2초 권장 (코드에서 10초 간격 사용) |
+| 풀업 저항 | 내장 (별도 필요 없음) |
+
+### 흔한 문제 & 해결
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">I2C 스캔에 장치 없음</div>
+    <span class="label">원인</span>
+    <span class="value">배선 오류</span>
+    <span class="label">대응</span>
+    <span class="value">SDA↔GP4, SCL↔GP5 확인</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">습도가 99% 고정</div>
+    <span class="label">원인</span>
+    <span class="value">센서 과포화</span>
+    <span class="label">대응</span>
+    <span class="value">건조한 곳에서 10분 방치 후 재시도</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">데이터가 갑자기 튐</div>
+    <span class="label">원인</span>
+    <span class="value">I2C 통신 에러</span>
+    <span class="label">대응</span>
+    <span class="value">gc.collect() 추가, 측정 간격 늘리기</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">ENOMEM 에러</div>
+    <span class="label">원인</span>
+    <span class="value">데이터 누적으로 메모리 부족</span>
+    <span class="label">대응</span>
+    <span class="value">MAX_DATA를 100으로 줄이기</span>
+  </div>
+</div>

@@ -1,0 +1,382 @@
+---
+title: "4차시: 전광판 디자인 완성"
+description: "UI/UX 디자인 집중 — 바이브 코딩으로 전광판의 레이아웃, 색상, 애니메이션을 완성"
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+{/* 프로젝트 진행 바 */}
+<div class="project-progress">
+  <div class="prog-item prog-1 done">1. 급식 전광판</div>
+  <div class="prog-item prog-2 done">2. 날씨+미세먼지</div>
+  <div class="prog-item prog-3 done">3. 버스 도착</div>
+  <div class="prog-item prog-4 current">4. 디자인 완성</div>
+  <div class="prog-item prog-5">5. 나만의 API</div>
+  <div class="prog-item prog-6">6. 발표</div>
+</div>
+
+{/* 결과물 미리보기 */}
+<div class="outcome-preview">
+  <div class="outcome-badge">이 차시가 끝나면</div>
+  <h4>전광판이 눈에 확 들어옵니다</h4>
+  <p>3차시까지 만든 4종 API 전광판의 <strong>디자인을 리뉴얼</strong>합니다. 가독성, 정보 계층, 가시성 — 좋은 전광판의 3가지 조건을 적용하여 <strong>바이브 코딩만으로</strong> 완성도를 높입니다. 새 코드 제공 없이, 전체 시간을 미션에 집중합니다.</p>
+  <div class="outcome-items">
+    <div class="outcome-item">
+      <div class="item-icon">🎨</div>
+      <div class="item-label">디자인 3원칙</div>
+      가독성, 정보 계층, 가시성
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🔄</div>
+      <div class="item-label">자동 슬라이드</div>
+      5초마다 섹션 자동 전환
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🖌️</div>
+      <div class="item-label">바이브 코딩 올인</div>
+      새 코드 없이 AI로만 개선
+    </div>
+    <div class="outcome-item">
+      <div class="item-icon">🎯</div>
+      <div class="item-label">상태별 색상</div>
+      조건에 따라 카드 색 자동 변경
+    </div>
+  </div>
+</div>
+
+<div class="lesson-overview">
+  <h4>수업 개요</h4>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="meta-label">프로젝트</div>
+      공공데이터 전광판 (4/6차시)
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">소요시간</div>
+      50분
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">형태</div>
+      개인 실습
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">선수학습</div>
+      3차시 — 4종 API 통합 전광판 완성
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">학습목표</div>
+      정보 전달에 효과적인 UI/UX 원칙을 적용하고, 바이브 코딩으로 전광판의 레이아웃·색상·애니메이션을 완성
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">핵심 역량</div>
+      <span class="badge badge-purple">디자인 사고</span> <span class="badge badge-emerald">AI 활용 능력</span>
+    </div>
+  </div>
+</div>
+
+## 준비물 체크리스트
+
+<div class="prep-checklist">
+  <h5>하드웨어 (1인 1세트)</h5>
+  <ul>
+    <li>Raspberry Pi Pico 2 WH</li>
+    <li>Micro USB **데이터** 케이블</li>
+  </ul>
+  <h5>소프트웨어</h5>
+  <ul>
+    <li>Thonny IDE</li>
+    <li>AI 접근 환경 — Claude, ChatGPT 등</li>
+    <li>스마트폰 (전광판 확인용)</li>
+  </ul>
+  <h5>수업 전 확인</h5>
+  <ul>
+    <li>3차시 코드가 Pico에 잘 저장되어 있는지 확인</li>
+    <li>4종 API(급식, 날씨, 미세먼지, 버스)가 모두 작동하는지 사전 테스트</li>
+    <li>**새 기본 코드 없음** — 3차시 코드 기반 바이브 코딩 전용 차시</li>
+  </ul>
+</div>
+
+<Aside type="tip" title="이번 차시의 특징: 코드 제공 없음!">
+이번 차시는 **새 기본 코드를 제공하지 않습니다.** 3차시에서 완성한 코드를 기반으로 **바이브 코딩만으로** 디자인을 개선합니다. 전체 시간을 미션에 집중합니다.
+</Aside>
+
+## 시간 배분
+
+<div class="time-block">
+  <div class="intro" style="flex: 2">도입 8분</div>
+  <div class="main" style="flex: 7; background: var(--teacher-emerald);">바이브 코딩 올인 35분</div>
+  <div class="wrap-up" style="flex: 1">정리 7분</div>
+</div>
+
+---
+
+## 도입 (00-08분)
+
+<div class="step-header">
+  <span class="step-num">1</span>
+  <span class="step-title">"좋은 전광판" vs "나쁜 전광판" 비교</span>
+  <span class="step-time">00-04분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"지금 우리 전광판은 기능은 다 됐어요. 근데 솔직히... 예쁜가요?"</p>
+  <p>(학생들 반응)</p>
+  <p>"기능은 100점, 디자인은 글쎄요. 오늘은 <strong>디자인만</strong> 집중합니다. 새 코드 없어요. 3차시 코드를 바이브 코딩으로 변신시키는 거예요."</p>
+</div>
+
+<div class="step-header">
+  <span class="step-num">2</span>
+  <span class="step-title">디자인 개선 방향 3가지 제시</span>
+  <span class="step-time">04-08분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"좋은 전광판의 조건 3가지를 알려줄게요."</p>
+</div>
+
+<div class="key-terms">
+  <dl>
+    <dt>1. 한눈에 읽힌다 (가독성)</dt>
+    <dd>큰 글씨, 명확한 대비, 핵심 정보만 표시</dd>
+    <dt>2. 뭐가 중요한지 안다 (정보 계층)</dt>
+    <dd>가장 급한 정보가 가장 크게 — 버스 > 날씨 > 미세먼지 > 급식</dd>
+    <dt>3. 멀리서도 보인다 (가시성)</dt>
+    <dd>어두운 배경 + 밝은 글씨, 색상으로 상태 구분 (초록/노랑/빨강)</dd>
+  </dl>
+</div>
+
+<div class="teacher-script">
+  <p>"이 3가지를 기준으로 미션을 수행하면 돼요."</p>
+</div>
+
+---
+
+## 바이브 코딩 올인 (08-43분)
+
+<div class="step-header">
+  <span class="step-num">3</span>
+  <span class="step-title">필수 미션 A: 전광판 모드 (3개 중 택 2)</span>
+  <span class="step-time">08-25분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"이제 본격적으로 바이브 코딩을 해볼 거예요. 필수 미션 3개 중 2개를 골라서 도전하세요."</p>
+  <p>"3차시 코드를 AI에게 붙여넣고, 프롬프트를 보내면 돼요."</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">미션 A-1: 자동 슬라이드 전광판</span>
+    <span class="mission-difficulty">난이도 ★★★☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-full">
+      <p>"이 MicroPython 전광판 코드에서 5초마다 섹션이 자동으로 전환되는 전광판 모드를 만들어줘. 하단에 ● ● ● ● ● 인디케이터를 표시하고, 현재 섹션은 밝게 보여줘."</p>
+      <p>[코드 붙여넣기]</p>
+    </div>
+    <div class="prompt-box prompt-light">
+      <p>"5초마다 자동 전환 + 인디케이터 추가해줘"</p>
+      <p>[코드 붙여넣기]</p>
+    </div>
+  </div>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">미션 A-2: 글씨 크기 대폭 확대</span>
+    <span class="mission-difficulty">난이도 ★★☆☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-full">
+      <p>"복도에서 3m 거리에서 읽을 수 있도록 핵심 정보(기온, 버스 도착, 미세먼지 등급)를 3~4배 키워줘. 나머지 보조 정보는 작게 처리해줘."</p>
+      <p>[코드 붙여넣기]</p>
+    </div>
+    <div class="prompt-box prompt-light">
+      <p>"복도 전광판용으로 글씨 크게 키워줘"</p>
+      <p>[코드 붙여넣기]</p>
+    </div>
+  </div>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">미션 A-3: 색상으로 상태 표현</span>
+    <span class="mission-difficulty">난이도 ★★★☆☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-full">
+      <p>"각 섹션의 배경색이 상태에 따라 바뀌게 해줘. 버스 3분 이내면 카드 배경 빨강, 미세먼지 나쁨이면 카드 배경 주황, 비 오면 날씨 카드 배경 파랑으로."</p>
+      <p>[코드 붙여넣기]</p>
+    </div>
+    <div class="prompt-box prompt-light">
+      <p>"상태에 따라 카드 배경색 자동으로 바뀌게"</p>
+      <p>[코드 붙여넣기]</p>
+    </div>
+  </div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">4</span>
+  <span class="step-title">선택 미션 B: 자유 디자인 + 추가 도전</span>
+  <span class="step-time">25-43분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"필수 미션 2개를 끝낸 사람은 자유 디자인에 도전하세요. 자기만의 전광판 테마를 만들어봐요!"</p>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">미션 B: 자유 디자인</span>
+    <span class="mission-difficulty">난이도 ★★★★☆</span>
+  </div>
+  <div class="mission-body">
+    <div class="mission-desc">
+      자기만의 전광판 디자인을 만들어보세요! 디자인을 바꿔도 데이터는 그대로 — <code>make_page()</code>의 CSS만 바꾸면 됩니다.
+    </div>
+    <div class="prompt-box prompt-light">
+      <p>"지하철 역 전광판 스타일로 바꿔줘"</p>
+      <p>"카페 메뉴판 느낌으로 바꿔줘"</p>
+      <p>"스마트워치 대시보드 느낌으로"</p>
+      <p>"레트로 게임 도트 폰트 느낌으로"</p>
+      <p>"미니멀리스트 — 배경 흰색, 정보 최소화"</p>
+      <p>"네온사인 느낌 — 글자에 발광 효과"</p>
+    </div>
+  </div>
+</div>
+
+<div class="mission-card">
+  <div class="mission-header">
+    <span class="mission-title">추가 도전</span>
+    <span class="mission-difficulty">난이도 ★★★★★</span>
+  </div>
+  <div class="mission-body">
+    <div class="prompt-box prompt-light">
+      <p>"스와이프로 섹션 넘기는 모바일 제스처 추가"</p>
+      <p>"전체화면 버튼 만들어줘 (키오스크 모드)"</p>
+      <p>"30분마다 화면 전체가 부드럽게 fade 갱신"</p>
+      <p>"가로 모드 대응 레이아웃 (2단 그리드)"</p>
+      <p>"PWA 설정으로 홈 화면에 추가 가능하게"</p>
+    </div>
+  </div>
+</div>
+
+### 바이브 코딩 사이클
+
+<div class="flow-diagram">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-icon">💬</div>
+    <div class="flow-label">요청</div>
+    <div class="flow-desc">프롬프트 작성</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-icon">🤖</div>
+    <div class="flow-label">받기</div>
+    <div class="flow-desc">AI 응답 코드</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-icon">▶️</div>
+    <div class="flow-label">실행</div>
+    <div class="flow-desc">Thonny 실행</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-icon">🤔</div>
+    <div class="flow-label">판단</div>
+    <div class="flow-desc">원하는 결과?</div>
+  </div>
+  <div class="flow-arrow flow-return">↩️</div>
+</div>
+
+<div class="compare-summary">YES → 다음 미션! &nbsp;|&nbsp; NO → 프롬프트 수정해서 다시 요청!</div>
+
+<div class="patrol-point">
+  <p><strong>순회 시 확인:</strong></p>
+  <ol>
+    <li>코드 수정 후 <strong>Ctrl+C → 다시 실행</strong> 하고 있는지</li>
+    <li>AI에게 코드를 붙여넣고 있는지 (프롬프트만 보내면 효과 없음)</li>
+    <li>디자인 3원칙(가독성, 정보 계층, 가시성)을 의식하고 있는지</li>
+    <li>"기능 추가"가 아닌 "디자인 개선"에 집중하고 있는지</li>
+  </ol>
+</div>
+
+---
+
+## 공유 & 정리 (43-50분)
+
+<div class="step-header">
+  <span class="step-num">5</span>
+  <span class="step-title">시연 + 투표</span>
+  <span class="step-time">43-48분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"3~4명 지원자가 자기 전광판을 보여주세요. IP 주소를 공유하면 다 같이 접속해서 볼게요."</p>
+  <p>"볼 때 3가지를 기준으로 봐주세요. 한눈에 읽히는가? 중요한 정보가 돋보이는가? 멀리서도 보이는가?"</p>
+</div>
+
+<div class="class-scene">
+  <div class="scene-line"><span class="speaker speaker-student">수연:</span> "저는 지하철 전광판 느낌으로 바꿨어요. 검정 배경에 주황 글씨!"</div>
+  <div class="scene-line"><span class="speaker speaker-student">지호:</span> "자동 슬라이드 넣었는데 5초마다 넘어가요. 인디케이터도 있어요!"</div>
+  <div class="scene-line"><span class="speaker speaker-teacher">선생님:</span> "둘 다 좋네요. 가장 마음에 드는 전광판에 투표해볼까요?"</div>
+</div>
+
+<div class="step-header">
+  <span class="step-num">6</span>
+  <span class="step-title">다음 시간 예고</span>
+  <span class="step-time">48-50분</span>
+</div>
+
+<div class="teacher-script">
+  <p>"다음 시간에는 <strong>자기만의 API를 추가</strong>하는 시간이에요. 버스 노선을 바꾸거나, 새로운 공공 API를 찾아서 전광판에 넣는 거예요. 어떤 데이터가 있으면 좋을지 미리 생각해오세요!"</p>
+</div>
+
+---
+
+## 교사용 참고사항
+
+### 이번 차시의 핵심
+
+<div class="patrol-point">
+  <ol>
+    <li><strong>새 코드 제공 없음</strong> — 순수 바이브 코딩 차시</li>
+    <li>교사는 순회하며 <strong>프롬프트 품질</strong>, <strong>디자인 원칙 적용 여부</strong> 피드백</li>
+    <li>"기능 추가"가 아닌 "디자인 개선"에 집중하도록 안내</li>
+    <li>CSS만 수정해도 충분히 큰 변화를 만들 수 있음을 강조</li>
+  </ol>
+</div>
+
+### 평가 포인트 (참고)
+
+| 평가 항목 | 관찰 기준 |
+|----------|----------|
+| 바이브 코딩 사이클 | 요청→확인→수정을 능숙하게 수행하는가 |
+| 디자인 3원칙 | 가독성, 정보 계층, 가시성을 적용했는가 |
+| 프롬프트 개선 | 점점 구체적으로 개선해가는 과정이 보이는가 |
+| 문제 해결 | 에러 발생 시 AI를 활용해 해결하는가 |
+
+### 흔한 문제 & 해결
+
+<div class="trouble-cards">
+  <div class="trouble-card">
+    <div class="symptom">CSS 수정했는데 반영이 안 돼요</div>
+    <span class="label">대응</span>
+    <span class="value">Ctrl+C로 서버 중지 → 코드 저장 → 다시 실행. 브라우저에서 강력 새로고침(Ctrl+Shift+R)</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">자동 슬라이드가 너무 빨라요/느려요</div>
+    <span class="label">대응</span>
+    <span class="value">AI에게 "전환 시간을 3초(또는 8초)로 바꿔줘"라고 요청</span>
+  </div>
+  <div class="trouble-card">
+    <div class="symptom">AI가 일반 Python 코드를 줬어요</div>
+    <span class="label">대응</span>
+    <span class="value">프롬프트에 "이건 MicroPython이고 Pico 2 WH에서 실행돼"라고 명시</span>
+  </div>
+</div>
