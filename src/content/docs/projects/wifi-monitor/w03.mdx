@@ -156,8 +156,268 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 코드 블록 오른쪽 위의 복사 버튼을 클릭하면 전체 코드가 복사됩니다. Thonny에 붙여넣고 Pico에 저장하세요. `wifi_config.py`는 그대로 사용합니다.
 </Aside>
 
+<div class="code-file-label">main.py — Pico에 저장 (2차시 코드 덮어쓰기)</div>
+
+```python
+# ============================================
+# 교실 Wi-Fi 모니터 - 3차시
+# 차트 시각화 (게이지 + 꺾은선 + 채널 분포)
+# ============================================
+import network
+import socket
+import time
+import gc
+from wifi_config import WIFI_SSID, WIFI_PASSWORD
+
+# ── Wi-Fi 연결 ──────────────────────────────
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+print("Wi-Fi 연결 중...")
+wlan.connect(WIFI_SSID, WIFI_PASSWORD)
+wait = 0
+while not wlan.isconnected():
+    time.sleep(1)
+    wait += 1
+    if wait > 15:
+        print("연결 실패!")
+        raise SystemExit
+my_ip = wlan.ifconfig()[0]
+print(f"연결 완료! IP: {my_ip}")
+
+visit_count = 0
+start_time = time.ticks_ms()
+
+# ── RSSI 이력 (최근 30개) ───────────────────
+rssi_history = []
+MAX_HISTORY = 30
+
+# ── AP 스캔 (캐시) ──────────────────────────
+ap_cache = []
+last_scan = 0
+SCAN_INTERVAL = 30
+
+def scan_ap():
+    try:
+        results = wlan.scan()
+        aps = []
+        for ap in sorted(results, key=lambda x: x[3], reverse=True)[:8]:
+            ssid = ap[0].decode('utf-8', 'ignore')
+            if not ssid:
+                continue
+            aps.append((ssid, ap[3], ap[2], ap[4]))
+        return aps
+    except:
+        return []
+
+def get_ap_cached():
+    global ap_cache, last_scan
+    now = time.ticks_ms()
+    if time.ticks_diff(now, last_scan) > SCAN_INTERVAL * 1000:
+        ap_cache = scan_ap()
+        last_scan = now
+    return ap_cache
+
+# ── 정적 CSS (f-string 아님 → 중괄호 그대로) ──
+PAGE_CSS = """<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,sans-serif;background:#0f0f23;color:#ccc;padding:12px}
+.hdr{text-align:center;padding:8px 0 12px}
+.hdr h1{color:#00d4ff;font-size:1.3em}
+.hdr .sub{color:#555;font-size:0.8em;margin-top:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:500px;margin:0 auto}
+.card{background:#1a1a3e;border-radius:12px;padding:12px;text-align:center;border:1px solid #2a2a5e}
+.card.wide{grid-column:span 2}
+.lbl{color:#888;font-size:0.75em;margin-bottom:4px}
+.val{color:#00d4ff;font-size:1.2em;font-weight:bold}
+.gauge-wrap{position:relative;width:160px;height:90px;margin:8px auto}
+.gauge-bg{width:160px;height:80px;border-radius:80px 80px 0 0;background:conic-gradient(from 0.75turn,#ff6b6b,#ffd43b,#51cf66);overflow:hidden}
+.gauge-needle{position:absolute;bottom:0;left:50%;width:3px;height:70px;background:#fff;transform-origin:bottom center;margin-left:-1.5px;border-radius:2px;transition:transform 0.5s}
+.gauge-center{position:absolute;bottom:-4px;left:50%;width:12px;height:12px;background:#fff;border-radius:50%;margin-left:-6px}
+canvas{width:100%;height:140px;display:block;margin-top:8px}
+.ap-tbl{width:100%;border-collapse:collapse;font-size:0.8em;margin-top:8px}
+.ap-tbl th{color:#888;font-weight:normal;text-align:left;padding:4px;border-bottom:1px solid #2a2a5e}
+.ap-tbl td{padding:4px;border-bottom:1px solid #1a1a3e}
+.ft{text-align:center;margin-top:12px;color:#333;font-size:0.7em}
+</style>"""
+
+# ── 차트 JavaScript (f-string 아님) ─────────
+CHART_JS = """<script>
+function drawChart(id,data){
+var c=document.getElementById(id);if(!c)return;
+var ctx=c.getContext('2d'),W=c.width,H=c.height;
+ctx.clearRect(0,0,W,H);var n=data.length;if(n<2)return;
+var mn=Math.min.apply(null,data),mx=Math.max.apply(null,data);
+if(mn==mx){mn-=5;mx+=5}
+var p=25;
+ctx.strokeStyle='#2a2a5e';ctx.lineWidth=1;
+for(var i=0;i<5;i++){var y=p+(H-2*p)*i/4;
+ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(W-5,y);ctx.stroke();
+ctx.fillStyle='#555';ctx.font='10px sans-serif';ctx.textAlign='right';
+ctx.fillText((mx-(mx-mn)*i/4).toFixed(0),p-3,y+3);}
+ctx.beginPath();ctx.strokeStyle='#00d4ff';ctx.lineWidth=2;
+for(var i=0;i<n;i++){var x=p+(W-p-5)*i/(n-1);
+var y=p+(H-2*p)*(mx-data[i])/(mx-mn);
+if(i==0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();
+var avg=0;for(var i=0;i<n;i++)avg+=data[i];avg/=n;
+var ay=p+(H-2*p)*(mx-avg)/(mx-mn);
+ctx.setLineDash([4,4]);ctx.strokeStyle='#ffd43b';ctx.lineWidth=1;
+ctx.beginPath();ctx.moveTo(p,ay);ctx.lineTo(W-5,ay);ctx.stroke();
+ctx.setLineDash([]);ctx.fillStyle='#ffd43b';ctx.font='10px sans-serif';
+ctx.textAlign='left';ctx.fillText('avg '+avg.toFixed(0),W-50,ay-4);}
+
+function drawChannelChart(id,ch){
+var c=document.getElementById(id);if(!c)return;
+var ctx=c.getContext('2d'),W=c.width,H=c.height;
+ctx.clearRect(0,0,W,H);
+var mx=Math.max.apply(null,ch);if(mx==0)mx=1;
+var bw=(W-40)/13;
+for(var i=0;i<13;i++){var x=25+i*bw;
+var h=(H-30)*ch[i]/mx;
+var hue=ch[i]>0?(120-120*ch[i]/mx):120;
+ctx.fillStyle='hsl('+hue+',80%,55%)';
+ctx.fillRect(x,H-20-h,bw-3,h);
+ctx.fillStyle='#888';ctx.font='9px sans-serif';ctx.textAlign='center';
+ctx.fillText(''+(i+1),x+bw/2-1,H-6);
+if(ch[i]>0){ctx.fillStyle='#ccc';ctx.fillText(ch[i],x+bw/2-1,H-24-h);}}
+}
+window.onload=function(){
+drawChart('lineChart',RSSI_DATA);
+drawChannelChart('barChart',CH_DATA);}
+</script>"""
+
+# ── HTML 페이지 ─────────────────────────────
+def make_page():
+    gc.collect()
+    rssi = wlan.status('rssi')
+    rssi_history.append(rssi)
+    if len(rssi_history) > MAX_HISTORY:
+        rssi_history.pop(0)
+
+    uptime_sec = time.ticks_diff(time.ticks_ms(), start_time) // 1000
+    mem_free = gc.mem_free()
+    mem_pct = round(gc.mem_alloc() / (mem_free + gc.mem_alloc()) * 100, 1)
+    rssi_pct = max(0, min(100, (rssi + 90) * 100 // 60))
+
+    if rssi > -50:
+        quality, qcolor = "최고", "#51cf66"
+    elif rssi > -60:
+        quality, qcolor = "좋음", "#94d82d"
+    elif rssi > -70:
+        quality, qcolor = "보통", "#ffd43b"
+    elif rssi > -80:
+        quality, qcolor = "약함", "#ff922b"
+    else:
+        quality, qcolor = "매우 약함", "#ff6b6b"
+
+    if uptime_sec < 60:
+        uptime = f"{uptime_sec}초"
+    elif uptime_sec < 3600:
+        uptime = f"{uptime_sec // 60}분 {uptime_sec % 60}초"
+    else:
+        uptime = f"{uptime_sec // 3600}시간 {(uptime_sec % 3600) // 60}분"
+
+    needle_deg = -90 + rssi_pct * 180 // 100
+    rssi_str = ",".join(str(v) for v in rssi_history)
+
+    aps = get_ap_cached()
+    channels = [0] * 13
+    for ap in aps:
+        ch = ap[2]
+        if 1 <= ch <= 13:
+            channels[ch - 1] += 1
+    ch_str = ",".join(str(v) for v in channels)
+
+    ap_rows = ""
+    for ap in aps:
+        ssid, sig, ch, auth = ap
+        sec = ["OPEN", "WEP", "WPA", "WPA2", "WPA/2"][min(auth, 4)]
+        mark = "* " if ssid == WIFI_SSID else ""
+        tc = "#00d4ff" if ssid == WIFI_SSID else "#ccc"
+        pct = max(0, min(100, (sig + 90) * 100 // 60))
+        if sig > -50: sc = "#51cf66"
+        elif sig > -70: sc = "#ffd43b"
+        else: sc = "#ff6b6b"
+        ap_rows += f'<tr><td style="color:{tc}">{mark}{ssid}</td><td><span style="display:inline-block;height:6px;width:{pct}%;max-width:60px;background:{sc};border-radius:3px;"></span> {sig}</td><td>{ch}</td><td>{sec}</td></tr>'
+    if not ap_rows:
+        ap_rows = '<tr><td colspan="4" style="color:#555;">스캔 중...</td></tr>'
+
+    return f"""<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="refresh" content="5">
+<title>Wi-Fi 시각화</title>
+{PAGE_CSS}
+</head><body>
+<div class="hdr"><h1>Wi-Fi 시각화 대시보드</h1>
+<div class="sub">실시간 모니터링 · 5초 자동 갱신 · 데이터 {len(rssi_history)}개</div></div>
+<div class="grid">
+<div class="card wide">
+<div class="lbl">Wi-Fi 신호 세기</div>
+<div class="gauge-wrap">
+<div class="gauge-bg"></div>
+<div class="gauge-needle" style="transform:rotate({needle_deg}deg);background:{qcolor};"></div>
+<div class="gauge-center"></div>
+</div>
+<div class="val">{rssi} <span style="font-size:0.6em">dBm</span>
+<span style="font-size:0.5em;margin-left:8px;color:{qcolor}">{quality}</span></div>
+</div>
+<div class="card wide">
+<div class="lbl">RSSI 이력 (최근 {len(rssi_history)}개)</div>
+<canvas id="lineChart" width="460" height="140"></canvas>
+</div>
+<div class="card wide">
+<div class="lbl">채널 분포 (AP 수)</div>
+<canvas id="barChart" width="460" height="140"></canvas>
+</div>
+<div class="card">
+<div class="lbl">가동 시간</div>
+<div class="val">{uptime}</div></div>
+<div class="card">
+<div class="lbl">메모리</div>
+<div class="val">{mem_pct}%</div></div>
+<div class="card wide">
+<div class="lbl">주변 Wi-Fi 네트워크</div>
+<table class="ap-tbl"><thead><tr><th>이름</th><th>신호</th><th>채널</th><th>보안</th></tr></thead>
+<tbody>{ap_rows}</tbody></table>
+</div></div>
+<div class="ft">Powered by MicroPython on Pico 2 WH</div>
+<script>var RSSI_DATA=[{rssi_str}];var CH_DATA=[{ch_str}];</script>
+{CHART_JS}
+</body></html>"""
+
+# ── 웹서버 ───────────────────────────────────
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.bind(('0.0.0.0', 80))
+server.listen(2)
+print()
+print("=" * 45)
+print(f"  시각화 대시보드 시작! http://{my_ip}")
+print("=" * 45)
+
+while True:
+    try:
+        client, addr = server.accept()
+        request = client.recv(1024).decode()
+        if 'favicon' in request:
+            client.close()
+            continue
+        visit_count += 1
+        print(f"접속 #{visit_count}: {addr[0]}")
+        page = make_page()
+        client.send(b"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n")
+        client.send(page.encode())
+        client.close()
+    except Exception as e:
+        print(f"에러: {e}")
+        try:
+            client.close()
+        except:
+            pass
+```
+
 <Aside type="note" title="2차시 대비 변경점">
-2차시의 서버사이드 렌더링 구조를 그대로 유지합니다. `make_page()` 함수 안에 시각화 HTML/CSS가 추가됩니다. **서버에서 데이터를 수집하고 차트 HTML까지 생성해서 보내는 방식입니다.**
+2차시의 서버사이드 구조를 유지하되, **게이지는 CSS transform**, **꺾은선·막대차트는 JavaScript Canvas**로 그립니다. 서버(Python)가 데이터를 수집하고 JavaScript 데이터와 함께 완성된 HTML을 보내는 하이브리드 방식입니다.
 </Aside>
 
 ### 추가되는 시각화 요소
@@ -203,22 +463,22 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
   <div class="map-row">
     <div class="map-num n1">①</div>
     <div class="map-content">
-      <div class="map-title"><code>updateGauge(percent, color)</code></div>
-      <div class="map-desc">게이지 바늘 회전 — CSS transform 활용</div>
+      <div class="map-title">CSS 게이지 (JS 불필요)</div>
+      <div class="map-desc">서버가 바늘 각도를 계산, CSS transform으로 자동 표시</div>
     </div>
   </div>
   <div class="map-row">
     <div class="map-num n2">②</div>
     <div class="map-content">
-      <div class="map-title"><code>drawChart()</code></div>
-      <div class="map-desc">Canvas 꺾은선 그래프 렌더링 — RSSI 이력 시각화</div>
+      <div class="map-title"><code>drawChart(id, data)</code></div>
+      <div class="map-desc">Canvas 꺾은선 + 평균선 — RSSI 이력 시각화</div>
     </div>
   </div>
   <div class="map-row">
     <div class="map-num n3">③</div>
     <div class="map-content">
-      <div class="map-title"><code>drawChannelChart(apList)</code></div>
-      <div class="map-desc">채널별 AP 수 막대차트 — 채널 혼잡도 파악</div>
+      <div class="map-title"><code>drawChannelChart(id, ch)</code></div>
+      <div class="map-desc">채널별 AP 수 색상 막대차트 — 혼잡도 파악</div>
     </div>
   </div>
 </div>

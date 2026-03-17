@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 4009
+    },
+    {
+      "name": "student-site",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "/Users/greatsong/greatsong-project/ai-physical-computing"],
+      "port": 4008
     }
   ]
 }
