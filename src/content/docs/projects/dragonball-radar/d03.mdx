@@ -951,17 +951,12 @@ while True:
         if 'GET /data' in request:
             # 🔥 JSON 데이터 응답 (2초마다 호출됨)
             response = json.dumps(scan_results)
-            cl.send('HTTP/1.0 200 OK\r\n')
-            cl.send('Content-type: application/json\r\n')
-            cl.send('Access-Control-Allow-Origin: *\r\n')
-            cl.send('\r\n')
+            cl.send(b'HTTP/1.0 200 OK\r\nContent-type: application/json\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n')
             cl.send(response)
         elif 'GET / ' in request or 'GET / HTTP' in request:
             # HTML 페이지 응답 (최초 접속)
             response = make_dashboard_html()
-            cl.send('HTTP/1.0 200 OK\r\n')
-            cl.send('Content-type: text/html\r\n')
-            cl.send('\r\n')
+            cl.send(b'HTTP/1.0 200 OK\r\nContent-type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n')
             cl.send(response)
 
         cl.close()

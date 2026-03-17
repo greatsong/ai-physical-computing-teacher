@@ -501,8 +501,8 @@ while True:
         print(f"접속: {addr[0]}")
         page = make_page()
 
-        response = f"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: {len(page.encode())}\r\nConnection: close\r\n\r\n{page}"
-        client.send(response.encode())
+        client.send(b"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n")
+        client.send(page.encode())
         client.close()
 
     except Exception as e:

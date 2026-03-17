@@ -746,8 +746,7 @@ while True:
                 "grade_emoji": air_data.get("grade_emoji", "?"),
             &#125;
             body = json.dumps(d)
-            header = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
-            client.send(header.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
             client.send(body.encode())
 
         elif 'favicon' in request:
@@ -757,8 +756,7 @@ while True:
         else:
             gc.collect()
             page = make_page()
-            header = f"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: &#123;len(page.encode())&#125;\r\nConnection: close\r\n\r\n"
-            client.send(header.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n")
             client.send(page.encode())
             print(f"페이지: &#123;addr[0]&#125;")
 

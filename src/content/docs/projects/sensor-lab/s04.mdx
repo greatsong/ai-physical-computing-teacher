@@ -481,30 +481,30 @@ while True:
                 "elapsed": elapsed,
                 "log": detect_log[-50:],  # 최근 50개만
             })
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
 
         elif 'GET /start' in request:
             recording = True
             start_time = time.ticks_ms()
             last_detect = 0
             body = json.dumps({"status": "recording"})
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
             print("▶ 기록 시작")
 
         elif 'GET /stop' in request:
             recording = False
             body = json.dumps({"status": "stopped"})
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
             print("⏹ 기록 정지")
 
         elif 'GET /reset' in request:
             detect_log.clear(); total_count = 0; recording = False
             body = json.dumps({"status": "reset"})
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
             gc.collect()
 
         elif 'favicon' in request:
@@ -512,8 +512,8 @@ while True:
 
         else:
             gc.collect(); page = make_page()
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: {len(page.encode())}\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(page.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n")
+            client.send(page.encode())
 
         client.close(); gc.collect()
     except Exception as e:

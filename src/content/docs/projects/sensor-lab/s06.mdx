@@ -686,8 +686,8 @@ while True:
         if 'GET /now' in request:
             p, t = sensor.read()
             body = json.dumps(&#123;"p": p, "t": t&#125;)
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
 
         elif 'GET /calibrate' in request:
             # 1층 기준점 설정 (10회 평균)
@@ -702,8 +702,8 @@ while True:
                 "diff": 0.0,
             &#125;)
             body = json.dumps(&#123;"base": p_avg, "t": t_avg&#125;)
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
             print(f"📍 기준점: &#123;p_avg&#125; hPa")
 
         elif 'GET /measure' in request:
@@ -758,8 +758,8 @@ while True:
                 "base": base_pressure,
                 "log": floor_data,
             &#125;)
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
             print(f"📏 &#123;floor_name&#125;: &#123;p_avg&#125; hPa (&#123;diff:+.2f&#125; hPa, &#123;alt&#125;m)")
 
         elif 'GET /log' in request:
@@ -767,15 +767,15 @@ while True:
                 "base": base_pressure,
                 "log": floor_data,
             &#125;)
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
 
         elif 'GET /reset' in request:
             floor_data.clear()
             base_pressure = 0.0
             body = json.dumps(&#123;"status": "reset"&#125;)
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
             gc.collect()
             print("↺ 데이터 초기화")
 
@@ -785,8 +785,8 @@ while True:
         else:
             gc.collect()
             page = make_page()
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: &#123;len(page.encode())&#125;\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(page.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n")
+            client.send(page.encode())
 
         client.close(); gc.collect()
     except Exception as e:

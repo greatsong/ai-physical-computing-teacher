@@ -738,36 +738,36 @@ while True:
         if 'GET /now' in request:
             co2, temp, hum = sensor.read()
             body = json.dumps(&#123;"co2": co2, "temp": temp, "hum": hum&#125;)
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
 
         elif 'GET /log' in request:
             body = json.dumps(data_log)
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
 
         elif 'GET /start' in request:
             recording = True
             start_time = time.ticks_ms()
             last_sample = time.ticks_ms()
             body = json.dumps(&#123;"status": "recording"&#125;)
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
             print("▶ CO2 측정 시작")
 
         elif 'GET /stop' in request:
             recording = False
             body = json.dumps(&#123;"status": "stopped"&#125;)
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
             print("⏹ 측정 정지")
 
         elif 'GET /reset' in request:
             data_log.clear()
             recording = False
             body = json.dumps(&#123;"status": "reset"&#125;)
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
             gc.collect()
 
         elif 'favicon' in request:
@@ -776,8 +776,8 @@ while True:
         else:
             gc.collect()
             page = make_page()
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: &#123;len(page.encode())&#125;\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(page.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n")
+            client.send(page.encode())
 
         client.close(); gc.collect()
     except Exception as e:

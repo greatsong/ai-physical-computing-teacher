@@ -697,8 +697,8 @@ while True:
             body = json.dumps(&#123;"msg1": bus_data.get("msg1", ""),
                               "msg2": bus_data.get("msg2", ""),
                               "sec1": bus_data.get("sec1", 0)&#125;)
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
 
         elif 'GET /data' in request:
             body = json.dumps(&#123;
@@ -712,8 +712,8 @@ while True:
                 "bus1": bus_data.get("msg1", ""),
                 "bus2": bus_data.get("msg2", ""),
             &#125;)
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: &#123;len(body)&#125;\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
 
         elif 'favicon' in request:
             client.close(); continue
@@ -721,8 +721,8 @@ while True:
         else:
             gc.collect()
             page = make_page()
-            h = f"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: &#123;len(page.encode())&#125;\r\nConnection: close\r\n\r\n"
-            client.send(h.encode()); client.send(page.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n")
+            client.send(page.encode())
             print(f"페이지: &#123;addr[0]&#125;")
 
         client.close(); gc.collect()

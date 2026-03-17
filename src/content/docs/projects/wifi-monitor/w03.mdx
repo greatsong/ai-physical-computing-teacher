@@ -61,7 +61,7 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
     </div>
     <div class="meta-item">
       <div class="meta-label">선수학습</div>
-      2차시 — 실시간 데이터 대시보드, JSON API
+      2차시 — 실시간 데이터 대시보드, 서버사이드 렌더링
     </div>
     <div class="meta-item">
       <div class="meta-label">학습목표</div>
@@ -157,7 +157,7 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 </Aside>
 
 <Aside type="note" title="2차시 대비 변경점">
-Python 서버 코드는 2차시와 동일합니다. `make_page()` 함수 안의 HTML/CSS/JavaScript 부분에 시각화가 추가됩니다. **서버는 변경 없이, 시각화는 전부 브라우저가 처리합니다.**
+2차시의 서버사이드 렌더링 구조를 그대로 유지합니다. `make_page()` 함수 안에 시각화 HTML/CSS가 추가됩니다. **서버에서 데이터를 수집하고 차트 HTML까지 생성해서 보내는 방식입니다.**
 </Aside>
 
 ### 추가되는 시각화 요소
@@ -194,7 +194,7 @@ Python 서버 코드는 2차시와 동일합니다. `make_page()` 함수 안의 
 </div>
 
 <div class="teacher-script">
-  <p>"서버(Python)는 2차시랑 완전 같아요. <strong>그래프는 브라우저(스마트폰)가 그립니다.</strong> JavaScript가 데이터를 받아서 Canvas에 그리는 거예요."</p>
+  <p>"서버(Python)는 2차시랑 같은 구조예요. <strong>make_page() 함수 안에서 데이터를 수집하고, SVG나 CSS로 차트를 그려서 HTML에 포함시킵니다.</strong>"</p>
 </div>
 
 ### JavaScript에 추가된 함수

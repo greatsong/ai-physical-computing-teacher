@@ -788,37 +788,37 @@ while True:
                 body = json.dumps({"temp": t, "hum": h})
             except:
                 body = json.dumps({"temp": "--", "hum": "--"})
-            hdr = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
-            client.send(hdr.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
 
         elif 'GET /log' in request:
             # 기록된 데이터 전체
             body = json.dumps(data_log)
-            hdr = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
-            client.send(hdr.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
 
         elif 'GET /start' in request:
             recording = True
             start_time = time.ticks_ms()
             last_sample = time.ticks_ms()
             body = json.dumps({"status": "recording"})
-            hdr = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
-            client.send(hdr.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
             print("▶ 측정 시작!")
 
         elif 'GET /stop' in request:
             recording = False
             body = json.dumps({"status": "stopped"})
-            hdr = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
-            client.send(hdr.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
             print("⏹ 측정 정지")
 
         elif 'GET /reset' in request:
             data_log.clear()
             recording = False
             body = json.dumps({"status": "reset"})
-            hdr = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
-            client.send(hdr.encode()); client.send(body.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n")
+            client.send(body.encode())
             print("↺ 데이터 초기화")
             gc.collect()
 
@@ -828,8 +828,8 @@ while True:
         else:
             gc.collect()
             page = make_page()
-            hdr = f"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: {len(page.encode())}\r\nConnection: close\r\n\r\n"
-            client.send(hdr.encode()); client.send(page.encode())
+            client.send(b"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n")
+            client.send(page.encode())
 
         client.close(); gc.collect()
     except Exception as e:
