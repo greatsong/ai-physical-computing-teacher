@@ -383,17 +383,68 @@ WIFI_PASSWORD = "비밀번호"
     #   ↑ 내 IP          ↑ 서브넷           ↑ 게이트웨이       ↑ DNS
     ```
 
-    <Aside type="note" title="이 4개 숫자가 뭔가요?">
-    네트워크를 **아파트 단지**에 비유하면 이해하기 쉬워요:
+    <div style="background:#1a1a3e; border:1px solid #2a2a5e; border-radius:12px; padding:20px; margin:16px 0; font-family:monospace;">
+      <div style="text-align:center; color:#888; font-size:0.85em; margin-bottom:12px;">wlan.ifconfig() 결과 해석</div>
+      <div style="display:flex; justify-content:center; gap:6px; flex-wrap:wrap; margin-bottom:16px;">
+        <div style="background:#2d4a7a; color:#7cc4ff; padding:8px 12px; border-radius:8px; text-align:center;">
+          <div style="font-size:0.7em; color:#888;">네트워크 주소</div>
+          <div style="font-size:1.2em; font-weight:bold;">192.168.0</div>
+        </div>
+        <div style="color:#555; align-self:center; font-size:1.4em;">.</div>
+        <div style="background:#2d6a4a; color:#7cffb4; padding:8px 12px; border-radius:8px; text-align:center;">
+          <div style="font-size:0.7em; color:#888;">기기 번호</div>
+          <div style="font-size:1.2em; font-weight:bold;">15</div>
+        </div>
+        <div style="color:#555; align-self:center; margin:0 8px;">=</div>
+        <div style="background:#1a1a3e; border:1px solid #444; color:#ccc; padding:8px 12px; border-radius:8px; text-align:center;">
+          <div style="font-size:0.7em; color:#888;">내 IP 주소</div>
+          <div style="font-size:1.1em;">192.168.0.15</div>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; max-width:400px; margin:0 auto;">
+        <div style="background:#2a2a5e; padding:10px; border-radius:8px; text-align:center;">
+          <div style="font-size:1.1em;">🔢 서브넷 마스크</div>
+          <div style="color:#ffd43b; font-size:0.95em; margin-top:4px;">255.255.255.0</div>
+          <div style="color:#888; font-size:0.75em; margin-top:2px;">→ 앞 3자리가 같으면 "같은 네트워크"</div>
+        </div>
+        <div style="background:#2a2a5e; padding:10px; border-radius:8px; text-align:center;">
+          <div style="font-size:1.1em;">🚪 게이트웨이</div>
+          <div style="color:#ff922b; font-size:0.95em; margin-top:4px;">192.168.0.1</div>
+          <div style="color:#888; font-size:0.75em; margin-top:2px;">→ 인터넷 출입구 = 공유기 주소</div>
+        </div>
+      </div>
+    </div>
 
-    | 용어 | 아파트 비유 | 실제 의미 | 예시 |
-    |------|-----------|----------|------|
-    | **IP 주소** | 우리집 주소 (101동 1501호) | 네트워크에서 이 기기의 고유 주소 | `192.168.0.15` |
-    | **서브넷 마스크** | 아파트 단지의 범위 | "같은 네트워크"의 범위를 정하는 규칙 | `255.255.255.0` |
-    | **게이트웨이** | 단지 정문 (관리실) | 외부 인터넷으로 나가는 출입구 = 공유기 주소 | `192.168.0.1` |
-    | **DNS** | 114 안내전화 | 도메인 이름을 IP로 변환해주는 서버 | `8.8.8.8` |
+    <div style="background:#1a1a3e; border:1px solid #2a2a5e; border-radius:12px; padding:20px; margin:16px 0;">
+      <div style="text-align:center; color:#888; font-size:0.85em; margin-bottom:12px;">같은 네트워크 = 서로 접속 가능!</div>
+      <div style="display:flex; justify-content:center; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div style="text-align:center;">
+          <div style="font-size:1.8em;">📡</div>
+          <div style="color:#ff922b; font-size:0.85em; font-weight:bold;">공유기</div>
+          <div style="color:#888; font-size:0.75em;">192.168.0.<strong style="color:#ff922b;">1</strong></div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <div style="color:#51cf66; font-size:0.8em;">━━ Wi-Fi ━━</div>
+          <div style="color:#51cf66; font-size:0.8em;">━━ Wi-Fi ━━</div>
+        </div>
+        <div style="display:flex; gap:16px;">
+          <div style="text-align:center;">
+            <div style="font-size:1.8em;">🔌</div>
+            <div style="color:#7cc4ff; font-size:0.85em; font-weight:bold;">Pico</div>
+            <div style="color:#888; font-size:0.75em;">192.168.0.<strong style="color:#7cffb4;">15</strong></div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:1.8em;">💻</div>
+            <div style="color:#7cc4ff; font-size:0.85em; font-weight:bold;">내 노트북</div>
+            <div style="color:#888; font-size:0.75em;">192.168.0.<strong style="color:#7cffb4;">42</strong></div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center; margin-top:12px; color:#51cf66; font-size:0.85em;">앞 3자리(192.168.0)가 같으니까 → 노트북에서 Pico에 접속 가능! ✅</div>
+    </div>
 
-    **서브넷 마스크**가 `255.255.255.0`이면 → IP의 앞 3자리(`192.168.0`)가 같은 기기들이 "같은 네트워크"예요. Pico와 노트북이 같은 네트워크에 있어야 서로 접속할 수 있어요!
+    <Aside type="caution" title="Pico에 접속이 안 될 때">
+    노트북/스마트폰이 Pico와 **다른 네트워크**에 연결되어 있으면 접속할 수 없어요. 예를 들어 Pico는 `192.168.0.x`인데 스마트폰이 `172.30.x.x`(학교 Wi-Fi)에 연결되어 있으면 서브넷이 달라서 접속 불가! 둘 다 **같은 Wi-Fi**에 연결되어 있는지 확인하세요.
     </Aside>
 
     공유기마다 대역이 다르므로 **반드시 직접 확인**하세요:
@@ -962,16 +1013,32 @@ while True:
 
 ### 네트워크 개념 — 교사 배경지식
 
-학생 교재에서 "아파트 단지" 비유를 사용합니다. 학생이 질문하면 아래 내용으로 보충 설명해주세요.
+학생 교재에서는 IP 주소를 **색상 구분 다이어그램**으로 시각화합니다. 학생이 질문하면 아래 내용으로 보충 설명해주세요.
+
+<div class="compare-cards">
+  <div class="compare-card old" style="flex:1;">
+    <div class="compare-title">서브넷 255.255.255.0 (가정)</div>
+    <div class="compare-item">앞 3자리가 "동네 주소"</div>
+    <div class="compare-item">마지막 1자리가 "기기 번호"</div>
+    <div class="compare-item">같은 동네 = 최대 254대</div>
+  </div>
+  <div class="compare-arrow">vs</div>
+  <div class="compare-card new" style="flex:1;">
+    <div class="compare-title">서브넷 255.255.0.0 (학교)</div>
+    <div class="compare-item">앞 2자리가 "동네 주소"</div>
+    <div class="compare-item">뒤 2자리가 "기기 번호"</div>
+    <div class="compare-item">같은 동네 = 최대 65,534대</div>
+  </div>
+</div>
 
 <div class="key-terms">
   <dl>
     <dt>IP 주소 (Internet Protocol Address)</dt>
     <dd>네트워크에서 각 기기를 식별하는 고유 주소. <code>192.168.0.15</code>처럼 4개 숫자(0~255)를 점으로 구분. 같은 네트워크에 같은 IP가 두 개 있으면 <strong>IP 충돌</strong>이 발생하여 둘 다 접속 불가.</dd>
     <dt>서브넷 마스크 (Subnet Mask)</dt>
-    <dd>"같은 네트워크"의 범위를 결정하는 규칙. <code>255.255.255.0</code>이면 IP의 앞 3자리가 같은 기기끼리 직접 통신 가능 (예: <code>192.168.0.x</code> 범위). <code>255.255.0.0</code>이면 앞 2자리까지 (예: <code>172.30.x.x</code> 범위, 학교 네트워크). Pico 웹서버에 접속하려면 <strong>같은 서브넷에 있어야</strong> 합니다.</dd>
+    <dd>"같은 네트워크"의 범위를 결정하는 규칙. 255 = "이 자리는 네트워크 주소(고정)", 0 = "이 자리는 기기 번호(변동)". 학생에게는 <strong>"앞 3자리가 같으면 같은 네트워크"</strong>라고 안내하면 충분합니다.</dd>
     <dt>게이트웨이 (Gateway)</dt>
-    <dd>내부 네트워크와 외부 인터넷을 연결하는 출입구 = <strong>공유기(라우터)의 IP 주소</strong>. 보통 서브넷의 첫 번째 주소(예: <code>192.168.0.1</code>). 웹 브라우저에 게이트웨이 IP를 입력하면 공유기 관리 페이지가 뜸.</dd>
+    <dd>내부 네트워크와 외부 인터넷을 연결하는 출입구 = <strong>공유기(라우터)의 IP 주소</strong>. 보통 서브넷의 첫 번째 주소(예: <code>.1</code>). 브라우저에 게이트웨이 IP를 입력하면 공유기 관리 페이지가 뜸.</dd>
     <dt>DHCP (Dynamic Host Configuration Protocol)</dt>
     <dd>공유기가 연결된 기기에 <strong>자동으로 IP를 배정</strong>하는 기능. 기본 코드에서는 DHCP로 자동 IP를 받음. 정적 IP를 설정하면 DHCP를 무시하고 지정한 IP를 사용.</dd>
     <dt>DNS (Domain Name System)</dt>
@@ -981,11 +1048,13 @@ while True:
 
 <Aside type="tip" title="학생 질문 예상 답변">
 
-**"서브넷이 왜 255.255.255.0인가요?"** → "255는 '이 자리는 네트워크 주소', 0은 '이 자리는 기기 주소'라는 뜻이에요. 255.255.255.0이면 마지막 숫자만 기기를 구분하니까 최대 254대까지 연결할 수 있어요."
+**"서브넷 255가 뭔가요?"** → "255는 '이 자리는 바뀌면 안 되는 네트워크 주소'라는 뜻이에요. 0은 '이 자리는 기기마다 다른 번호'라는 뜻이고요."
 
-**"학교는 왜 255.255.0.0인가요?"** → "학교는 기기가 훨씬 많으니까 뒤의 2자리를 기기 주소로 쓰는 거예요. 최대 65,534대까지 가능해요."
+**"학교는 왜 255.255.0.0인가요?"** → "학교는 기기가 훨씬 많으니까 뒤의 2자리를 기기 주소로 쓰는 거예요. 가정은 254대, 학교는 65,534대까지 가능해요."
 
-**"게이트웨이를 왜 써야 해요?"** → "Pico끼리 통신할 때는 안 써도 되지만, 인터넷에 접속하려면 '출입구'를 알려줘야 해요."
+**"왜 같은 Wi-Fi에 연결해야 해요?"** → "Pico 웹서버는 인터넷에 공개된 게 아니라 같은 공유기 안에서만 접속할 수 있어요. 학생 교재 다이어그램처럼, 같은 공유기에 연결된 기기들끼리만 서로 찾을 수 있어요."
+
+**"게이트웨이를 왜 써야 해요?"** → "Pico끼리 통신할 때는 안 써도 되지만, 정적 IP를 설정할 때 빈칸으로 두면 에러가 나서 넣어주는 거예요."
 </Aside>
 
 ### Wi-Fi 환경별 설정 가이드
