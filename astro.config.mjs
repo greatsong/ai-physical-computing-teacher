@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-sections';
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -130,6 +131,9 @@ export default defineConfig({
           ],
         },
       ],
+      expressiveCode: {
+        plugins: [pluginCollapsibleSections()],
+      },
       customCss: ['./src/styles/custom.css'],
     }),
     react(),

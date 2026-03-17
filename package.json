@@ -12,6 +12,7 @@
   "dependencies": {
     "@astrojs/react": "^4.4.2",
     "@astrojs/starlight": "^0.37.6",
+    "@expressive-code/plugin-collapsible-sections": "^0.41.7",
     "@tailwindcss/vite": "^4.2.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
