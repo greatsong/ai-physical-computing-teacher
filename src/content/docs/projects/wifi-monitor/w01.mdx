@@ -324,12 +324,12 @@ WIFI_PASSWORD = "비밀번호"
 
 <Tabs>
   <TabItem label="🏫 학교에서">
-    학교 Wi-Fi(예: `senWiFi_Free`)는 보통 **개방형(비밀번호 없음)**이에요. Pico는 **2.4GHz만 지원**하므로 5GHz 전용 네트워크는 사용할 수 없어요.
+    학교 Wi-Fi는 **비밀번호가 설정**되어 있어요. 선생님이 SSID와 비밀번호를 칠판에 적어줄 거예요. Pico는 **2.4GHz만 지원**하므로 5GHz 전용 네트워크는 사용할 수 없어요.
 
     ```python
     # wifi_config.py — 학교 버전
-    WIFI_SSID = "senWiFi_Free"
-    WIFI_PASSWORD = ""
+    WIFI_SSID = "학교Wi-Fi이름"        # 선생님이 알려준 SSID
+    WIFI_PASSWORD = "학교Wi-Fi비밀번호"  # 선생님이 알려준 비밀번호
     ```
 
     <Aside type="tip" title="IP를 고정하고 싶다면">
@@ -337,8 +337,8 @@ WIFI_PASSWORD = "비밀번호"
 
     ```python
     # wifi_config.py — 학교 정적 IP 버전
-    WIFI_SSID = "senWiFi_Free"
-    WIFI_PASSWORD = ""
+    WIFI_SSID = "학교Wi-Fi이름"
+    WIFI_PASSWORD = "학교Wi-Fi비밀번호"
 
     STATIC_IP = "172.30.6.10"    # 다른 기기와 안 겹치는 번호
     SUBNET    = "255.255.0.0"    # 학교 네트워크는 보통 /16 대역
@@ -391,7 +391,7 @@ WIFI_PASSWORD = "비밀번호"
     |------|------|-----|
     | 대역 | `172.30.x.x` | `192.168.0.x` 또는 `192.168.1.x` |
     | 서브넷 | `255.255.0.0` | `255.255.255.0` |
-    | 비밀번호 | 없음 (개방형) | 있음 |
+    | 비밀번호 | 있음 (선생님이 안내) | 있음 |
     | 게이트웨이 | `172.30.0.1` | `192.168.0.1` |
     </Aside>
 
@@ -407,7 +407,7 @@ WIFI_PASSWORD = "비밀번호"
 
 <div class="code-file-label">main.py — Pico에 저장</div>
 
-```python
+```python collapse={10-181}
 # ============================================
 # 교실 Wi-Fi 모니터 - 1차시 기본 코드
 # Pico 2 WH 웹서버 + 자기소개 페이지
@@ -931,12 +931,12 @@ while True:
 Pico 2 WH의 CYW43439 칩은 **2.4GHz Wi-Fi만 지원**합니다. 5GHz 전용 네트워크에는 연결할 수 없어요. 학교·집 모두 **2.4GHz 대역의 SSID**를 확인하세요. 최근 공유기는 2.4G와 5G를 같은 이름으로 통합하는 경우도 있는데, 이때 Pico는 자동으로 2.4G에 연결됩니다.
 </Aside>
 
-#### 학교 네트워크 (senWiFi_Free 등)
+#### 학교 네트워크
 
 | 항목 | 값 | 비고 |
 |------|-----|------|
-| SSID | `senWiFi_Free` | 서울시교육청 개방형 Wi-Fi |
-| 비밀번호 | 없음 (개방형) | `WIFI_PASSWORD = ""` |
+| SSID | 학교 관리자에게 확인 | **2.4GHz 대역** SSID 사용 |
+| 비밀번호 | 있음 | 수업 전 칠판에 게시 |
 | IP 대역 | `172.30.x.x` | 넓은 /16 대역 |
 | 서브넷 마스크 | `255.255.0.0` | |
 | 게이트웨이 | `172.30.0.1` (교실마다 다를 수 있음) | |
