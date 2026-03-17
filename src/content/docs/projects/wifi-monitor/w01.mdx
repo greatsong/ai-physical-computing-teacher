@@ -322,6 +322,83 @@ WIFI_SSID = "교실Wi-Fi이름"
 WIFI_PASSWORD = "비밀번호"
 ```
 
+<Tabs>
+  <TabItem label="🏫 학교에서">
+    학교 Wi-Fi(예: `senWiFi_Free`)는 보통 **개방형(비밀번호 없음)**이에요. Pico는 **2.4GHz만 지원**하므로 5GHz 전용 네트워크는 사용할 수 없어요.
+
+    ```python
+    # wifi_config.py — 학교 버전
+    WIFI_SSID = "senWiFi_Free"
+    WIFI_PASSWORD = ""
+    ```
+
+    <Aside type="tip" title="IP를 고정하고 싶다면">
+    DHCP가 자동으로 IP를 바꾸기 때문에, 매번 IP가 달라질 수 있어요. 아래처럼 **정적 IP**를 설정하면 항상 같은 주소로 접속할 수 있습니다.
+
+    ```python
+    # wifi_config.py — 학교 정적 IP 버전
+    WIFI_SSID = "senWiFi_Free"
+    WIFI_PASSWORD = ""
+
+    STATIC_IP = "172.30.6.10"    # 다른 기기와 안 겹치는 번호
+    SUBNET    = "255.255.0.0"    # 학교 네트워크는 보통 /16 대역
+    GATEWAY   = "172.30.0.1"     # 기본 게이트웨이
+    DNS       = "8.8.8.8"
+    ```
+
+    `main.py`에서 Wi-Fi 연결 직후에 한 줄 추가:
+
+    ```python
+    wlan.connect(WIFI_SSID, WIFI_PASSWORD)
+    while not wlan.isconnected():
+        time.sleep(1)
+    # ↓ 이 줄을 추가하면 IP 고정!
+    wlan.ifconfig((STATIC_IP, SUBNET, GATEWAY, DNS))
+    ```
+    </Aside>
+
+    **학교 IP 대역 확인법:** Thonny 셸에서 연결 후 `wlan.ifconfig()`를 실행하면 자동 할당된 IP, 서브넷, 게이트웨이를 확인할 수 있어요. 정적 IP를 설정할 때 이 값들을 참고하세요.
+  </TabItem>
+  <TabItem label="🏠 집에서">
+    집에 가져가서 실습하려면 `wifi_config.py`만 바꾸면 돼요! 집 공유기의 **2.4GHz SSID**를 확인하세요 (5GHz와 이름이 다를 수 있어요).
+
+    ```python
+    # wifi_config.py — 집 버전
+    WIFI_SSID = "우리집Wi-Fi이름"
+    WIFI_PASSWORD = "우리집비밀번호"
+    ```
+
+    **집 네트워크 대역 확인 방법:**
+    - **Windows:** `Win+R` → `cmd` → `ipconfig` → IPv4 주소 확인
+    - **Mac:** 시스템 설정 → Wi-Fi → 세부사항 → IP 주소 확인
+    - **스마트폰:** 설정 → Wi-Fi → 연결된 네트워크 → IP 주소
+
+    정적 IP를 쓰고 싶다면:
+
+    ```python
+    # wifi_config.py — 집 정적 IP 버전
+    WIFI_SSID = "우리집Wi-Fi이름"
+    WIFI_PASSWORD = "우리집비밀번호"
+
+    STATIC_IP = "192.168.0.200"    # 겹치지 않는 번호
+    SUBNET    = "255.255.255.0"    # 가정용은 보통 /24
+    GATEWAY   = "192.168.0.1"      # 공유기 주소 (보통 .1)
+    DNS       = "8.8.8.8"
+    ```
+
+    <Aside type="caution" title="학교 vs 집 — 핵심 차이">
+    | 항목 | 학교 | 집 |
+    |------|------|-----|
+    | 대역 | `172.30.x.x` | `192.168.0.x` 또는 `192.168.1.x` |
+    | 서브넷 | `255.255.0.0` | `255.255.255.0` |
+    | 비밀번호 | 없음 (개방형) | 있음 |
+    | 게이트웨이 | `172.30.0.1` | `192.168.0.1` |
+    </Aside>
+
+    `main.py`는 수정할 필요 없어요! `wifi_config.py`만 교체하면 어디서든 동일하게 작동합니다.
+  </TabItem>
+</Tabs>
+
 ### 파일 2: main.py (1차시 기본 코드)
 
 <Aside type="tip" title="복사 & 붙여넣기">
@@ -848,10 +925,74 @@ while True:
   </ol>
 </div>
 
+### Wi-Fi 환경별 설정 가이드
+
+<Aside type="caution" title="Pico 2 WH는 2.4GHz 전용!">
+Pico 2 WH의 CYW43439 칩은 **2.4GHz Wi-Fi만 지원**합니다. 5GHz 전용 네트워크에는 연결할 수 없어요. 학교·집 모두 **2.4GHz 대역의 SSID**를 확인하세요. 최근 공유기는 2.4G와 5G를 같은 이름으로 통합하는 경우도 있는데, 이때 Pico는 자동으로 2.4G에 연결됩니다.
+</Aside>
+
+#### 학교 네트워크 (senWiFi_Free 등)
+
+| 항목 | 값 | 비고 |
+|------|-----|------|
+| SSID | `senWiFi_Free` | 서울시교육청 개방형 Wi-Fi |
+| 비밀번호 | 없음 (개방형) | `WIFI_PASSWORD = ""` |
+| IP 대역 | `172.30.x.x` | 넓은 /16 대역 |
+| 서브넷 마스크 | `255.255.0.0` | |
+| 게이트웨이 | `172.30.0.1` (교실마다 다를 수 있음) | |
+
+**정적 IP 선택 시 주의:**
+- DHCP 자동 배포 범위(보통 100~200)를 피해 **낮은 번호(10~30)** 또는 **높은 번호(240~250)** 선택
+- 같은 교실에서 여러 Pico를 쓸 경우 학생마다 다른 번호 배정 (예: `172.30.6.10`, `172.30.6.11`, ...)
+- AP마다 VLAN이 다를 수 있으므로, 연결 후 `wlan.ifconfig()`로 자동 할당된 게이트웨이를 먼저 확인
+
+#### 가정 네트워크
+
+| 항목 | 값 | 비고 |
+|------|-----|------|
+| SSID | 공유기에 설정된 이름 | 2.4GHz 대역인지 확인! |
+| 비밀번호 | 있음 | `WIFI_PASSWORD = "비밀번호"` |
+| IP 대역 | `192.168.0.x` 또는 `192.168.1.x` | 좁은 /24 대역 |
+| 서브넷 마스크 | `255.255.255.0` | |
+| 게이트웨이 | `192.168.0.1` 또는 `192.168.1.1` | 공유기 관리 페이지 주소와 동일 |
+
+**학생이 집에서 실습하려면** `wifi_config.py`만 집 환경에 맞게 교체하면 됩니다. `main.py`는 수정 불필요!
+
+#### 정적 IP 적용 방법 (main.py 수정)
+
+정적 IP를 사용하려면 `wifi_config.py`에 IP 정보를 추가하고, `main.py`의 Wi-Fi 연결부에 한 줄을 추가합니다.
+
+```python
+# wifi_config.py에 추가
+STATIC_IP = "172.30.6.10"    # 원하는 IP
+SUBNET    = "255.255.0.0"    # 서브넷 마스크
+GATEWAY   = "172.30.0.1"     # 게이트웨이
+DNS       = "8.8.8.8"        # DNS 서버
+```
+
+```python
+# main.py — Wi-Fi 연결 직후에 추가
+from wifi_config import *
+
+wlan.connect(WIFI_SSID, WIFI_PASSWORD)
+while not wlan.isconnected():
+    time.sleep(1)
+
+# 정적 IP 설정 (이 줄 추가)
+wlan.ifconfig((STATIC_IP, SUBNET, GATEWAY, DNS))
+
+my_ip = wlan.ifconfig()[0]
+print(f"IP 고정 완료: {my_ip}")
+```
+
+<Aside type="tip" title="정적 IP는 선택사항">
+DHCP 자동 할당으로도 충분합니다. 정적 IP는 **매번 같은 주소로 접속하고 싶을 때**만 설정하세요. 처음 수업에서는 자동 할당을 권장합니다.
+</Aside>
+
 ### MicroPython 주의사항
 
 <Aside type="caution">
-- HTML 안에서 중괄호 `{}`를 쓸 때, f-string과 충돌하므로 `{{`, `}}`로 이스케이프 필요 (CSS 부분)
+- CSS를 별도 문자열 변수(`PAGE_CSS`)로 분리하면 f-string 중괄호 이스케이프(`{{`, `}}`) 없이 깔끔하게 작성 가능
 - `gc.collect()` 주기적 호출 권장 (메모리 관리)
 - 큰 HTML을 한 번에 `send()`하면 실패할 수 있음 — 현재 코드 수준에서는 문제없지만, 페이지가 커지면 분할 전송 필요
 </Aside>
@@ -861,8 +1002,10 @@ while True:
 | 증상 | 원인 | 해결 |
 |------|------|------|
 | Thonny에서 Pico 안 잡힘 | USB 케이블 / 드라이버 | 데이터 케이블로 교체, USB 재연결 |
-| Wi-Fi 연결 실패 | SSID/비밀번호 오류 또는 5GHz | wifi_config.py 확인, 2.4GHz 확인 |
+| Wi-Fi 연결 실패 | SSID/비밀번호 오류 또는 5GHz | wifi_config.py 확인, **2.4GHz SSID** 확인 |
 | `EADDRINUSE` | 이전 서버가 포트 점유 중 | Pico USB 재연결 (하드 리셋) |
 | 브라우저 접속 불가 | https 자동 변환 / 다른 네트워크 | Wi-Fi 확인, http:// 직접 입력 |
 | AI 코드에서 에러 | MicroPython 비호환 문법 | 프롬프트에 "MicroPython용" 명시 |
 | 한글 깨짐 | charset 누락 | `<meta charset="UTF-8">` 확인 |
+| IP가 매번 바뀜 | DHCP 자동 할당 | 정적 IP 설정 (위 가이드 참조) |
+| 집에서 연결 안 됨 | wifi_config.py가 학교 설정 | 집 SSID/비밀번호로 교체, 2.4GHz 확인 |
